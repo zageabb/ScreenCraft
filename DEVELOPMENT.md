@@ -111,3 +111,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - Found gap: table instances had no direct inspector for mock datasets and new tables could be blank/invisible because no dataset was assigned. Button-action Sample row (JSON) was not an editable table dataset.
 - New feature branch `fix/editable-table-sample-data`: new tables create an independent seed-reset dataset containing visible example columns and a record; Table Properties now has its own sample-data editor for columns/rows, including adding/removing rows and columns, changing values, and selecting existing datasets. Existing unbound table nodes show a visible placeholder with a Create sample dataset action.
 - Acceptance: add table, see sample row, edit it through inspector, add row, save and confirm the dataset appears in JSON/.scraft; recover old unbound table. Test in Chromium and CI before merging. Live Ubuntu retest remains separate.
+
+## Ubuntu acceptance improvement — editable screen names (2026-11-12)
+- User confirmed table sample-data editor is functioning on Ubuntu.
+- New screen names were fixed to `New Screen`, making multiple screens indistinguishable.
+- Added a screen-name input in the inspector, committing on blur/Enter. Screen IDs are preserved so existing button navigation and other references remain valid. Empty names are rejected and restored; Escape cancels the rename.
+- New screens use distinct initial names (`New Screen`, `New Screen 2`, etc.). Browser tests validate rename and saved JSON, stable navigation IDs and distinct default names. Live Ubuntu acceptance after deploy is pending.
