@@ -49,3 +49,12 @@
 .data-grid td>input:not([type="checkbox"]){min-width:70px;width:100%;max-width:200px;padding:3px 4px}
 .data-grid td>input[type="checkbox"]{margin:2px}
 .data-grid .muted{font-size:11px}
+
+/* Phase 9B: dataset-linked KPI cards and charts */
+.metric-configuration{border-top:1px solid #dce3ea;padding-top:8px;margin-top:14px}
+.sc-chart{display:flex;flex-direction:column;gap:5px;width:100%;height:100%;overflow:auto;font-size:12px}
+.sc-chart>strong{flex-shrink:0}
+.sc-chart svg{display:block;width:100%;height:65%;min-height:110px;flex:1}
+.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
+.sc-chart-legend span{display:inline-flex;gap:3px;align-items:center}
+.sc-chart-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
