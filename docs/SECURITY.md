@@ -6,3 +6,6 @@ A server-wide GitHub token is never exposed to the browser or `.scraft` document
 
 ## SQL concurrent writes
 Project saves require a matching document revision and perform an atomic conditional update. Project-shared prototype data writes require an expected dataset revision, with SQL row locking where supported. Do not disable these checks to bypass a conflict; reload and reconcile.
+
+## Optional UDA single sign-on
+In UDA mode, every API request requires a server-verifiable proxy assertion plus the verified UDA user identity; a previous Flask session cookie or client-set user header is not sufficient. The private Caddy integration MUST replace inbound identity headers with its authenticated identity and attach a separate 32+ character random server-only secret. Existing accounts link by matching username; new accounts default to non-admin with no project membership. Local login/bootstrap/logout/user-password provisioning are disabled while UDA mode is active. Live UDA/Caddy identity propagation is not yet verified. See docs/UDA_AUTHENTICATION.md.
