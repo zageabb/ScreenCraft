@@ -388,3 +388,42 @@ test('Phase 9C accordion can collapse and expand its content',async({page})=>{
  await toggle.click();
  await expect(toggle).toHaveAttribute('aria-expanded','true');
 });
+
+test('Phase 9D required field validation prevents invalid Preview add-row actions',async({page})=>{
+ await page.route('**/api/projects/p1',async route=>{
+   if(route.request().method()==='GET'){
+     const doc=structuredClone(app);
+     doc.screens[1].nodes.push({
+       id:'customer-input',type:'input',parent_id:null,
+       props:{placeholder:'Customer name',required:true,min_length:3},
+       layout:{x:425,y:20,width:220,height:45}
+     });
+     doc.screens[1].nodes.push({
+       id:'customer-add',type:'button',parent_id:null,
+       props:{label:'Add customer'},layout:{x:425,y:80,width:220,height:45},
+       action:{type:'add_mock_row',dataset_id:'people',values:{Status:'Active'},field_bindings:{Name:'customer-input'}}
+     });
+     await route.fulfill({status:200,contentType:'application/json',
+       body:JSON.stringify({id:'p1',revision:1,role:'owner',document:doc})});
+   }else await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({revision:2})});
+ });
+ await page.reload();
+ await page.getByRole('button',{name:'Open',exact:true}).click();
+ await page.getByRole('button',{name:'Customers',exact:true}).first().click();
+ await page.getByRole('button',{name:'input · customer-'}).click();
+ await expect(page.getByLabel('Required field')).toBeChecked();
+ await expect(page.getByLabel('Minimum characters')).toHaveValue('3');
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const add=page.locator('.canvas .prototype-button').filter({hasText:'Add customer'});
+ await add.click();
+ await expect(page.locator('.notice')).toContainText('Customer name is required');
+ await expect(page.locator('.canvas table tbody tr')).toHaveCount(1);
+ await page.locator('.canvas input[placeholder="Customer name"]').fill('AB');
+ await add.click();
+ await expect(page.locator('.notice')).toContainText('needs at least 3 characters');
+ await expect(page.locator('.canvas table tbody tr')).toHaveCount(1);
+ await page.locator('.canvas input[placeholder="Customer name"]').fill('Acme');
+ await add.click();
+ await expect(page.locator('.canvas table tbody tr')).toHaveCount(2);
+ await expect(page.locator('.canvas table')).toContainText('Acme');
+});
