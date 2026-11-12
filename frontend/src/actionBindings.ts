@@ -7,7 +7,7 @@ export function resolveActionRow(action:Action, nodes:Node[], inputValues:Record
    if(!id)continue;
    const source=nodes.find(node=>node.id===id);
    if(!source||!['input','select','checkbox','x-date','x-number','x-textarea'].includes(source.type))continue;
-   values[column]=inputValues[id]??(source.type==='checkbox'?false:source.props?.value??'');
+   values[column]=inputValues[id]??(source.type==='checkbox'?false:source.type==='select'?(source.props?.options?.[0]??''):source.props?.value??'');
  }
  return values;
 }
