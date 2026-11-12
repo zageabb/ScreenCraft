@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from uuid import uuid4
-from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select, update
+from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select, update, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 class Base(DeclarativeBase): pass
@@ -37,6 +37,12 @@ class PrototypeSession(Base):
 
 def connect(url: str, auto_create: bool = False):
     engine = create_engine(url, future=True, pool_pre_ping=True)
+    if engine.dialect.name == 'sqlite':
+        @event.listens_for(engine, 'connect')
+        def _sqlite_foreign_keys(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute('PRAGMA foreign_keys=ON')
+            cursor.close()
     if auto_create: Base.metadata.create_all(engine) # for tests or opted-in local development only
     return engine
 
@@ -48,7 +54,9 @@ def create_user(engine, username, hashed_password, is_admin=False):
 def create_project(engine, user_id, name, archive):
     with Session(engine) as db:
         p=Project(id=str(uuid4()),name=name,owner_id=user_id,revision=1,archive=archive)
-        db.add(p);db.add(Membership(project_id=p.id,user_id=user_id,role="owner"))
+        db.add(p)
+        db.flush()  # Insert parent row before the membership FK is inserted (PostgreSQL).
+        db.add(Membership(project_id=p.id,user_id=user_id,role="owner"))
         db.commit();return p.id
 
 def get_role(db, project_id, user_id):
@@ -94,7 +102,7 @@ def mutate_rows(engine, project_id, user_id, dataset_id, mode, seed_rows, operat
             rows=list(seed_rows)
             if operation=="add": rows.append(values or {})
             return {"rows":rows,"revision":0}
-        key_user = user_id if mode=="session-persisted" else "shared"
+        key_user = user_id  # Shared sessions still reference a real creator for the user FK.
         key= session_id or ("shared:"+project_id+":"+dataset_id if mode=="project-shared" else None)
         if not key: raise ValueError("Session ID required")
         item=db.get(PrototypeSession,key,with_for_update=(mode=="project-shared"))
