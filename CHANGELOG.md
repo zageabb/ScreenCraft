@@ -37,3 +37,9 @@ No runnable ScreenCraft application has been released.
 - Browser and package regression tests for deletion, nesting, ordering and unknown object preservation.
 
 - Added a per-screen Delete control to the Screens list beside reorder arrows. It confirms deletion, protects the last screen, updates the entry screen, clears dangling navigation references and supports Undo before Save.
+
+## Phase 6 — SCRAFT validation and import compatibility
+- Added reference/manifest/dataset/node/action/asset integrity checks and safer ZIP/JSON handling.
+- Resolves local ZIP JSON references and preserves compatible v1 minor metadata without silent version downgrades; rejects unsupported major formats and remote references.
+- Added a read-only /api/scraft/inspect endpoint and a two-step browser import workflow with visible compatibility warnings and user approval.
+- Added conformance and browser regression tests covering round trips, safety failures and failed imports without project mutation.

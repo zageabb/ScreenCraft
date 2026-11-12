@@ -7,6 +7,7 @@ import re
 from pathlib import PurePosixPath
 from uuid import uuid4
 from zipfile import ZipFile, ZIP_DEFLATED, BadZipFile
+from .conformance import validate_contract, ContractError
 
 MAX_ARCHIVE = 25 * 1024 * 1024
 MAX_EXPANDED = 100 * 1024 * 1024
@@ -19,7 +20,14 @@ class FormatError(ValueError):
 
 def _json(data: bytes, name: str):
     try:
-        result = json.loads(data.decode("utf-8"))
+        def no_duplicates(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError("Duplicate JSON key")
+                result[key] = value
+            return result
+        result = json.loads(data.decode("utf-8"), object_pairs_hook=no_duplicates)
     except (UnicodeError, ValueError) as exc:
         raise FormatError("Invalid JSON in " + name) from exc
     if not isinstance(result, dict):
@@ -74,6 +82,25 @@ def _validate(manifest, app):
                 raise FormatError("Missing navigation target")
     return True
 
+def _resolve_internal_refs(z, document, names):
+    """Resolve standard local ZIP references to a self-contained application model."""
+    def resolve(value, trail=()):
+        if isinstance(value, dict) and "$ref" in value:
+            if len(value) != 1 or not isinstance(value["$ref"], str):
+                raise FormatError("Invalid local JSON reference")
+            path = value["$ref"]
+            _safe_path(path)
+            if (path.startswith("assets/") or not path.endswith(".json") or
+                    path not in names or path in trail or len(trail) > 16):
+                raise FormatError("Missing, cyclic or unsafe ZIP JSON reference: " + path)
+            return resolve(_json(z.read(path), path), trail + (path,))
+        if isinstance(value, list):
+            return [resolve(item, trail) for item in value]
+        if isinstance(value, dict):
+            return {key: resolve(item, trail) for key, item in value.items()}
+        return value
+    return resolve(document)
+
 def read_document(blob: bytes):
     if len(blob) > MAX_ARCHIVE:
         raise FormatError("Archive too large")
@@ -96,7 +123,7 @@ def read_document(blob: bytes):
             if "manifest.json" not in names or "application.json" not in names:
                 raise FormatError("Missing required files")
             manifest = _json(z.read("manifest.json"), "manifest.json")
-            app = _json(z.read("application.json"), "application.json")
+            app = _resolve_internal_refs(z, _json(z.read("application.json"), "application.json"), names)
             _validate(manifest, app)
             for name in names:
                 if name.startswith("assets/") and not name.endswith("/"):
@@ -109,6 +136,10 @@ def read_document(blob: bytes):
                     if ext == ".webp" and data[8:12] != b"WEBP":
                         raise FormatError("Invalid WebP")
                     assets[name] = data
+            try:
+                validate_contract(manifest, app, assets, verify_assets=True)
+            except ContractError as exc:
+                raise FormatError(str(exc)) from exc
             return manifest, app, assets
     except (OSError, ValueError, KeyError, EOFError, BadZipFile) as exc:
         if isinstance(exc, FormatError):
@@ -119,13 +150,18 @@ def make_document(app: dict, assets: dict | None = None, manifest: dict | None =
     assets = assets or {}
     now = datetime.now(timezone.utc).isoformat()
     manifest = dict(manifest or {})
-    manifest.update({"format": "screencraft", "format_version": "1.0.0", "entry": "application.json"})
+    manifest.setdefault("format_version", "1.0.0")
+    manifest.update({"format": "screencraft", "entry": "application.json"})
     manifest.setdefault("document_id", str(uuid4()))
     manifest.setdefault("document_revision", 1)
     manifest.setdefault("name", app.get("name", "Untitled"))
     manifest.setdefault("created_at", now)
     manifest["updated_at"] = now
     _validate(manifest, app)
+    try:
+        validate_contract(manifest, app, assets, verify_assets=True)
+    except ContractError as exc:
+        raise FormatError(str(exc)) from exc
     for name, data in assets.items():
         _safe_path(name)
         ext = PurePosixPath(name).suffix.lower()

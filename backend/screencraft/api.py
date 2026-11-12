@@ -19,6 +19,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .package import FormatError, read_document, make_document, starter_app, MAX_ARCHIVE
+from .conformance import validate_contract
 from .export import interactive_html
 from .store import connect, User, Project, Membership, create_user, create_project, get_project, update_project, set_membership, get_role, mutate_rows
 
@@ -203,6 +204,20 @@ def create_app(config=None):
         new=make_document(document,assets,manifest)
         revision=update_project(engine,project_id,session["user_id"],new,int(payload.get("revision",0)))
         return jsonify(revision=revision)
+    @app.post("/api/scraft/inspect")
+    @auth
+    def inspect_scraft():
+        """Read-only preflight: no project mutation, credentials or archive payload in response."""
+        uploaded=request.files.get("file")
+        if not uploaded:
+            return jsonify(error="Missing .scraft file"),400
+        blob=uploaded.read(MAX_ARCHIVE+1)
+        manifest,document,assets=read_document(blob)
+        warnings=validate_contract(manifest,document,assets,verify_assets=True)
+        return jsonify(valid=True,compatible=True,format_version=manifest["format_version"],
+            name=document.get("name",""),screen_count=len(document["screens"]),
+            warnings=warnings,asset_count=len(assets))
+
     @app.get("/api/projects/<project_id>/download")
     @auth
     def download(project_id):
@@ -213,10 +228,13 @@ def create_app(config=None):
     def upload(project_id):
         if "file" not in request.files:return jsonify(error="Missing file"),400
         blob=request.files["file"].read(MAX_ARCHIVE+1)
-        read_document(blob)
+        manifest,document,assets=read_document(blob)
+        warnings=validate_contract(manifest,document,assets,verify_assets=True)
+        # Normalize split references into a portable, self-contained ZIP on import.
+        blob=make_document(document,assets,manifest)
         rev=int(request.form.get("revision",0))
         revision=update_project(engine,project_id,session["user_id"],blob,rev)
-        return jsonify(revision=revision)
+        return jsonify(revision=revision,warnings=warnings)
     @app.get("/api/projects/<project_id>/export/html")
     @auth
     def export_html(project_id):
