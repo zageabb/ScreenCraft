@@ -1,17 +1,26 @@
 """Standalone offline prototype HTML exporter with restricted declarative actions."""
 import html
 import json
+import base64
+import mimetypes
 from .package import _validate, FormatError
 
-def interactive_html(app: dict) -> str:
+def interactive_html(app: dict, assets: dict | None = None) -> str:
     _validate({"format":"screencraft","format_version":"1.0.0","entry":"application.json"}, app)
     payload=json.dumps(app,ensure_ascii=True,separators=(",",":")).replace("<","\\u003c").replace(">","\\u003e").replace("&","\\u0026")
+    import hashlib
+    images={}
+    for path, content in (assets or {}).items():
+        mime=mimetypes.guess_type(path)[0] or "application/octet-stream"
+        images[path]="data:"+mime+";base64,"+base64.b64encode(content).decode("ascii")
+    asset_payload=json.dumps(images,ensure_ascii=True).replace("<","\\u003c").replace(">","\\u003e").replace("&","\\u0026")
     title=html.escape(str(app.get("name","ScreenCraft Prototype")),quote=True)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>"""+title+"""</title><style>
 :root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}
-</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script>
+</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
+const assetUris=JSON.parse(document.getElementById('sc-assets').textContent);
 const screens=Object.fromEntries(app.screens.map(s=>[s.id,s]));
 let active=app.start_screen,history=[],modal=null,message='',theme=app.default_theme||'light';
 let datasets=Object.fromEntries((app.datasets||[]).map(d=>[d.id,structuredClone(d.rows||[])]));
@@ -36,7 +45,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'input':x=el('input');x.placeholder=p.placeholder||'';x.value=p.value||'';break;
  case 'select':x=el('select');(p.options||[]).forEach(v=>{let o=el('option',typeof v==='string'?v:v.label);o.value=typeof v==='string'?v:v.value;x.append(o)});break;
  case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;x.append(c,el('span',p.label||''));break;
- case 'image':x=el('div','Image: '+(p.asset||'not embedded'));break;
+ case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
  case 'table':{x=el('div');x.className='sc-table';let t=el('table'),data=datasets[p.dataset_id]||[],definition=(app.datasets||[]).find(d=>d.id===p.dataset_id);let cols=(definition?.columns||[]).map(c=>c.id);if(!cols.length)cols=Object.keys(data[0]||{});let tr=el('tr');cols.forEach(k=>tr.append(el('th',k)));t.append(tr);data.forEach(row=>{let tr=el('tr');cols.forEach(k=>tr.append(el('td',row[k]??'')));t.append(tr)});x.append(t);break}
  case 'modal':x=el('div');if(modal!==n.id)return; x.className='sc-modal';x.append(el('h3',p.label||'Dialog'));break;
  default:x=el('section');if(p.label)x.append(el('h3',p.label));break;
@@ -59,4 +68,4 @@ function render(){root.replaceChildren();menu.replaceChildren();
  (s.nodes||[]).filter(n=>!n.parent_id||!nodes.has(n.parent_id)).forEach(n=>build(n,wrapper));
  if(message)root.append(el('div',message));}
 render();
-</script><script type="application/json" id="sc-document">"""+payload+"""</script></body></html>"""
+</script></body></html>"""
