@@ -73,3 +73,9 @@ All items remain proposals, not implemented or tested.
 8. Pin dependency lockfiles and perform dependency/security/licence checks. A fresh-clone Docker build on Ubuntu and a backup/restore test are pending.
 
 **Merge policy:** only merge implementation after relevant green CI and review of outstanding blockers. Completing initial code is not equivalent to release acceptance.
+
+## Browser regression test expansion — 2026-11-12
+- Added Playwright Chromium smoke tests for object palette insertion, theme switching, screen navigation and mock Add Record.
+- CI now includes a `browser` job with a Vite test server and intercepted synthetic API fixtures. This is editor behavioural verification, **not** a complete real-backend/browser integration test.
+- Added initial Alembic upgrade/downgrade test and Caddy forwarded-prefix/cookie-scope test.
+- New acceptance gate: Playwright browser job green; verify errors and correct before marking these browser behaviours tested. Real Ubuntu/Caddy remains manual acceptance pending.
