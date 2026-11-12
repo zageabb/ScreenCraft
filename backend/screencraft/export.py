@@ -25,6 +25,37 @@ const screens=Object.fromEntries(app.screens.map(s=>[s.id,s]));
 const screenList=(app.screen_order||app.screens.map(s=>s.id)).map(id=>screens[id]).filter(Boolean);
 let active=app.start_screen,history=[],modal=null,message='',theme=app.default_theme||'light';
 let datasets=Object.fromEntries((app.datasets||[]).map(d=>[d.id,structuredClone(d.rows||[])]));
+const inputValues=Object.create(null);
+const SUPPORTED_INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea']);
+function selectValue(option){return typeof option==='string'?option:(option&&typeof option==='object'?(option.value??option.label??''):'')}
+function resolveActionRow(action,screen){
+ const row={...(action.values||{})};
+ const sources=new Map((screen?.nodes||[]).filter(n=>SUPPORTED_INPUTS.has(n.type)).map(n=>[n.id,n]));
+ for(const [column,id] of Object.entries(action.field_bindings||{})){
+  if(!id)continue;
+  const source=sources.get(id);
+  if(!source)continue;
+  const options=source.props?.options||[];
+  row[column]=Object.prototype.hasOwnProperty.call(inputValues,id)
+   ?inputValues[id]
+   :source.type==='checkbox'?false:
+    source.type==='select'?selectValue(options[0]??''):
+    (source.props?.value??'');
+ }
+ return row;
+}
+function captureInput(node,control,kind){
+ const id=node.id;
+ const read=()=>kind==='checkbox'?control.checked:control.value;
+ control.addEventListener(kind==='checkbox'?'change':'input',()=>{inputValues[id]=read()});
+ if(kind==='select')control.addEventListener('change',()=>{inputValues[id]=read()});
+ if(Object.prototype.hasOwnProperty.call(inputValues,id)){
+  if(kind==='checkbox')control.checked=Boolean(inputValues[id]);
+  else control.value=String(inputValues[id]??'');
+ }else{
+  inputValues[id]=read();
+ }
+}
 const root=document.getElementById('root'),menu=document.getElementById('menu');
 document.getElementById('title').textContent=app.name||'Prototype';
 function el(tag,text){const x=document.createElement(tag);if(text!==undefined)x.textContent=String(text);return x}
@@ -35,7 +66,15 @@ function action(a){if(!a||!a.type)return;
  else if(a.type==='close_modal')modal=null;
  else if(a.type==='message')message=String(a.text||'');
  else if(a.type==='toggle_visibility'){const t=document.querySelector('[data-node-id="'+CSS.escape(String(a.target_node||''))+'"]');if(t)t.hidden=!t.hidden;return}
- else if(a.type==='add_mock_row' && datasets[a.dataset_id])datasets[a.dataset_id].push(structuredClone(a.values||{}));
+ else if(a.type==='add_mock_row'){
+  if(!Object.prototype.hasOwnProperty.call(datasets,a.dataset_id)){
+   message='Choose an existing dataset for this button.';
+  }else{
+   const row=resolveActionRow(a,screens[active]);
+   if(!Object.keys(row).length){message='Configure fixed values or bind input fields for the new row.'}
+   else datasets[a.dataset_id].push(structuredClone(row));
+  }
+ }
  else if(a.type==='delete_mock_row' && datasets[a.dataset_id])datasets[a.dataset_id].splice(Number(a.row_index||0),1);
  else if(a.type==='set_mock_field' && datasets[a.dataset_id]){let row=datasets[a.dataset_id][Number(a.row_index||0)];if(row&&typeof a.field==='string')row[a.field]=a.value}
  render();}
@@ -43,16 +82,16 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  switch(n.type){
  case 'text':x=el('div',p.text||'Text');break;
  case 'button':x=el('button',p.label||'Button');x.addEventListener('click',()=>action(n.action));break;
- case 'input':x=el('input');x.placeholder=p.placeholder||'';x.value=p.value||'';break;
- case 'select':x=el('select');(p.options||[]).forEach(v=>{let o=el('option',typeof v==='string'?v:v.label);o.value=typeof v==='string'?v:v.value;x.append(o)});break;
- case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;x.append(c,el('span',p.label||''));break;
+ case 'input':x=el('input');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'input');break;
+ case 'select':x=el('select');(p.options||[]).forEach(v=>{let o=el('option',typeof v==='string'?v:v.label);o.value=selectValue(v);x.append(o)});captureInput(n,x,'select');break;
+ case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;captureInput(n,c,'checkbox');x.append(c,el('span',p.label||''));break;
  case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
  case 'table':{x=el('div');x.className='sc-table';let t=el('table'),data=datasets[p.dataset_id]||[],definition=(app.datasets||[]).find(d=>d.id===p.dataset_id);let cols=(definition?.columns||[]).map(c=>c.id);if(!cols.length)cols=Object.keys(data[0]||{});let tr=el('tr');cols.forEach(k=>tr.append(el('th',k)));t.append(tr);data.forEach(row=>{let tr=el('tr');cols.forEach(k=>tr.append(el('td',row[k]??'')));t.append(tr)});x.append(t);break}
  case 'modal':x=el('div');if(modal!==n.id)return; x.className='sc-modal';x.append(el('h3',p.label||'Dialog'));break;
  case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':x=el('section');x.className='sc-box'+(n.type==='x-card'?' sc-card':'');x.append(el('strong',p.label||n.type));break;
- case 'x-date':x=el('input');x.type='date';break;
- case 'x-number':x=el('input');x.type='number';x.placeholder=p.placeholder||'0';break;
- case 'x-textarea':x=el('textarea');x.placeholder=p.placeholder||'';break;
+ case 'x-date':x=el('input');x.type='date';x.value=p.value||'';captureInput(n,x,'date');break;
+ case 'x-number':x=el('input');x.type='number';x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
+ case 'x-textarea':x=el('textarea');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
  case 'x-kpi':x=el('div');x.className='sc-kpi';x.append(el('small',p.label||'KPI'),el('strong',p.value||'0'));break;
  case 'tabs':x=el('div',p.label||'Tabs');break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
