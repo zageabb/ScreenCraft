@@ -47,3 +47,23 @@ test('interactive preview navigates screens and adds mock record',async({page})=
  await expect(page.locator('.canvas table tbody tr')).toHaveCount(2);
  await expect(page.locator('.canvas table')).toContainText('New Person');
 });
+
+test('drag from component gallery and resize on canvas',async({page})=>{
+ const canvas=page.locator('.canvas');
+ const palette=page.locator('.palette button').filter({hasText:'text'});
+ await palette.dragTo(canvas,{targetPosition:{x:360,y:180}});
+ await expect(canvas.locator('.canvas-node')).toHaveCount(3);
+ const added=canvas.locator('.canvas-node').last();
+ await added.click();
+ const handle=added.locator('.resize-handle');
+ await expect(handle).toBeVisible();
+ const oldWidth=await added.evaluate(e=>e.getBoundingClientRect().width);
+ const box=await handle.boundingBox();
+ if(!box)throw Error('Missing resize handle');
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+ await page.mouse.down();
+ await page.mouse.move(box.x+box.width/2+80,box.y+box.height/2+40,{steps:8});
+ await page.mouse.up();
+ const newWidth=await added.evaluate(e=>e.getBoundingClientRect().width);
+ expect(newWidth).toBeGreaterThan(oldWidth);
+});
