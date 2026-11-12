@@ -276,3 +276,36 @@ test('screen delete confirmation can cancel without modifying design',async({pag
  await expect(page.getByRole('button',{name:'Delete screen Customers'})).toBeVisible();
  await expect(page.locator('.canvas .prototype-button')).toContainText(['Open customers']);
 });
+
+test('Phase 6 import preflight warns and needs explicit approval before replacing design',async({page})=>{
+ let inspectCount=0,saveCount=0;
+ await page.route('**/api/scraft/inspect',async route=>{
+   inspectCount++;
+   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+     valid:true,compatible:true,name:'Imported Design',format_version:'1.2.0',
+     screen_count:3,asset_count:1,warnings:['x-custom preserved as inactive placeholder']})});
+ });
+ await page.route('**/api/projects/p1/upload',async route=>{
+   saveCount++;
+   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({revision:2,warnings:[]})});
+ });
+ await page.getByLabel('Choose .scraft file').setInputFiles({name:'sample.scraft',mimeType:'application/zip',buffer:Buffer.from('zip-stub')});
+ const panel=page.getByRole('region',{name:'Import validation results'});
+ await expect(panel).toContainText('Imported Design');
+ await expect(panel).toContainText('x-custom preserved');
+ expect(inspectCount).toBe(1);
+ expect(saveCount).toBe(0);
+ await page.getByRole('button',{name:'Cancel import'}).click();
+ await expect(panel).toHaveCount(0);
+ expect(saveCount).toBe(0);
+ await page.getByLabel('Choose .scraft file').setInputFiles({name:'sample.scraft',mimeType:'application/zip',buffer:Buffer.from('zip-stub')});
+ await page.getByRole('button',{name:'Import validated design'}).click();
+ await expect.poll(()=>saveCount).toBe(1);
+});
+test('Phase 6 invalid ZIP shows error and cannot be approved',async({page})=>{
+ await page.route('**/api/scraft/inspect',route=>route.fulfill({
+   status:400,contentType:'application/json',body:JSON.stringify({error:'Invalid screen order'})}));
+ await page.getByLabel('Choose .scraft file').setInputFiles({name:'bad.scraft',mimeType:'application/zip',buffer:Buffer.from('bad')});
+ await expect(page.locator('.status')).toContainText('Invalid screen order');
+ await expect(page.getByRole('button',{name:'Import validated design'})).toHaveCount(0);
+});
