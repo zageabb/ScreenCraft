@@ -105,3 +105,9 @@ All items remain proposals, not implemented or tested.
 ### Root cause confirmed by Ubuntu/Desktop investigation
 PostgreSQL rejected the new owner membership because the parent project had not been flushed/inserted first. SQLAlchemy `create_project()` previously queued both objects without a relationship dependency and committed them together. The database generated an HTTP 500 HTML page; the frontend parsed that as JSON. **Caddy routing was not the cause.**
 Fix: explicitly `db.flush()` after adding the project and before adding its owner membership, within the same transaction (failure rolls back both). Enable `PRAGMA foreign_keys=ON` for SQLite test engines; add FK violation assertion and verify project/owner membership join. Other API/HTML diagnostics remain useful but are not the primary fix. Live PostgreSQL confirmation after deployment is still pending.
+
+## Ubuntu acceptance — Table prototype data editor (2026-11-12)
+- User confirmed application creation, visual drag/resize, button navigation, saving and .scraft operations work through Ubuntu/Caddy.
+- Found gap: table instances had no direct inspector for mock datasets and new tables could be blank/invisible because no dataset was assigned. Button-action Sample row (JSON) was not an editable table dataset.
+- New feature branch `fix/editable-table-sample-data`: new tables create an independent seed-reset dataset containing visible example columns and a record; Table Properties now has its own sample-data editor for columns/rows, including adding/removing rows and columns, changing values, and selecting existing datasets. Existing unbound table nodes show a visible placeholder with a Create sample dataset action.
+- Acceptance: add table, see sample row, edit it through inspector, add row, save and confirm the dataset appears in JSON/.scraft; recover old unbound table. Test in Chromium and CI before merging. Live Ubuntu retest remains separate.
