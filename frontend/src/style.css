@@ -68,3 +68,38 @@
 .sc-accordion>button{width:100%;text-align:left}
 .sc-accordion .nested-content{position:relative;min-height:60px}
 .sc-wizard-buttons{justify-content:flex-end}
+
+/* Phase 9.1: single shared app navigation and nested collapsible containers */
+.shared-preview-layout{display:flex;min-width:0;flex:1;min-height:0;overflow:hidden}
+.shared-preview-layout .workscroll{min-width:0;flex:1;max-height:calc(100vh - 155px)}
+.shared-preview-layout.nav-layout-right{flex-direction:row-reverse}
+.shared-preview-layout.nav-layout-top{flex-direction:column}
+.shared-app-nav{display:flex;flex-direction:column;flex:0 0 200px;max-width:240px;overflow:auto;gap:8px;border-right:1px solid #c6d0df;background:#edf3fc;padding:8px;min-height:0}
+.shared-app-nav.nav-right{border-right:0;border-left:1px solid #c6d0df}
+.shared-app-nav.nav-top{max-width:none;flex:0 0 auto;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid #c6d0df}
+.shared-app-nav.nav-top .shared-nav-items{display:flex;flex-wrap:wrap;gap:6px}
+.shared-app-nav.is-collapsed:not(.nav-top){flex-basis:48px}
+.shared-nav-controls{display:flex;align-items:center;gap:4px}
+.shared-app-nav button{cursor:pointer}
+.shared-nav-entry{min-width:0}
+.shared-nav-entry-row{display:flex;align-items:center;gap:2px}
+.shared-nav-entry-row>button:first-child{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shared-nav-entry-row button.is-active{background:#bdd7ff;color:#123b74;border-color:#84abd9;font-weight:700}
+.shared-nav-children{margin-left:16px;padding-left:7px;border-left:1px solid #a5b7ce}
+.shared-mobile-toggle{display:none}
+.shared-nav-editor{border-bottom:1px solid #d6e0ee;padding-bottom:8px}
+.shared-nav-editor summary{font-weight:700;cursor:pointer;margin:6px 0}
+.shared-nav-item-editor{margin:9px 0;padding:7px;border:1px solid #d9e1ed;border-radius:5px}
+.shared-nav-item-actions{display:flex;gap:4px}
+.sc-collapse-header{display:flex;justify-content:space-between;align-items:center;min-height:28px;padding:0 5px;font-size:12px}
+.sc-collapse-header button{padding:2px 7px}
+.sc-collapse-header strong{pointer-events:none}
+.collapse-properties{border-top:1px solid #d6e0ee;margin-top:14px;padding-top:8px}
+@media(max-width:700px){
+ .shared-preview-layout{flex-direction:column!important}
+ .shared-app-nav,.shared-app-nav.nav-top{flex:0 0 auto;max-width:none;width:100%;padding:5px;flex-direction:column;max-height:45vh}
+ .shared-app-nav .shared-nav-controls{justify-content:space-between}
+ .shared-app-nav .shared-mobile-toggle{display:inline-flex}
+ .shared-app-nav:not(.mobile-open) .shared-nav-items{display:none}
+ .shared-app-nav.nav-top .shared-nav-items{flex-direction:column}
+}
