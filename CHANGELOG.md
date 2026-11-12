@@ -21,3 +21,5 @@ No runnable ScreenCraft application has been released.
 - Production cause pending actual request/status evidence from Ubuntu; no remote deployment performed by this change.
 
 - Corrected PostgreSQL project creation: flush the new project row before creating the foreign-key dependent owner membership, atomically within one transaction. Enabled SQLite foreign-key enforcement in test DB connections and added regression coverage. Confirmed independent Desktop investigation excluded Caddy as the cause.
+
+- Added a direct Table sample-data editor with editable column names, sample cell values and add/remove rows and columns. New table objects now have visible default sample data; existing unbound tables offer explicit dataset creation. Kept button action JSON separate from the table data editor.

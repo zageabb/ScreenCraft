@@ -85,3 +85,45 @@ test('reports exact API endpoint and status when proxy returns HTML instead of J
  await expect(error).toContainText('text/html');
  await expect(error).not.toContainText('Unexpected token');
 });
+
+test('new table shows seed records and inspector edits persist in save payload',async({page})=>{
+ await page.locator('.palette button').filter({hasText:'table'}).click();
+ const table=page.locator('.canvas table').first();
+ await expect(table).toBeVisible();
+ await expect(table).toContainText('Example record');
+ const row=page.getByRole('textbox',{name:'Row 1 Name'});
+ await row.fill('Edited sample customer');
+ await expect(table).toContainText('Edited sample customer');
+ await page.getByRole('button',{name:'+ Sample row'}).click();
+ await page.getByRole('textbox',{name:'Row 2 Name'}).fill('Second customer');
+ await expect(table.locator('tbody tr')).toHaveCount(2);
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const request=await saved;
+ const payload=request.postDataJSON();
+ const node=payload.document.screens[0].nodes.find((n:any)=>n.type==='table');
+ expect(node).toBeTruthy();
+ const dataset=payload.document.datasets.find((d:any)=>d.id===node.props.dataset_id);
+ expect(dataset.rows[0].Name).toBe('Edited sample customer');
+ expect(dataset.rows[1].Name).toBe('Second customer');
+});
+test('existing unbound table can create its own dataset',async({page})=>{
+ // Simulate a design made with the earlier ScreenCraft release.
+ await page.route('**/api/projects/p1',async route=>{
+   if(route.request().method()==='GET'){
+     const old=structuredClone(app);
+     old.screens[0].nodes.push({id:'legacy-table',type:'table',parent_id:null,
+       props:{},layout:{x:80,y:180,width:420,height:220}});
+     await route.fulfill({status:200,contentType:'application/json',
+       body:JSON.stringify({id:'p1',revision:1,role:'owner',document:old})});
+   }else{
+     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({revision:2})});
+   }
+ });
+ await page.reload();
+ await page.getByRole('button',{name:'Open',exact:true}).click();
+ await expect(page.locator('.table-empty')).toBeVisible();
+ await page.getByRole('button',{name:'table · legacy-ta'}).click();
+ await page.getByRole('button',{name:'Create sample dataset'}).click();
+ await expect(page.locator('.canvas table')).toContainText('Example record');
+});
