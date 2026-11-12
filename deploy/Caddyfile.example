@@ -7,3 +7,14 @@ handle_path /apps/screencraft/* {
 }
 # Optional redirect for URL without trailing slash:
 redir /apps/screencraft /apps/screencraft/ 308
+
+# UDA identity integration (required BEFORE setting SCREENCRAFT_AUTH_MODE=uda):
+# In your trusted authenticated Caddy route, *overwrite* these two upstream
+# headers with server-trusted values. Do NOT pass browser-supplied identities.
+# See docs/UDA_AUTHENTICATION.md for the security contract and rollout tests.
+#
+# header_up X-UDA-User <UDA-authenticated-identity-placeholder>
+# header_up X-ScreenCraft-Proxy-Secret {$SCREENCRAFT_UDA_PROXY_SECRET}
+#
+# The verified user placeholder depends on your UDA auth middleware. It is
+# intentionally not guessed or activated by this example.
