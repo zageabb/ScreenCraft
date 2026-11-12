@@ -1,0 +1,740 @@
+{
+  "canonical_source": "zageabb/Application-Standard/standards/screencraft/object-catalogue.json",
+  "source_blob_sha": "e7c91d3325988cfa07e39171b713dc919344e813",
+  "catalogue_id": "screencraft-object-catalogue",
+  "catalogue_version": "1.0.0",
+  "objects": [
+    {
+      "id": "text",
+      "category": "Content",
+      "level": "core",
+      "description": "Static or dynamic textual content",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.text",
+        "style",
+        "layout"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "button",
+      "category": "Inputs",
+      "level": "core",
+      "description": "Trigger an action or navigation",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.label",
+        "action",
+        "disabled",
+        "style"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "input",
+      "category": "Inputs",
+      "level": "core",
+      "description": "Text or numeric entry",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.label",
+        "props.placeholder",
+        "bindings",
+        "validation"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "select",
+      "category": "Inputs",
+      "level": "core",
+      "description": "Choose a value from defined options",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.options",
+        "props.value",
+        "bindings"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "checkbox",
+      "category": "Inputs",
+      "level": "core",
+      "description": "Boolean selection",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.label",
+        "props.checked",
+        "bindings"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "table",
+      "category": "Data",
+      "level": "core",
+      "description": "Tabular data and optional mock interactions",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "column",
+          "row",
+          "cell"
+        ]
+      },
+      "property_groups": [
+        "props.dataset_id",
+        "props.columns",
+        "bindings"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "image",
+      "category": "Content",
+      "level": "core",
+      "description": "Packaged media",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.asset_id",
+        "props.alt",
+        "style"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "container",
+      "category": "Layout",
+      "level": "core",
+      "description": "Generic container with nested components",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "layout",
+        "style",
+        "children"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "tabs",
+      "category": "Navigation",
+      "level": "core",
+      "description": "Switch between labelled panels",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "tab",
+          "panel"
+        ]
+      },
+      "property_groups": [
+        "props.tabs",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "modal",
+      "category": "Overlay",
+      "level": "core",
+      "description": "Dialog with nested content",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props.title",
+        "action",
+        "layout"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-card",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-card extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-grid",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-grid extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-flex",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-flex extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-splitter",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-splitter extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-sidebar",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-sidebar extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-accordion",
+      "category": "Layout",
+      "level": "extension",
+      "description": "x-accordion extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-number",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-number extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-date",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-date extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-time",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-time extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-radio",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-radio extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-toggle",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-toggle extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-file-upload",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-file-upload extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-search",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-search extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-textarea",
+      "category": "Inputs",
+      "level": "extension",
+      "description": "x-textarea extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-editable-grid",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-editable-grid extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "column",
+          "row",
+          "cell"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-tree",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-tree extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "tree-node"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-list",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-list extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-record-detail",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-record-detail extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-kpi",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-kpi extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-chart",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-chart extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-pagination",
+      "category": "Data",
+      "level": "extension",
+      "description": "x-pagination extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-menu",
+      "category": "Navigation",
+      "level": "extension",
+      "description": "x-menu extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "menu-item"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-breadcrumbs",
+      "category": "Navigation",
+      "level": "extension",
+      "description": "x-breadcrumbs extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "breadcrumb"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-toolbar",
+      "category": "Navigation",
+      "level": "extension",
+      "description": "x-toolbar extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "*"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-wizard",
+      "category": "Navigation",
+      "level": "extension",
+      "description": "x-wizard extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "step"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-schema-map",
+      "category": "Advanced",
+      "level": "extension",
+      "description": "x-schema-map extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "schema-table",
+          "schema-link"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-timeline",
+      "category": "Advanced",
+      "level": "extension",
+      "description": "x-timeline extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "event"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-file-preview",
+      "category": "Advanced",
+      "level": "extension",
+      "description": "x-file-preview extension object",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-diagram",
+      "category": "Advanced",
+      "level": "extension",
+      "description": "x-diagram extension object",
+      "container": {
+        "supports_children": true,
+        "allowed_child_roles": [
+          "node",
+          "edge"
+        ]
+      },
+      "property_groups": [
+        "props",
+        "layout",
+        "style",
+        "bindings",
+        "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    }
+  ]
+}
