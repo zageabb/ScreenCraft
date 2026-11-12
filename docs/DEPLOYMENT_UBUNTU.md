@@ -26,3 +26,15 @@ Optional. Set `SCREENCRAFT_ALLOWED_REPOS` (comma-separated owner/repo) to explic
 Deployment not performed; GitHub Actions checks and local tests must be recorded in DEVELOPMENT.md. No exposure of live service has been requested from this chat.
 
 **Cookie configuration:** production Compose sets `SCREENCRAFT_COOKIE_PATH=/apps/screencraft` to scope the unique application session cookie to its Caddy prefix. For direct root-path local development set cookie path to `/` and keep the backend isolated.
+
+## Troubleshooting: 'Unexpected token <' / HTML returned for API
+If the application loads and login succeeds but creating a project reports invalid JSON, the browser received HTML where a JSON API response was expected. The updated frontend reports the failing method/path, HTTP status, Content-Type and redirect pathname. Check those details first.
+
+In browser DevTools > Network, select the failing `/apps/screencraft/api/...` request and inspect Status, Content-Type and Response (avoid sharing credentials/cookies). A 404 or 200 with the React HTML page points toward an incorrect route/fallback; a 502/503 indicates upstream/gateway trouble; a 500 with HTML may be an upstream server exception; a 302 to login indicates auth redirect. The status and content establish the next investigation step, not the other way round.
+
+From the Ubuntu host (with an existing authenticated browser session for protected routes) compare:
+```sh
+curl -i http://127.0.0.1:8085/api/health
+curl -i https://YOUR_HOST/apps/screencraft/api/health
+```
+Both should be JSON. Health alone does not establish that project POST works; use the Network tab when reproducing the project creation error. Caddy example must strip exactly one `/apps/screencraft` prefix before forwarding. Verify route ordering against existing Caddy/UDA handlers; preserve all other applications. Do not expose an unprotected production API to bypass gateway authentication.
