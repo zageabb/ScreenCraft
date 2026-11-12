@@ -54,3 +54,19 @@ def test_image_upload_bundled_export(app):
     assert path in assets and any(a["path"]==path for a in app_doc["assets"])
     assert c.get("/api/projects/"+pid+"/images/"+path.replace("assets/","")).status_code==200
     assert b"data:image/png;base64," in c.get("/api/projects/"+pid+"/export/html").data
+
+def test_caddy_prefix_headers_and_cookie_scope(tmp_path,monkeypatch):
+    monkeypatch.setenv("SCREENCRAFT_TRUST_PROXY","1")
+    monkeypatch.setenv("SCREENCRAFT_SETUP_KEY","caddy-setup-key")
+    scoped=create_app({"TESTING":True,"SQLALCHEMY_URL":"sqlite:///"+str(tmp_path/"proxy.db"),
+                       "SESSION_COOKIE_SECURE":True,"SESSION_COOKIE_PATH":"/apps/screencraft"})
+    client=scoped.test_client()
+    headers={"X-Forwarded-Prefix":"/apps/screencraft","X-Forwarded-Proto":"https"}
+    assert client.get("/api/health",headers=headers).status_code==200
+    resp=client.post("/api/bootstrap",headers=headers,
+         json={"setup_key":"caddy-setup-key","username":"proxyadmin","password":"a-long-proxy-password!"})
+    assert resp.status_code==201
+    cookie=resp.headers["Set-Cookie"]
+    assert "Path=/apps/screencraft" in cookie
+    assert "Secure" in cookie and "HttpOnly" in cookie
+    assert "screencraft_session" in cookie
