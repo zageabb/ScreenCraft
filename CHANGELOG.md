@@ -27,3 +27,11 @@ No runnable ScreenCraft application has been released.
 - Added an editable screen name field in the inspector and distinct default names for new screens. Renaming preserves screen IDs and existing navigation links.
 
 - Added opt-in UDA single sign-on to reuse the reverse-proxy authenticated identity without a second ScreenCraft password. Preserves accounts/projects by matching the existing username, creates least-privilege accounts for new UDA users and disables local credential endpoints in UDA mode. Deployment requires verified UDA identity forwarding plus protected proxy secret; live integration is pending.
+
+## Phase 5 — Canonical catalogue and nested objects
+- Canonical 39-object gallery with supported widgets and explicit unsupported placeholders.
+- Nested containers/cards, flex/grid/toolbars, parent selection and reusable component templates.
+- Screen reorder controls and right Properties panel delete action for every object.
+- New application templates no longer include Get started; existing demo buttons are deletable.
+- Preview Back/Home buttons and screen-order-aware standalone export.
+- Browser and package regression tests for deletion, nesting, ordering and unknown object preservation.

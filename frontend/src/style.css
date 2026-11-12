@@ -14,3 +14,24 @@
 .dataset-editor .dataset-row strong{display:block;font-size:12px}
 .dataset-editor button{align-self:flex-start}
 .table-empty{border:1px dashed #a6b5c6;border-radius:4px;min-height:100%;padding:12px;color:#607187;background:#f5f8fb;font-size:12px}
+
+/* Phase 5: catalogue groups, screen order, nested layers and object actions */
+.sidebar .palette{display:block}
+.palette details{border-bottom:1px solid #e3e9f1;padding:4px 0}
+.palette summary{cursor:pointer;font-size:12px;font-weight:650;color:#486080}
+.palette-group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:7px 0}
+.palette-group button{text-align:left;overflow-wrap:anywhere}
+.screen-list-row,.layer-list-row{display:flex;align-items:center;gap:3px;margin:4px 0}
+.screen-list-row>button:first-child,.layer-list-row>button:first-child{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.screen-list-row>button:not(:first-child),.layer-list-row>button:not(:first-child){flex:0 0 27px;padding:5px 2px;font-weight:700}
+.object-inspector-head{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.object-inspector-head button{font-size:11px;border-color:#cb8b8b;color:#953333;padding:6px}
+.nested-content{position:relative;min-height:65%;height:calc(100% - 23px);width:100%;padding:4px}
+.container-outline{height:100%;width:100%;background:#f3f7fc;border:1px dashed #7d95b0;border-radius:5px;overflow:auto}
+.container-outline>strong{display:block;font-size:12px;padding:1px 4px;pointer-events:none}
+.nested-x-card{background:#fff;border:1px solid #dce3ea;box-shadow:0 2px 8px #0001}
+.nested-x-grid>.nested-content{background-image:linear-gradient(90deg,#cad7e055 1px,transparent 1px);background-size:50% 100%}
+.nested-x-toolbar{background:#e9eff8}
+.unsupported-object{border:1px dashed #bc8345;background:#fff5e8;color:#744b22;padding:6px;font-size:12px}
+.kpi-tile{border:1px solid #d1dbe8;border-radius:7px;background:#f5f8fc;padding:8px;display:flex;flex-direction:column;gap:7px;height:100%}
+.kpi-tile strong{font-size:22px}

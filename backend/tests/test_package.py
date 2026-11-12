@@ -40,11 +40,35 @@ def test_reject_unsupported_version():
 
 def test_reject_cycle():
     app=starter_app()
-    app["screens"][0]["nodes"][0]["parent_id"]="start"
-    app["screens"][0]["nodes"][1]["parent_id"]="heading"
+    app["screens"][0]["nodes"]=[{"id":"heading","type":"text","parent_id":"start"},{"id":"start","type":"button","parent_id":"heading"}]
     with pytest.raises(FormatError):make_document(app)
 
 def test_reject_invalid_navigation():
     app=starter_app()
-    app["screens"][0]["nodes"][1]["action"]={"type":"navigate","target_screen":"missing"}
+    app["screens"][0]["nodes"]=[{"id":"start","type":"button","parent_id":None,"action":{"type":"navigate","target_screen":"missing"}}]
     with pytest.raises(FormatError):make_document(app)
+
+def test_new_application_starts_without_unrequested_demo_button():
+    app=starter_app()
+    assert app["screens"][0]["nodes"]==[]
+    assert app["start_screen"]=="home"
+    assert read_document(make_document(app))[1]==app
+
+
+def test_nested_catalogue_extensions_preserve_unknown_metadata_and_screen_order():
+    app=starter_app()
+    app["screens"].append({"id":"details","name":"Details","viewport":{"width":800,"height":600},
+        "layout":{"mode":"freeform"},"nodes":[]})
+    app["screen_order"]=["details","home"]
+    app["screens"][0]["nodes"]=[
+        {"id":"card","type":"x-card","parent_id":None,"props":{"label":"Card"},"layout":{"width":400}},
+        {"id":"button","type":"button","parent_id":"card","props":{"label":"Edit"},
+          "action":{"type":"navigate","target_screen":"details"}},
+        {"id":"unknown","type":"x-diagram","parent_id":"card",
+         "props":{"vendor_specific":"retained"},"responsive":[{"min_width":0,"layout":{"width":"fill"}}]}
+    ]
+    manifest,actual,_=read_document(make_document(app))
+    assert manifest["format_version"]=="1.0.0"
+    assert actual==app
+    assert actual["screen_order"]==["details","home"]
+    assert actual["screens"][0]["nodes"][2]["props"]["vendor_specific"]=="retained"
