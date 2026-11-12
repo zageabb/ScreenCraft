@@ -84,3 +84,13 @@ Add **x-kpi** or **x-chart** from the Data section of the Object Gallery. Select
 **x-kpi** can also show a fixed number when no dataset is selected. **x-chart** requires a dataset, a **Category column** and a Chart type of Bar, Line or Pie. Charts group records by category and display up to 30 categories. For pie charts, negative values contribute zero to slice sizes; bar/line support numerical values.
 
 In Preview and the standalone Interactive HTML export, a chart or KPI uses the same mock dataset as tables and buttons. Adding a record to that dataset refreshes values when the prototype re-renders. HTML export runs entirely offline; no production database writes are made.
+
+## Phase 9C — Tabs, wizards, accordions and layouts
+
+The Object Gallery now contains working **tabs**, **x-wizard**, **x-accordion**, **x-sidebar** and **x-splitter** objects. All can be added and sized like other canvas objects.
+
+For Tabs or Wizard, select the parent and set **Step labels (comma separated)** in the right-hand Properties panel (maximum 10). Drag child elements into the parent. Select a child and set **Assigned step** to choose which tab/step displays it in Preview. In Design all children remain visible for editing; in Preview switching tabs hides children assigned to other steps. The Wizard includes Next/Previous step buttons.
+
+An Accordion opens and closes its child content in Preview. **Expanded initially** controls its default state. A Splitter exposes **Split width (%)** in Properties; Sidebar and Splitter act as two-area layout containers for nested objects. These are prototype-safe layout behaviours; no production routing or data access is added.
+
+**Interactive HTML** reproduces the navigation/layout behaviours in a single offline file. Test exported designs with both tabs and nested input controls before publishing.
