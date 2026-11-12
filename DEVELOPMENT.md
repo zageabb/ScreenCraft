@@ -199,3 +199,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Acceptance:** Existing editable table inspector tests; additional Playwright editor Preview and generated-offline-HTML browser tests for grid insert/edit/delete, query/filter/sort, pagination and stable source row selection. Python/React/docs/Docker checks as applicable. Manual Ubuntu runtime verification remains independent of CI.
 
 **Deferred:** True shared/session dataset inline write API, rich cell types/validation, bulk edit, column drag-reorder, server-side filtering/sorting, and advanced layout grid responsive column sizing. FigmaBridge remains deferred.
+
+### Phase 9A merge and automated acceptance (2026-11-12)
+- **Merged:** PR #14 https://github.com/zageabb/ScreenCraft/pull/14, squash commit `461975c4e12cd5e8f93e437e9253c3226a624d1e`.
+- **CI:** Python, React, browser Playwright, Docker and documentation all passed on final feature head `72f7f8bc6a78bd7347966571b48b980a5ec01513`, run https://github.com/zageabb/ScreenCraft/actions/runs/43308595277.
+- **Ubuntu deployment:** Not performed in this chat. Desktop should pull main and rebuild, then manually confirm grid sample dataset creation, selection/edit/delete/sort/filter, and standalone offline HTML parity.
+- **Remaining Phase 9:** Charts and dataset-bound KPIs; expanded layout/navigation; form validation; further production hardening. FigmaBridge/Phase 7 stays deferred.
