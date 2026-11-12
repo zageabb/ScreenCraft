@@ -77,7 +77,7 @@ test('offline shared app menu is single-source, nested, active, responsive and h
  await page.setContent(html(),{waitUntil:'load'});
  const nav=page.getByRole('navigation',{name:'Application navigation'});
  await expect(nav).toHaveCount(1);
- await expect(nav.getByRole('button',{name:'General'})).toBeVisible();
+ await expect(nav.getByRole('button',{name:'General',exact:true})).toBeVisible();
  await nav.getByRole('button',{name:'Expand General'}).click();
  await expect(nav.getByRole('button',{name:'Home link'})).toHaveAttribute('aria-current','page');
  await nav.getByRole('button',{name:'Details link'}).click();
