@@ -364,3 +364,27 @@ test('Phase 9B KPI and chart use dataset values and persist configured metric pr
  expect(chart.props).toMatchObject({dataset_id:'people',chart_type:'pie',category_column:'Status'});
  expect(kpi.props).toMatchObject({dataset_id:'people',aggregation:'count'});
 });
+
+test('Phase 9C wizard and accordion preview controls have editable properties and navigation',async({page})=>{
+ await page.locator('.palette details').filter({has:page.locator('[data-catalogue-type="x-wizard"]')}).locator('summary').click();
+ await page.locator('[data-catalogue-type="x-wizard"]').click();
+ await expect(page.getByLabel('Step labels')).toBeVisible();
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const wizard=page.locator('.canvas [data-panel-kind="x-wizard"]');
+ await expect(wizard.getByRole('button',{name:'Step 1'})).toHaveAttribute('aria-pressed','true');
+ await wizard.getByRole('button',{name:'Next step'}).click();
+ await expect(wizard.getByRole('button',{name:'Step 2'})).toHaveAttribute('aria-pressed','true');
+ await wizard.getByRole('button',{name:'Previous step'}).click();
+ await expect(wizard.getByRole('button',{name:'Step 1'})).toHaveAttribute('aria-pressed','true');
+});
+test('Phase 9C accordion can collapse and expand its content',async({page})=>{
+ await page.locator('[data-catalogue-type="x-accordion"]').click();
+ await expect(page.getByLabel('Expanded initially')).toBeVisible();
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const toggle=page.locator('.canvas .sc-accordion > button');
+ await expect(toggle).toHaveAttribute('aria-expanded','true');
+ await toggle.click();
+ await expect(toggle).toHaveAttribute('aria-expanded','false');
+ await toggle.click();
+ await expect(toggle).toHaveAttribute('aria-expanded','true');
+});
