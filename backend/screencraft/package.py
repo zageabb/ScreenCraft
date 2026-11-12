@@ -150,7 +150,8 @@ def make_document(app: dict, assets: dict | None = None, manifest: dict | None =
     assets = assets or {}
     now = datetime.now(timezone.utc).isoformat()
     manifest = dict(manifest or {})
-    manifest.update({"format": "screencraft", "format_version": "1.0.0", "entry": "application.json"})
+    manifest.setdefault("format_version", "1.0.0")
+    manifest.update({"format": "screencraft", "entry": "application.json"})
     manifest.setdefault("document_id", str(uuid4()))
     manifest.setdefault("document_revision", 1)
     manifest.setdefault("name", app.get("name", "Untitled"))
