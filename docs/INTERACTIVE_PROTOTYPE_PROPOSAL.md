@@ -1,6 +1,6 @@
 # ScreenCraft — Interactive Application Prototyping Proposal v1.1
 **Date:** 2026-11-12  
-**Status:** APPROVED DIRECTION / NOT IMPLEMENTED  
+**Status:** APPROVED DIRECTION / INITIAL IMPLEMENTATION ON FEATURE BRANCH (not user accepted)  
 **Supersedes:** None. This extends docs/INITIAL_IDEA.md without rewriting its historical record.
 
 ## Product boundary

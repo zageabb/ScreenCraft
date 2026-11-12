@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: screencraft
+      POSTGRES_USER: screencraft
+      POSTGRES_PASSWORD: ${SCREENCRAFT_DB_PASSWORD:?Set database password}
+    volumes:
+      - screencraft-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U screencraft"]
+      interval: 10s
+      retries: 5
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8085:8085"
+    environment:
+      SCREENCRAFT_SECRET_KEY: ${SCREENCRAFT_SECRET_KEY:?Set Flask secret key}
+      SCREENCRAFT_SETUP_KEY: ${SCREENCRAFT_SETUP_KEY:?Set initial setup key}
+      DATABASE_URL: postgresql+psycopg://screencraft:${SCREENCRAFT_DB_PASSWORD}@db:5432/screencraft
+      SCREENCRAFT_TRUST_PROXY: "1"
+      SCREENCRAFT_COOKIE_SECURE: "1"
+      SCREENCRAFT_COOKIE_PATH: /apps/screencraft
+      SCREENCRAFT_ALLOWED_REPOS: ${SCREENCRAFT_ALLOWED_REPOS:-}
+      SCREENCRAFT_GITHUB_TOKEN: ${SCREENCRAFT_GITHUB_TOKEN:-}
+volumes:
+  screencraft-postgres:

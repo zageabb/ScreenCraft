@@ -1,5 +1,5 @@
 # ScreenCraft proposed architecture
-**Planning only — no running backend/editor.**
+**Implementation in development:** Flask API, SQL store and React editor exist on feature branch; no live deployment acceptance yet.
 ```text
 local UI / Figma JSON / SVG / possible .fig feasibility
             | import adapters

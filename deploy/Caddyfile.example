@@ -1,0 +1,9 @@
+# Add this block within the existing Caddy site (do not replace other apps).
+# UDA ingress authentication should wrap this route in the existing deployment policy.
+handle_path /apps/screencraft/* {
+    reverse_proxy 127.0.0.1:8085 {
+        header_up X-Forwarded-Prefix /apps/screencraft
+    }
+}
+# Optional redirect for URL without trailing slash:
+redir /apps/screencraft /apps/screencraft/ 308
