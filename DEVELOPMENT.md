@@ -85,3 +85,11 @@ All items remain proposals, not implemented or tested.
 - Shared mock-data writes now require a matching dataset revision and use row locking where the SQL backend supports it; editor preview tracks returned revisions.
 - The shared server-side GitHub token is accessible only to the ScreenCraft server administrator. Per-user OAuth/delegated permissions remain future work; this must be assessed before enabling non-admin repository access.
 - Added regression tests for shared-dataset optimistic locking and GitHub admin-only access. New CI run pending; earlier passing CI remains recorded above, not assumed to cover the latest changes.
+
+## Phase 1–4 final CI evidence — 2026-11-12
+- **Verified commit:** `8b43aa450c5c828d0b054c8a8ed415a3e96c1d44`.
+- **Successful GitHub Actions workflow:** [run 43249859736](https://github.com/zageabb/ScreenCraft/actions/runs/43249859736). All five jobs succeeded: docs, Python backend tests, React/TypeScript production build, Playwright Chromium browser tests (3), and Docker build/runtime smoke test.
+- **Docker CI:** built production multi-stage image, applied Alembic initial migration to isolated SQLite, started Gunicorn/Flask, and received API health success. This establishes build/start viability, **not** live Ubuntu/Caddy/PostgreSQL acceptance.
+- **Security checks:** concurrent project saves use atomic SQL conditional revision; project-shared dataset writes require a matching revision and use row locking; server GitHub credentials restricted to ScreenCraft administrator and allowlisted repos.
+- **Manual acceptance still pending:** live PostgreSQL migration/restore; Ubuntu Caddy /apps/screencraft/ route; authentication across actual UDA session and cookie path; actual GitHub repo PR round trip; browser accessibility/200% zoom and design fidelity; multi-user concurrent end-to-end test; Figma import is a later phase.
+- **Merge policy:** code may enter main as a documented prototype when CI green, but do not tag it production-ready or claim deployment. A release acceptance checklist remains open in docs/ACCEPTANCE.md.
