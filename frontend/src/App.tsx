@@ -30,6 +30,7 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows
  const resizeMove=(e:React.PointerEvent)=>{if(!resize.current)return;const v=resize.current;onResize(Math.max(40,Math.round((v.w+e.clientX-v.x)/8)*8),Math.max(24,Math.round((v.h+e.clientY-v.y)/8)*8))};
  let child:React.ReactNode;
  switch(node.type){
+ case 'text':child=<span>{p.text||p.label||'Text'}</span>;break;
  case 'button':child=<button className="prototype-button" onClick={()=>mode==='preview'&&onAction(node.action)}>{p.label||'Button'}</button>;break;
  case 'input':child=<input placeholder={p.placeholder||'Input'} disabled={mode==='design'}/>;break;
  case 'select':child=<select disabled={mode==='design'}>{(p.options||['Option 1','Option 2']).map((v:string,i:number)=><option key={i}>{v}</option>)}</select>;break;
