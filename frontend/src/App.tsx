@@ -73,7 +73,51 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  while(doc.screens.some(s=>s.name.toLowerCase()==='new screen '+number))number++;
  const name=doc.screens.some(s=>s.name.toLowerCase()==='new screen')?'New Screen '+number:'New Screen';
  edit({...doc,screen_order:[...doc.screen_order,id],screens:[...doc.screens,{id,name,viewport:{width:1280,height:800},layout:{mode:'freeform',overflow_x:'auto',overflow_y:'auto'},nodes:[]}]});setScreenId(id)}
- const drop=(e:React.DragEvent)=>{e.preventDefault();if(!canEdit||mode!=='design')return;const type=e.dataTransfer.getData('application/screencraft-type');if(!palette.includes(type as any))return;const rect=e.currentTarget.getBoundingClientRect();const generated=withTableDataset(doc,newNode(type,Math.max(0,e.clientX-rect.left),Math.max(0,e.clientY-rect.top)));edit(insertNode(generated.document,screen.id,generated.node));setSelected(generated.node.id)}
+ function moveScreen(id:string,direction:-1|1){edit(reorderScreen(doc,id,direction))}
+ function deleteObject(id:string){edit(removeNodeTree(doc,screen.id,id));if(selected===id||!screen.nodes.some(n=>n.id===selected))setSelected(null)}
+ function addFromGallery(type:string,parentId:string|null=null,x=24,y=24){
+   if(!canEdit||mode!=='design')return;
+   const generated=withTableDataset(doc,newNode(type,x,y));
+   generated.node.parent_id=parentId;
+   edit(insertNode(generated.document,screen.id,generated.node));
+   setSelected(generated.node.id)
+ }
+ function placeFromDrop(e:React.DragEvent,parentId:string|null=null){
+   e.preventDefault();if(!canEdit||mode!=='design')return;
+   const type=e.dataTransfer.getData('application/screencraft-type');
+   const move=e.dataTransfer.getData('application/screencraft-node');
+   if(move){const newDoc=reparentNode(doc,screen.id,move,parentId);if(newDoc!==doc){edit(newDoc);setSelected(move)}return}
+   if(!palette.includes(type))return;
+   const rect=e.currentTarget.getBoundingClientRect();
+   addFromGallery(type,parentId,Math.max(8,Math.round(e.clientX-rect.left)),Math.max(8,Math.round(e.clientY-rect.top)))
+ }
+ function saveComponent(){
+   if(!node)return;
+   const tree=cloneSubtree(screen,node.id);
+   const label=String(node.props.label||node.props.text||node.type);
+   edit({...doc,components:[...doc.components,{id:'component-'+crypto.randomUUID(),name:label,nodes:tree}]});
+ }
+ function addComponent(component:any){
+   if(!canEdit||mode!=='design')return;
+   const nodes:Array<Node>=component.nodes||[];
+   const map=new Map(nodes.map(n=>[n.id,crypto.randomUUID()]));
+   const copies=nodes.map(n=>({...cloneDoc(n),id:map.get(n.id)!,parent_id:n.parent_id?map.get(n.parent_id)||null:null}));
+   edit({...doc,screens:doc.screens.map(s=>s.id===screen.id?{...s,nodes:[...s.nodes,...copies]}:s)});
+   if(copies[0])setSelected(copies[0].id);
+ }
+ function renderTree(n:Node,ancestors=new Set<string>()):React.ReactNode{
+   if(ancestors.has(n.id))return null;
+   const path=new Set([...ancestors,n.id]);
+   return <CanvasNode key={n.id} node={n} mode={mode} selected={n.id===selected}
+     onPick={()=>setSelected(n.id)}
+     onMove={(x,y)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,x,y}}))) }}
+     onResize={(width,height)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,width,height}}))) }}
+     onAction={act} projectId={projectId} doc={doc} rows={dataRows(n.props.dataset_id||'')}
+     onDropChild={e=>placeFromDrop(e,n.id)}>
+       {screen.nodes.filter(child=>child.parent_id===n.id).map(child=>renderTree(child,path))}
+     </CanvasNode>
+ }
+ function layerDepth(n:Node){let depth=0,parent=n.parent_id,seen=new Set([n.id]);while(parent&&!seen.has(parent)){seen.add(parent);depth++;parent=screen.nodes.find(x=>x.id===parent)?.parent_id||null}return Math.min(depth,8)}
  const tokens=doc.themes[theme]?.tokens||{};const canvasStyle:React.CSSProperties={width:screen.viewport.width,minHeight:screen.viewport.height,background:tokens['surface.default']||'#fff',color:tokens['text.primary']||'#172033',position:'relative',overflowX:screen.layout.overflow_x||'auto',overflowY:screen.layout.overflow_y||'auto'};
  return <div className="workspace"><aside className="sidebar"><h3>Screens</h3>{doc.screens.map(s=><button key={s.id} className={s.id===screen.id?'active':''} onClick={()=>{setScreenId(s.id);setSelected(null)}}>{s.name}</button>)}<button disabled={!canEdit} onClick={addScreen}>+ Screen</button><h3>Object Gallery</h3><div className="palette">{palette.map(t=><button key={t} draggable={canEdit&&mode==='design'} onDragStart={e=>e.dataTransfer.setData('application/screencraft-type',t)} onClick={()=>{if(canEdit&&mode==='design'){const generated=withTableDataset(doc,newNode(t));edit(insertNode(generated.document,screen.id,generated.node));setSelected(generated.node.id)}}}>{t}</button>)}</div><h3>Layers</h3>{screen.nodes.map(n=><button key={n.id} className={n.id===selected?'active':''} onClick={()=>setSelected(n.id)}>{n.type} · {n.id.slice(0,9)}</button>)}</aside>
  <div className="mainarea"><div className="toolbar"><button onClick={()=>setMode(mode==='design'?'preview':'design')}>{mode==='design'?'▶ Preview':'✎ Design'}</button><button disabled={!history.length||!canEdit} onClick={()=>{setFuture(f=>[...f,doc]);setDoc(history[history.length-1]);setHistory(h=>h.slice(0,-1))}}>Undo</button><button disabled={!future.length||!canEdit} onClick={()=>{setHistory(h=>[...h,doc]);setDoc(future[future.length-1]);setFuture(f=>f.slice(0,-1))}}>Redo</button><label>Theme <select value={theme} onChange={e=>setTheme(e.target.value)}>{Object.keys(doc.themes).map(t=><option key={t}>{t}</option>)}</select></label><button onClick={onSave} disabled={!canEdit}>Save</button><button onClick={onExport}>Interactive HTML</button><span className="muted">{screen.viewport.width}×{screen.viewport.height}</span></div>
