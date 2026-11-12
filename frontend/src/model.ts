@@ -1,8 +1,10 @@
 export type Action={type:string;target_screen?:string;target_node?:string;dataset_id?:string;text?:string;values?:Record<string,unknown>;field_bindings?:Record<string,string>}
 export type Node={id:string;type:string;parent_id:string|null;props:Record<string,any>;layout:Record<string,any>;style?:Record<string,string>;action?:Action;bindings?:Record<string,any>;responsive?:any[];accessibility?:Record<string,any>}
-export type Screen={id:string;name:string;viewport:{width:number;height:number};layout:Record<string,any>;nodes:Node[]}
+export type Screen={id:string;name:string;viewport:{width:number;height:number};layout:Record<string,any>;nodes:Node[];shared_navigation_hidden?:boolean}
 export type Dataset={id:string;columns:{id:string;type:string}[];rows:Record<string,any>[];persistence?:string}
-export type Document={application_id:string;name:string;start_screen:string;default_theme:string;screen_order:string[];screens:Screen[];components:any[];themes:Record<string,{tokens:Record<string,string>}>;datasets:Dataset[];assets:any[]}
+export type SharedNavItem={id:string;label:string;target_screen?:string;parent_id?:string|null;icon?:string;hidden_on?:string[]};
+export type SharedNavigation={enabled:boolean;position:'left'|'right'|'top';collapsible:boolean;initial_collapsed?:boolean;mobile_collapsed?:boolean;items:SharedNavItem[]};
+export type Document={shared_navigation?:SharedNavigation;application_id:string;name:string;start_screen:string;default_theme:string;screen_order:string[];screens:Screen[];components:any[];themes:Record<string,{tokens:Record<string,string>}>;datasets:Dataset[];assets:any[]}
 import catalogue from './catalogue.snapshot.json';
 export const palette=catalogue.objects.map(o=>o.id);
 export const catalogueEntries=catalogue.objects;
@@ -21,11 +23,14 @@ export function removeScreen(doc:Document,screenId:string):Document {
      ?{...n,action:undefined}:n
  )}));
  const order=doc.screen_order.filter(id=>id!==screenId);
- return {...doc,screens,screen_order:order,
+ const shared_navigation=doc.shared_navigation?(()=>{const items=doc.shared_navigation!.items.filter(item=>item.target_screen!==screenId);const ids=new Set(items.map(item=>item.id));return {...doc.shared_navigation!,items:items.map(item=>({...item,parent_id:item.parent_id&&ids.has(item.parent_id)?item.parent_id:null,hidden_on:item.hidden_on?.filter(s=>s!==screenId)}))}})():undefined;
+ return {...doc,screens,screen_order:order,...(shared_navigation?{shared_navigation}:{}),
    start_screen:doc.start_screen===screenId?(order[0]||screens[0].id):doc.start_screen};
 }
 export function cloneSubtree(screen:Screen,nodeId:string){const ids=descendants(screen,nodeId);ids.add(nodeId);const idMap=new Map([...ids].map(id=>[id,crypto.randomUUID()]));return screen.nodes.filter(n=>ids.has(n.id)).map(n=>({...cloneDoc(n),id:idMap.get(n.id)!,parent_id:n.id===nodeId?null:(n.parent_id?idMap.get(n.parent_id)||null:null),action:n.action?.target_node&&idMap.has(n.action.target_node)?{...n.action,target_node:idMap.get(n.action.target_node)}:n.action}))}
 
+export const COLLAPSIBLE_TYPES=new Set(['container','x-card','x-grid','x-flex','x-toolbar','x-sidebar','x-splitter']);
+export function defaultSharedNavigation(doc:Document):SharedNavigation{return {enabled:true,position:'left',collapsible:true,initial_collapsed:false,mobile_collapsed:true,items:doc.screen_order.map(id=>({id:'nav-'+crypto.randomUUID().slice(0,8),label:doc.screens.find(s=>s.id===id)?.name||id,target_screen:id}))}}
 export function newNode(type:string,x=24,y=24):Node{
  const props:Record<string,any>=type==='button'?{label:'Button'}:type==='text'?{text:'Text'}:type==='select'?{options:['Option 1','Option 2']}:(type==='table'||type==='x-editable-grid')?{dataset_id:'',searchable:true,sortable:true,selectable:type==='x-editable-grid',page_size:0}:type==='x-kpi'?{label:'Total',value:'100',aggregation:'count'}:type==='x-chart'?{label:'Chart',chart_type:'bar',aggregation:'count'}:type==='tabs'||type==='x-wizard'?{label:type==='tabs'?'Tabs':'Wizard',tab_labels:type==='tabs'?['Tab 1','Tab 2']:['Step 1','Step 2']}:type==='x-accordion'?{label:'Details',expanded:true}:type==='x-sidebar'?{label:'Sidebar',sidebar_width:180}:type==='x-splitter'?{label:'Splitter',split_percent:50}:type==='x-toolbar'?{label:'Toolbar'}:type==='x-card'?{label:'Card'}:type==='x-grid'?{label:'Grid'}:type==='x-date'?{label:'Date'}:type==='x-number'?{placeholder:'0'}:type==='x-textarea'?{placeholder:'Enter text'}:{};
  const container=isContainer(type);

@@ -17,13 +17,18 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
     title=html.escape(str(app.get("name","ScreenCraft Prototype")),quote=True)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>"""+title+"""</title><style>
 :root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-chart{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;overflow:auto}.sc-chart svg{width:100%;height:65%;min-height:110px}.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}.sc-chart-legend span{display:inline-flex;align-items:center;gap:3px}.sc-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}.sc-panel-container{border:1px solid #cbd5e1;background:white;min-height:100%;padding:6px}.sc-panel-nav,.sc-wizard-buttons{display:flex;gap:5px;flex-wrap:wrap}.sc-panel-nav button[aria-pressed="true"]{background:#cbdff9}.sc-panel-content{position:relative;min-height:100px}.sc-accordion{background:white;border:1px solid #cbd5e1;min-height:55px}.sc-accordion>button{width:100%;text-align:left}.sc-accordion-content{position:relative;min-height:50px}.sc-layout-content{position:relative;min-height:80%;height:calc(100% - 25px)}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
-</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
+.sc-shared-layout{display:flex;min-width:0}.sc-shared-layout.nav-layout-right{flex-direction:row-reverse}.sc-shared-layout.nav-layout-top{flex-direction:column}.sc-screen-content{flex:1;min-width:0}.sc-shared-nav{display:flex;flex-direction:column;flex:0 0 190px;max-width:240px;background:#e9f1fc;border-right:1px solid #c1cfe0;padding:6px;gap:4px}.sc-shared-nav.nav-right{border-right:0;border-left:1px solid #c1cfe0}.sc-shared-nav.nav-top{flex:0 0 auto;max-width:none;flex-direction:row;align-items:center}.sc-shared-nav.nav-top .sc-shared-nav-items{display:flex;gap:4px;flex-wrap:wrap}.sc-shared-nav.is-collapsed:not(.nav-top){flex-basis:46px}.sc-shared-nav-row{display:flex;gap:4px}.sc-shared-nav-row button:first-child{flex:1;min-width:0;text-align:left}.sc-shared-nav-row .is-active{background:#bad7ff;font-weight:700}.sc-shared-nav-children{padding-left:11px;border-left:1px solid #b0bfd1}.sc-shared-nav-controls{display:flex;gap:4px}.sc-mobile-nav-toggle{display:none}.sc-collapse-header{display:flex;justify-content:space-between;align-items:center;min-height:26px}.sc-collapse-header button{padding:2px 8px}.sc-box.is-collapsed{min-height:40px!important;max-height:40px;overflow:hidden}@media(max-width:700px){.sc-shared-layout{flex-direction:column!important}.sc-shared-nav{max-width:none;width:100%;flex:0 0 auto;box-sizing:border-box}.sc-mobile-nav-toggle{display:inline-flex}.sc-shared-nav:not(.mobile-open) .sc-shared-nav-items{display:none}.sc-shared-nav.nav-top{flex-direction:column;align-items:stretch}.sc-shared-nav.nav-top .sc-shared-nav-items{display:block}}</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
 const assetUris=JSON.parse(document.getElementById('sc-assets').textContent);
 const screens=Object.fromEntries(app.screens.map(s=>[s.id,s]));
 const screenList=(app.screen_order||app.screens.map(s=>s.id)).map(id=>screens[id]).filter(Boolean);
 let active=app.start_screen,history=[],modal=null,message='',theme=app.default_theme||'light';
+const containerStates=Object.create(null);
+let navCollapsed=Boolean(app.shared_navigation?.initial_collapsed);
+let mobileOpen=!app.shared_navigation?.mobile_collapsed;
+const navExpanded=new Set();
+const collapsibleTypes=new Set(['container','x-card','x-grid','x-flex','x-toolbar','x-sidebar','x-splitter']);
 let datasets=Object.fromEntries((app.datasets||[]).map(d=>[d.id,structuredClone(d.rows||[])]));
 const inputValues=Object.create(null);
 const SUPPORTED_INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea']);
@@ -90,6 +95,12 @@ function el(tag,text){const x=document.createElement(tag);if(text!==undefined)x.
 function action(a){if(!a||!a.type)return;
  if(a.type==='navigate' && screens[a.target_screen]){history.push(active);active=a.target_screen;modal=null}
  else if(a.type==='back'){active=history.pop()||active;modal=null}
+ else if(['toggle_container','collapse_container','expand_container'].includes(a.type)){
+  const node=(screens[active]?.nodes||[]).find(n=>n.id===a.target_node&&collapsibleTypes.has(n.type));
+  if(!node)return;
+  const current=Object.prototype.hasOwnProperty.call(containerStates,node.id)?containerStates[node.id]:node.props?.expanded!==false;
+  containerStates[node.id]=a.type==='collapse_container'?false:a.type==='expand_container'?true:!current;
+ }
  else if(a.type==='show_modal')modal=a.target_node;
  else if(a.type==='close_modal')modal=null;
  else if(a.type==='message')message=String(a.text||'');
@@ -279,7 +290,13 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  }
  case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':case 'x-sidebar':case 'x-splitter':{
   x=el('section');x.className='sc-box'+(n.type==='x-card'?' sc-card':'');
-  x.append(el('strong',p.label||n.type));const content=el('div');content.className='sc-layout-content';
+  const header=el('div');header.className='sc-collapse-header';header.append(el('strong',p.label||n.type));
+  const expanded=Object.prototype.hasOwnProperty.call(containerStates,n.id)?containerStates[n.id]:p.expanded!==false;
+  if(p.collapsible){const button=el('button',expanded?'▾':'▸');button.setAttribute('aria-label','Toggle '+(p.label||n.type));
+   button.setAttribute('aria-expanded',String(expanded));button.onclick=()=>action({type:'toggle_container',target_node:n.id});header.append(button)}
+  x.append(header);
+  if(!expanded){x._hideChildren=true;x.classList.add('is-collapsed');x.style.height='40px';break}
+  const content=el('div');content.className='sc-layout-content';
   if(n.type==='x-sidebar'){content.style.display='flex';content.style.gap='8px'}
   if(n.type==='x-splitter'){content.style.display='grid';content.style.gridTemplateColumns=Math.max(10,Math.min(90,Number(p.split_percent)||50))+'% 1fr';content.style.gap='8px'}
   x.append(content);x._childContainer=content;break
@@ -292,17 +309,61 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  }
  x.dataset.nodeId=n.id;x.classList.add('sc-node');
  if(typeof l.width==='number')x.style.width=l.width+'px';else if(l.width==='fill')x.style.width='100%';
- if(typeof l.height==='number')x.style.height=l.height+'px';
+ if(x._hideChildren)x.style.height='40px';else if(typeof l.height==='number')x.style.height=l.height+'px';
  if(typeof l.max_height==='number')x.style.maxHeight=l.max_height+'px';
  if(l.overflow_x)x.style.overflowX=l.overflow_x;if(l.overflow_y)x.style.overflowY=l.overflow_y;
  if(l.x!==undefined||l.y!==undefined){x.style.position='absolute';x.style.left=(l.x||0)+'px';x.style.top=(l.y||0)+'px'}
  parent.append(x);return x;
 }
+function renderSharedNav(){
+ const nav=app.shared_navigation;
+ const panel=el('nav');panel.className='sc-shared-nav nav-'+nav.position+(navCollapsed?' is-collapsed':'')+(mobileOpen?' mobile-open':'');
+ panel.setAttribute('aria-label','Application navigation');panel.dataset.navPosition=nav.position;
+ const controls=el('div');controls.className='sc-shared-nav-controls';
+ if(nav.collapsible){const toggle=el('button',navCollapsed?'☰':'◀');toggle.setAttribute('aria-label','Toggle shared navigation');
+  toggle.setAttribute('aria-expanded',String(!navCollapsed));toggle.onclick=()=>{navCollapsed=!navCollapsed;render()};controls.append(toggle)}
+ const mobile=el('button','☰ Menu');mobile.className='sc-mobile-nav-toggle';mobile.setAttribute('aria-label','Toggle mobile navigation');
+ mobile.setAttribute('aria-expanded',String(mobileOpen));mobile.onclick=()=>{mobileOpen=!mobileOpen;render()};controls.append(mobile);panel.append(controls);
+ const listing=el('div');listing.className='sc-shared-nav-items';panel.append(listing);
+ const valid=new Set(Object.keys(screens));
+ const items=(nav.items||[]).filter(item=>(!item.target_screen||valid.has(item.target_screen))&&!(item.hidden_on||[]).includes(active));
+ const ids=new Set(items.map(item=>item.id));
+ function make(item,trail=new Set()){
+  if(trail.has(item.id))return null;
+  const entry=el('div');entry.className='sc-shared-nav-entry';const row=el('div');row.className='sc-shared-nav-row';
+  const title=navCollapsed?(item.icon||'•'):(item.icon?item.icon+' ':'')+item.label;
+  const button=el('button',title);button.title=item.label;
+  if(item.target_screen===active){button.classList.add('is-active');button.setAttribute('aria-current','page')}
+  button.onclick=()=>{if(item.target_screen&&item.target_screen!==active){mobileOpen=false;action({type:'navigate',target_screen:item.target_screen})}};
+  row.append(button);
+  const children=items.filter(candidate=>candidate.parent_id===item.id);
+  if(children.length&&!navCollapsed){const expanded=navExpanded.has(item.id);
+   const expand=el('button',expanded?'▾':'▸');expand.setAttribute('aria-label','Expand '+item.label);expand.setAttribute('aria-expanded',String(expanded));
+   expand.onclick=()=>{if(expanded)navExpanded.delete(item.id);else navExpanded.add(item.id);render()};row.append(expand)}
+  entry.append(row);
+  if(children.length&&navExpanded.has(item.id)&&!navCollapsed){const subtree=el('div');subtree.className='sc-shared-nav-children';
+   for(const child of children){const nested=make(child,new Set([...trail,item.id]));if(nested)subtree.append(nested)}
+   entry.append(subtree)}
+  return entry;
+ }
+ items.filter(item=>!item.parent_id||!ids.has(item.parent_id)).forEach(item=>{const entry=make(item);if(entry)listing.append(entry)});
+ return panel;
+}
 function render(){root.replaceChildren();menu.replaceChildren();
- screenList.forEach(s=>{let b=el('button',s.name);b.disabled=s.id===active;b.onclick=()=>action({type:'navigate',target_screen:s.id});menu.append(b)});
+ const shared=app.shared_navigation?.enabled;
+ if(!shared)screenList.forEach(s=>{let b=el('button',s.name);b.disabled=s.id===active;b.onclick=()=>action({type:'navigate',target_screen:s.id});menu.append(b)});
+ else {
+  const back=el('button','← Back');back.setAttribute('aria-label','Prototype back');back.disabled=!history.length;
+  back.onclick=()=>action({type:'back'});menu.append(back);
+  const home=el('button','⌂ Home');home.setAttribute('aria-label','Prototype home');home.disabled=active===app.start_screen;
+  home.onclick=()=>action({type:'navigate',target_screen:app.start_screen});menu.append(home);
+ }
  let s=screens[active];if(!s)return;
- let heading=el('h2',s.name);root.append(heading);
- let wrapper=el('section');wrapper.style.overflowX=s.layout?.overflow_x||'auto';wrapper.style.overflowY=s.layout?.overflow_y||'auto';wrapper.style.minHeight='60vh';root.append(wrapper);
+ const layout=el('div');layout.className='sc-shared-layout nav-layout-'+(app.shared_navigation?.position||'left');root.append(layout);
+ if(shared&&!s.shared_navigation_hidden)layout.append(renderSharedNav());
+ const screenContent=el('div');screenContent.className='sc-screen-content';layout.append(screenContent);
+ let heading=el('h2',s.name);screenContent.append(heading);
+ let wrapper=el('section');wrapper.style.overflowX=s.layout?.overflow_x||'auto';wrapper.style.overflowY=s.layout?.overflow_y||'auto';wrapper.style.minHeight='60vh';screenContent.append(wrapper);
  let nodes=new Map((s.nodes||[]).map(n=>[n.id,n]));let rendered=new Set();
  function build(n,parent,trail=new Set()){if(rendered.has(n.id)||trail.has(n.id))return;rendered.add(n.id);let box=renderNode(n,parent);if(!box)return;
  if(box._hideChildren)return;

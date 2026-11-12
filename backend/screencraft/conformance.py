@@ -13,7 +13,7 @@ import re
 CORE_TYPES = frozenset("text button input select checkbox table image container tabs modal".split())
 EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi".split())
 KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram""".split())
-ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message".split())
+ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message toggle_container collapse_container expand_container".split())
 PERSISTENCE = frozenset(("seed-reset", "session-persisted", "project-shared"))
 MAX_DEPTH = 64
 MAX_SEED_ROWS = 1000
@@ -102,6 +102,40 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
     _require(isinstance(order, list) and len(order) == len(screen_ids)
              and all(isinstance(i, str) for i in order) and set(order) == set(screen_ids),
              "screen_order must contain every screen exactly once")
+    for screen in screens:
+        if "shared_navigation_hidden" in screen:
+            _require(isinstance(screen["shared_navigation_hidden"], bool),
+                     f"Invalid shared_navigation_hidden on {screen['id']}")
+    shared = app.get("shared_navigation")
+    if shared is not None:
+        _require(isinstance(shared, dict), "shared_navigation must be an object")
+        for flag in ("enabled", "collapsible", "initial_collapsed", "mobile_collapsed"):
+            if flag in shared:
+                _require(isinstance(shared[flag], bool), f"Invalid shared navigation {flag}")
+        _require(shared.get("position", "left") in ("left", "right", "top"),
+                 "Invalid shared navigation position")
+        items = shared.get("items", [])
+        _require(isinstance(items, list) and len(items) <= 100 and all(isinstance(i, dict) for i in items),
+                 "Invalid shared navigation items")
+        nav_ids = [_ident(item.get("id"), "shared navigation item.id") for item in items]
+        _unique(nav_ids, "shared navigation item IDs")
+        nav_map = {item["id"]: item for item in items}
+        for item in items:
+            _require(isinstance(item.get("label"), str) and len(item["label"]) <= 200,
+                     "Invalid shared navigation label")
+            target = item.get("target_screen")
+            if target:
+                _require(target in screen_ids, "Invalid shared navigation screen target")
+            hidden = item.get("hidden_on", [])
+            _require(isinstance(hidden, list) and all(s in screen_ids for s in hidden),
+                     "Invalid shared navigation hidden_on screens")
+            parent = item.get("parent_id")
+            seen = {item["id"]}
+            while parent:
+                _require(parent in nav_map and parent not in seen,
+                         "Invalid shared navigation nesting")
+                seen.add(parent)
+                parent = nav_map[parent].get("parent_id")
     themes = app.get("themes", {})
     _require(isinstance(themes, dict), "themes must be an object")
     if app["default_theme"] not in themes:
@@ -196,6 +230,11 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
                 _require(kind_action in ACTION_TYPES, f"Unsupported executable action on {nid}")
                 if kind_action == "navigate":
                     _require(action.get("target_screen") in screen_ids, f"Missing navigation target from {nid}")
+                if kind_action in ("toggle_container", "collapse_container", "expand_container"):
+                    target = action.get("target_node")
+                    _require(target in idmap and idmap[target]["type"] in (
+                        "container","x-card","x-grid","x-flex","x-toolbar","x-sidebar","x-splitter"
+                    ), f"Invalid container action target on {nid}")
                 if kind_action in ("show_modal", "close_modal", "toggle_visibility") and action.get("target_node"):
                     _require(action["target_node"] in idmap, f"Missing action target on {nid}")
                 if kind_action in ("add_mock_row", "delete_mock_row", "set_mock_field"):

@@ -243,7 +243,7 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 
 **Acceptance:** Browser tests cover button toggle/expand/collapse, nested objects, initial state, persistence, invalid targets, keyboard operation, and reopening with existing user-entered values. Run the same interaction against the **actual generated standalone HTML export**, not just its source. Keep manual and automated verification separate and document deviations.
 
-**Status:** PLANNED — specification only; no implementation or deployment claim.
+**Status:** IMPLEMENTED IN PHASE 9.1 FEATURE BRANCH — detailed implementation and acceptance in docs/PHASE_9_1.md. CI/merge and live deployment status tracked separately; prior wording remains as historical plan.
 
 ## Phase 9C — Interactive layout and navigation objects (2026-11-12)
 

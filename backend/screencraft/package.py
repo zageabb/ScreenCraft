@@ -76,7 +76,7 @@ def _validate(manifest, app):
                 visited.add(parent)
                 parent = parents[parent]
             action = node.get("action") or {}
-            if action and action.get("type") not in {"navigate","back","show_modal","close_modal","toggle_visibility","set_mock_field","add_mock_row","delete_mock_row","message"}:
+            if action and action.get("type") not in {"navigate","back","show_modal","close_modal","toggle_visibility","set_mock_field","add_mock_row","delete_mock_row","message","toggle_container","collapse_container","expand_container"}:
                 raise FormatError("Unsupported action")
             if action.get("type") == "navigate" and action.get("target_screen") not in ids:
                 raise FormatError("Missing navigation target")
