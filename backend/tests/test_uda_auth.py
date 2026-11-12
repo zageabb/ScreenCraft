@@ -57,11 +57,6 @@ def test_existing_local_account_keeps_identity_and_projects(tmp_path):
         "TESTING":True,"SQLALCHEMY_URL":"sqlite:///"+str(dbfile),
         "SESSION_COOKIE_SECURE":False,
     })
-    client=legacy.test_client()
-    client.post("/api/bootstrap",json={
-        "setup_key":"bootstrap-key","username":IDENTITY,"password":"a-long-legacy-password"
-    })
-    # Setup key can be provided through the environment in tests.
     from screencraft.store import create_user,create_project
     from screencraft.package import starter_app,make_document
     engine=legacy.extensions["screencraft_engine"]
