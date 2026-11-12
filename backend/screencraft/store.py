@@ -27,7 +27,7 @@ class Membership(Base):
     role: Mapped[str]=mapped_column(String(20))
 class PrototypeSession(Base):
     __tablename__="sc_preview_sessions"
-    id: Mapped[str]=mapped_column(String(36),primary_key=True)
+    id: Mapped[str]=mapped_column(String(200),primary_key=True)
     project_id: Mapped[str]=mapped_column(ForeignKey("sc_projects.id"))
     user_id: Mapped[str]=mapped_column(ForeignKey("sc_users.id"))
     dataset_id: Mapped[str]=mapped_column(String(160))
