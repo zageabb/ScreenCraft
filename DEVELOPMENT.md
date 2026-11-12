@@ -217,3 +217,15 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Testing:** Playwright validates inspector configuration and saved document properties, and separately generates a real offline HTML export to verify KPI values, bar/line/pie SVGs, grouped totals, live mock updates and network independence. CI Python, React, browser, Docker and docs required prior to merge.
 
 **Still pending in Phase 9:** advanced navigation/layout objects and form validation, additional accessibility and responsive layout checks. FigmaBridge phase 7 remains deferred.
+
+## Phase 9C — Interactive layout and navigation objects (2026-11-12)
+
+**Goal:** Continue Phase 9 independently of FigmaBridge, using the unchanged Application-Standard object catalogue.
+
+**Implementation:** Activate `x-wizard`, `x-accordion`, `x-sidebar` and `x-splitter`; extend core `tabs`. Tabs and wizards expose a configurable list of up to 10 captions. Nested children can be assigned to a tab/step via `props.tab_index` in the right inspector. In Preview only children assigned to the selected tab/step are rendered; Design keeps all children visible for editing. Wizards offer Previous/Next step controls; accordions have accessible expand/collapse button with default expanded state. Sidebar/splitter are distinct nested layout containers, with a configurable splitter percentage. Children persist through normal `.scraft` hierarchy.
+
+**Export parity:** The one-file offline Interactive HTML exporter reproduces panel state, switching, wizard steps, accordion expansion, and basic sidebar/splitter layout. It does not require network or external UI libraries.
+
+**Tests:** React editor and actual generated HTML Playwright checks cover step switching, content selection, accordion toggling, split dimensions and offline operation; Python/React/Docker/docs CI gates. Deployment/manual Ubuntu testing remains a separate acceptance step.
+
+**Follow-ups:** Responsive sidebar drawer behavior, keyboard-focused tab patterns, production workflow validation and advanced layout resizing are separately tracked; not claimed as production-grade. Form validation remains next.
