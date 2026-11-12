@@ -97,7 +97,7 @@ def mutate_rows(engine, project_id, user_id, dataset_id, mode, seed_rows, operat
         key_user = user_id if mode=="session-persisted" else "shared"
         key= session_id or ("shared:"+project_id+":"+dataset_id if mode=="project-shared" else None)
         if not key: raise ValueError("Session ID required")
-        item=db.get(PrototypeSession,key)
+        item=db.get(PrototypeSession,key,with_for_update=(mode=="project-shared"))
         if item and (item.project_id!=project_id or item.dataset_id!=dataset_id or (mode=="session-persisted" and item.user_id!=user_id)):
             raise PermissionError("Session access denied")
         if not item:
@@ -105,6 +105,8 @@ def mutate_rows(engine, project_id, user_id, dataset_id, mode, seed_rows, operat
             db.add(item);db.flush()
         rows=json.loads(item.rows_json)
         if operation!="list":
+            if mode=="project-shared" and expected_revision is None:
+                raise ValueError("Shared dataset write requires revision")
             if expected_revision is not None and item.revision!=expected_revision: raise ValueError("Revision conflict")
             if operation=="add": rows.append(values or {})
             elif operation=="reset": rows=list(seed_rows)
