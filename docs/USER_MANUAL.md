@@ -34,3 +34,17 @@ Select a screen from the **Screens** list on the left. In the right-hand **Scree
 
 ## UDA sign-in
 When `SCREENCRAFT_AUTH_MODE=uda` is enabled by the administrator, users sign in through the normal UDA login and navigate to ScreenCraft. No secondary ScreenCraft password or password-reset flow is needed; use UDA to sign out. ScreenCraft continues to control access to individual application designs using project ownership and memberships. New UDA users can be invited to designs after they have first opened ScreenCraft and established an account. See docs/UDA_AUTHENTICATION.md for installation details.
+
+## Phase 5 — Screen ordering and object management
+
+**Reorder screens:** Use the up/down arrows in the left Screens list. Screen IDs and button navigation remain intact; Save persists the new order and standalone HTML uses it.
+
+**Delete:** Select an object in the canvas or Layers. Choose Delete object at the top of right-hand Properties, or the small x at the right end of its Layers row. Deleting a container deletes its descendants; Undo restores the prior state. Existing Get started buttons are ordinary removable elements. New applications start with a blank Home screen.
+
+**Preview:** The preview toolbar supplies Back and Home independently of the design, so empty screens never trap the user. Design exits preview.
+
+**Nesting:** Add a card, container, grid, flex or toolbar and drag a gallery object into it, or set Parent container in the inspector. Circular parent references are rejected; child identity is stored in parent_id. Layout mode controls freeform, flow, grid and flex.
+
+**Reusable components:** Select an object (including a nested subtree) and choose Save as reusable component. The template appears in the left sidebar and can be inserted as a fresh editable copy with new node IDs.
+
+**Catalogue:** The grouped object gallery comes from a generated pinned snapshot of Application-Standard. Objects marked with a diamond are unsupported placeholders, not functional controls; their design JSON is preserved. To adopt a newer canonical catalogue, run scripts/sync_scraft_catalogue.py on the approved upstream JSON with its Git blob SHA, review and run tests. Do not maintain parallel object definitions in ScreenCraft.
