@@ -87,7 +87,7 @@ def test_api_error_is_json_not_spa(app):
     assert missing.status_code==404
     assert missing.is_json
     assert missing.json["error"]=="Unknown API endpoint"
-    wrong=c.get("/api/login")
+    wrong=c.post("/api/health")
     assert wrong.status_code==405
     assert wrong.is_json
 
