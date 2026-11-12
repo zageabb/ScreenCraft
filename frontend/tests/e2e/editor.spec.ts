@@ -35,7 +35,7 @@ test.beforeEach(async({page})=>{
  await expect(page.locator('.canvas-node')).toHaveCount(2);
 });
 test('palette inserts draggable object and theme switches',async({page})=>{
- await page.locator('.palette button').filter({hasText:'text'}).click();
+ await page.locator('[data-catalogue-type="text"]').click();
  await expect(page.locator('.canvas-node')).toHaveCount(3);
  await page.locator('.toolbar select').selectOption('dark');
  await expect(page.locator('.canvas')).toHaveCSS('background-color','rgb(30, 39, 55)');
@@ -51,7 +51,7 @@ test('interactive preview navigates screens and adds mock record',async({page})=
 
 test('drag from component gallery and resize on canvas',async({page})=>{
  const canvas=page.locator('.canvas');
- const palette=page.locator('.palette button').filter({hasText:'text'});
+ const palette=page.locator('[data-catalogue-type="text"]');
  await palette.dragTo(canvas,{targetPosition:{x:360,y:180}});
  await expect(canvas.locator('.canvas-node')).toHaveCount(3);
  const added=canvas.locator('.canvas-node').last();
@@ -88,7 +88,7 @@ test('reports exact API endpoint and status when proxy returns HTML instead of J
 });
 
 test('new table shows seed records and inspector edits persist in save payload',async({page})=>{
- await page.locator('.palette button').filter({hasText:'table'}).click();
+ await page.locator('[data-catalogue-type="table"]').click();
  const table=page.locator('.canvas table').first();
  await expect(table).toBeVisible();
  await expect(table).toContainText('Example record');
@@ -162,4 +162,56 @@ test('UDA mode does not display a second ScreenCraft password form',async({page}
  await expect(page.getByText('Sign in through UDA')).toBeVisible();
  await expect(page.getByRole('textbox',{name:'Username'})).toHaveCount(0);
  await expect(page.locator('input[type="password"]')).toHaveCount(0);
+});
+
+test('Phase 5 screen ordering is saved separately from stable navigation IDs',async({page})=>{
+ await page.getByRole('button',{name:'Move screen Customers up'}).click();
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const savedDoc=(await saved).postDataJSON().document;
+ expect(savedDoc.screen_order).toEqual(['customers','home']);
+ expect(savedDoc.start_screen).toBe('home');
+ expect(savedDoc.screens.find((s:any)=>s.id==='home').nodes.find((n:any)=>n.id==='go').action.target_screen).toBe('customers');
+});
+test('Phase 5 right inspector deletion removes existing objects and persists',async({page})=>{
+ await page.getByRole('button',{name:'text · welcome'}).click();
+ await expect(page.getByRole('button',{name:'Delete selected object'})).toBeVisible();
+ await page.getByRole('button',{name:'Delete selected object'}).click();
+ await expect(page.locator('.canvas')).not.toContainText('Home dashboard');
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const savedDoc=(await saved).postDataJSON().document;
+ expect(savedDoc.screens.find((s:any)=>s.id==='home').nodes.some((n:any)=>n.id==='welcome')).toBe(false);
+});
+test('Phase 5 nested card and reusable component keep parent relationships',async({page})=>{
+ await page.locator('[data-catalogue-type="x-card"]').click();
+ const card=page.locator('.canvas-node').last();
+ await expect(card).toContainText('Card');
+ await page.locator('[data-catalogue-type="text"]').click();
+ await page.getByRole('combobox',{name:'Parent container'}).selectOption({index:1});
+ await expect(card.locator('.canvas-node')).toHaveCount(1);
+ await page.getByRole('button',{name:'Save as reusable component'}).click();
+ await expect(page.getByRole('heading',{name:'Reusable components'})).toBeVisible();
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const savedDoc=(await saved).postDataJSON().document;
+ const cardNode=savedDoc.screens[0].nodes.find((n:any)=>n.type==='x-card');
+ expect(savedDoc.screens[0].nodes.some((n:any)=>n.parent_id===cardNode.id)).toBe(true);
+ expect(savedDoc.components.length).toBe(1);
+});
+test('Phase 5 preview always has a route home after navigation',async({page})=>{
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ await page.locator('.prototype-button').getByText('Open customers').click();
+ await expect(page.getByRole('button',{name:'Preview home'})).toBeVisible();
+ await page.getByRole('button',{name:'Preview home'}).click();
+ await expect(page.locator('.prototype-button')).toContainText(['Open customers']);
+ await expect(page.getByRole('button',{name:'Preview back'})).toBeDisabled();
+});
+test('Phase 5 unsupported extension stays editable and visibly warned',async({page})=>{
+ await page.locator('[data-catalogue-type="x-diagram"]').click();
+ await expect(page.locator('.canvas .unsupported-object')).toContainText('Unsupported object: x-diagram');
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const savedDoc=(await saved).postDataJSON().document;
+ expect(savedDoc.screens[0].nodes.some((n:any)=>n.type==='x-diagram')).toBe(true);
 });
