@@ -31,3 +31,6 @@ Select a Table in Design mode. In Properties > Table dataset, choose an existing
 
 ## Renaming screens
 Select a screen from the **Screens** list on the left. In the right-hand **Screen** panel, edit **Screen name**, then press Enter or click outside the field to apply it. Click **Save** to retain the name in the application and `.scraft` document. The underlying screen ID does not change, so existing navigation buttons keep working. New screens receive distinct default names until renamed.
+
+## UDA sign-in
+When `SCREENCRAFT_AUTH_MODE=uda` is enabled by the administrator, users sign in through the normal UDA login and navigate to ScreenCraft. No secondary ScreenCraft password or password-reset flow is needed; use UDA to sign out. ScreenCraft continues to control access to individual application designs using project ownership and memberships. New UDA users can be invited to designs after they have first opened ScreenCraft and established an account. See docs/UDA_AUTHENTICATION.md for installation details.
