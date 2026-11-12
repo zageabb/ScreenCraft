@@ -102,3 +102,13 @@ Select an input, dropdown, checkbox, date, number or textarea object in Design m
 These constraints are evaluated when an **add_mock_row** button binds a dataset column to that input in **Input source for [column]**. Clicking the button in Preview or standalone offline Interactive HTML checks the current values first. If required or value constraints fail, no row is added and a visible message explains the problem. Correct the field and click again. Unbound fixed row values still work as before.
 
 This is an interactive design prototype: validation protects mock data demonstrations only and must not be treated as production security or database validation.
+
+## Phase 9.1: Minimising containers and shared menus
+
+**Minimise container:** Add a Container, Card, Grid, Flex, Toolbar, Sidebar or Splitter. Select it and use the right-hand **Collapse behaviour** settings: `Enable collapsible header` shows a chevron in Preview; `Initially expanded` sets its default. To control it with a different button, choose one of `toggle_container`, `collapse_container` or `expand_container` from the button's **Action** dropdown, then choose **Target container**. The entire subtree hides without being deleted, and your input values survive reopening.
+
+**Shared application menu:** Open **Shared application navigation** at the top of the right-hand inspector and tick **Enabled**. The menu is stored once at application level and displayed across participating screens. Choose its left/right/top position, collapse settings and mobile initial state. Edit the ordered menu list with target screens, optional symbols, group nesting and screen-specific link visibility. Use **+ Menu item** to add links; menu edits propagate to all screens.
+
+**Screen opt-out:** On a screen, select **Hide navigation on screen** to remove the shared menu there (for example, on a login or full-screen view). Saved .scraft and standalone HTML preserve the setting. The exported HTML includes Back/Home fallback controls, so a screen without the shared menu need not trap you.
+
+This is mock navigation, not authorization; target applications must enforce their own permissions. For detailed field definitions and acceptance see `docs/PHASE_9_1.md`.
