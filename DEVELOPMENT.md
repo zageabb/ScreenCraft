@@ -20,6 +20,7 @@
 | SC-014 | User manual/release/deployment | IN_PROGRESS | Fresh clone + root/prefix tests |
 
 ## Standards adoption
+- **Canonical .scraft format and object catalogue:** `zageabb/Application-Standard` is the single authority for the `.scraft` v1 specification and `standards/screencraft/object-catalogue.json`. Each application stores its own design instance and references the central format/version; no copying or redefinition of canonical schema.
 - Source: zageabb/Application-Standard, proposed v1.0 baseline; profile P6 design tooling with P3 editor characteristics.
 - Copied master standard, reusable screen/proxy/integration/reuse guidance, QA and templates.
 - Adaptation: Flask plus JavaScript allowed; Figma optional; no private corporate screenshots or official brand token claims.
@@ -93,3 +94,55 @@ All items remain proposals, not implemented or tested.
 - **Security checks:** concurrent project saves use atomic SQL conditional revision; project-shared dataset writes require a matching revision and use row locking; server GitHub credentials restricted to ScreenCraft administrator and allowlisted repos.
 - **Manual acceptance still pending:** live PostgreSQL migration/restore; Ubuntu Caddy /apps/screencraft/ route; authentication across actual UDA session and cookie path; actual GitHub repo PR round trip; browser accessibility/200% zoom and design fidelity; multi-user concurrent end-to-end test; Figma import is a later phase.
 - **Merge policy:** code may enter main as a documented prototype when CI green, but do not tag it production-ready or claim deployment. A release acceptance checklist remains open in docs/ACCEPTANCE.md.
+
+## Phase 5 — AI-governed application design authority (future scope, approved direction 2026-11-12)
+
+**Shared design principle (canonical source: `zageabb/Application-Standard`):** **“Design what matters, let AI propose what's missing, and approve what changes.”** ScreenCraft applies this centrally defined principle rather than maintaining a separate variant.
+
+**Decision (refined 2026-11-12):** Screen layouts and their identifiable components are the **only mandatory authored design baseline**. Other areas—behaviour, bindings, navigation details, database/data models, API contracts, workflows, permissions/roles and acceptance criteria—are **optional design inputs** and may be absent, incomplete or revised. ScreenCraft should be capable of governing these areas when provided or subsequently approved, but must not require users to completely specify them before AI-assisted development can proceed. The goal is **controlled, progressive development, not rigid specification completeness**. This does **not** mandate a particular implementation framework.
+
+**Scheduling / non-interference:** This section is a requirement and roadmap addition only. Continue the existing Phase 1–4 scope, development, CI, testing and acceptance independently. Do **not** divert, block, rebase, or restart the current Phase 1–4 work for Phase 5. Phase 5 implementation requires separate planning and acceptance after the core foundation is sufficiently stable.
+
+| ID | Future workstream | Status | First acceptance |
+|---|---|---|---|
+| SC-026 | Versioned, stable-ID declarative design contracts for screens/components, behaviour, bindings, navigation and responsive rules | PLANNED (Phase 5) | A design change produces a deterministic and machine-readable diff |
+| SC-027 | Optional, incrementally enrichable application architecture contracts: entities, schema migrations, API schemas, integrations and workflows | PLANNED (Phase 5) | Absent contracts do not block development; approved additions are versioned and validated |
+| SC-028 | Optional authored identity/role/permission design, plus mandatory enforcement of applicable security requirements | PLANNED (Phase 5) | AI can propose missing role rules; required backend security is still verified |
+| SC-029 | Design-to-development handoff: export .scraft to application repos, produce change requests/issues and agent-readable tasks | PLANNED (Phase 5) | Agent can identify changed contract elements and required work |
+| SC-030 | Implementation conformance: structural checks, browser/visual regression, API, workflow, data and permission tests | PLANNED (Phase 5) | CI reports pass/fail and traceability to design requirements |
+| SC-031 | Governance: approval baselines, version history, deviations, design-to-code status and reverse feedback | PLANNED (Phase 5) | AI proposals and approved changes update the baseline transparently; no silent overwrite |
+| SC-032 | Standard object catalogue and nested/reusable components, centrally maintained in Application-Standard | PLANNED (Phase 5; central format catalogue merged) | Read/version core + extension object definitions; nested objects and safe unsupported-object warnings; tests for round-trip and containment |
+
+### Central object catalogue adoption (SC-032)
+- Canonical catalogue: `zageabb/Application-Standard/standards/screencraft/object-catalogue.json` and `standards/screencraft/README.md`. ScreenCraft must **consume and validate against** this standard, not fork its definition.
+- All ten v1 core types are specified; expanded `x-` prefixed objects are optional capabilities, not required editor support during Phase 1–4.
+- Support nested object hierarchy using v1 `parent_id` semantics. Preserve stable IDs, prohibit parent cycles, and validate containment; composed screens should include buttons inside cards, grids inside panels and forms inside modals.
+- Missing functional specifications must not block AI development; unsupported custom objects must be preserved, visibly warned about and never claimed functional.
+- Future ScreenCraft editor gallery should load versioned catalogue descriptors, advertise supported renderers/exporters, and allow controlled proposals to extend the central catalogue.
+- This is **future scope only**. CI bypass for documentation merge was explicitly authorised on 2026-11-12 because of GitHub Actions billing; do not consider CI passing by implication. No new Phase 1–4 dependency, gate, CI requirement or implementation diversion is authorised by this entry.
+
+### Progressive AI design-change policy
+- **Mandatory minimum:** a valid screen design with stable screen/component identifiers. Optional specification fields must not be mandatory checkboxes or hard development gates.
+- **AI initiative:** when an unspecified interaction, field, screen, endpoint, workflow step or rule is needed, the agent proposes a sensible addition with rationale, impact and tests. It should not freeze the entire task because the designer omitted a detail.
+- **Approval tiers:** (1) Within already-approved intent, low-risk implementation decisions may proceed autonomously and be recorded; (2) Material changes to approved screens, user-visible behaviour, data contracts, workflows or permissions are proposed as reviewable design amendments and require approval before becoming authoritative; (3) Destructive migrations, access expansion, sensitive data exposure, external actions and deployment always require the appropriate explicit approval.
+- **Nonblocking execution:** while approval is pending, the AI continues independent development and testing, and may use clearly marked provisional assumptions or non-destructive mocks for dependent work. It must not quietly treat an unapproved proposal as a new baseline.
+- **Change lifecycle:** identify gap → propose change with diff, rationale, risk and acceptance tests → classify approval tier → continue safe independent work → approve/reject/amend → version .scraft design and implementation trace → validate in CI.
+- **Guardrails:** optional specification does not mean optional security, accessibility or correctness. Apply repository standards and safe defaults; ask for approval when a meaningful product/security choice cannot be made safely.
+- **Traceability:** distinguish approved requirements, agent proposals, provisional assumptions, implemented changes and rejected changes. Capture decisions and outstanding approvals in DEVELOPMENT.md or linked issues.
+
+### Format constraints to preserve during Phases 1–4 (forward compatibility, not new implementation blockers)
+- Preserve stable unique IDs for screens, components, interactions and other schema entities; avoid position-dependent identification.
+- Version .scraft documents against the canonical schema owned in `zageabb/Application-Standard`; retain explicit extension points and a documented migration mechanism. Do not create a competing ScreenCraft-owned schema.
+- Keep the .scraft ZIP open, portable and machine-readable (canonical JSON plus assets), with Git-friendly unpacked representation; do not make the image preview the authoritative source.
+- Allow optional references to contracts for data, APIs, workflows and permissions, even if their Phase 5 interpretation is not yet implemented. Existing Phase 1–4 artefacts must remain valid.
+- Keep the application-specific approved design artefact in each consuming application's repository, referencing the shared .scraft standard in `zageabb/Application-Standard`; ScreenCraft reads/writes design instances via controlled GitHub sync and tracked revisions. Do not duplicate the standard definition in individual applications; cross-repository modifications must be explicit and reviewable.
+- Treat imported Figma designs as inputs for review and normalisation, not automatic approval of functional or security contracts.
+
+### Boundaries and safeguards
+- Design contract owns **what** must be implemented; the AI agent/developer owns **how**, subject to repository architecture and standards.
+- Generated code, database migrations and external actions are never automatically deployed from a design edit; use review, approvals and normal CI/merge controls.
+- Never infer authorisation solely from client-side visibility; permissions must be validated in the backend and tested.
+- Screen similarity alone is insufficient: visual, functional, persistence, data migration, API, workflow and security evidence are distinct.
+- Record contract revisions, implementation traceability, approvals, deviations and test evidence in DEVELOPMENT.md or linked repository artefacts.
+
+**Phase 5 acceptance (future):** Starting with screens alone and no authored API/database/workflow/permission contracts, the AI can develop a working implementation, propose missing requirements without deadlock, continue safe independent work while awaiting material decisions, and record all assumptions and approvals. Once a design change is approved, ScreenCraft generates a reproducible versioned contract and development task; tests report compliance for the specified areas and applicable safety standards, with no silent alteration to the approved baseline.
