@@ -23,7 +23,7 @@ export function removeScreen(doc:Document,screenId:string):Document {
      ?{...n,action:undefined}:n
  )}));
  const order=doc.screen_order.filter(id=>id!==screenId);
- const shared_navigation=doc.shared_navigation?{...doc.shared_navigation,items:doc.shared_navigation.items.filter(item=>item.target_screen!==screenId).map(item=>({...item,hidden_on:item.hidden_on?.filter(s=>s!==screenId)}))}:undefined;
+ const shared_navigation=doc.shared_navigation?(()=>{const items=doc.shared_navigation!.items.filter(item=>item.target_screen!==screenId);const ids=new Set(items.map(item=>item.id));return {...doc.shared_navigation!,items:items.map(item=>({...item,parent_id:item.parent_id&&ids.has(item.parent_id)?item.parent_id:null,hidden_on:item.hidden_on?.filter(s=>s!==screenId)}))}})():undefined;
  return {...doc,screens,screen_order:order,...(shared_navigation?{shared_navigation}:{}),
    start_screen:doc.start_screen===screenId?(order[0]||screens[0].id):doc.start_screen};
 }
