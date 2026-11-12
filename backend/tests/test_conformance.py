@@ -146,3 +146,51 @@ def test_json_depth_limit_rejected():
     doc["future_extension"]=nested
     with pytest.raises(FormatError,match="depth"):
         make_document(doc,assets)
+
+def test_phase91_shared_navigation_and_container_actions_roundtrip():
+    doc=starter_app()
+    home=doc["screens"][0]
+    home["nodes"]=[
+        {"id":"panel","type":"container","parent_id":None,
+         "props":{"label":"My panel","collapsible":True,"expanded":False},"layout":{"height":200}},
+        {"id":"child","type":"input","parent_id":"panel","props":{"placeholder":"Customer"}},
+        {"id":"button","type":"button","parent_id":None,"props":{"label":"Toggle"},
+         "action":{"type":"toggle_container","target_node":"panel"}}
+    ]
+    doc["shared_navigation"]={
+        "enabled":True,"position":"left","collapsible":True,"initial_collapsed":False,
+        "mobile_collapsed":True,"items":[
+            {"id":"group","label":"Group"},
+            {"id":"home-link","label":"Home","parent_id":"group","target_screen":"home"}
+        ]
+    }
+    manifest, restored, assets=read_document(make_document(doc))
+    assert restored==doc
+    assert not validate_contract(manifest,restored,assets,verify_assets=True)
+
+
+@pytest.mark.parametrize("tamper", [
+    lambda d:d["screens"][0]["nodes"][2]["action"].update(target_node="unknown"),
+    lambda d:d["screens"][0]["nodes"][2]["action"].update(target_node="child"),
+    lambda d:d["shared_navigation"]["items"][1].update(target_screen="unknown"),
+    lambda d:d["shared_navigation"]["items"][0].update(parent_id="home-link"),
+    lambda d:d["shared_navigation"]["items"].append(
+        {"id":"home-link","label":"Duplicate","target_screen":"home"}),
+    lambda d:d["shared_navigation"].update(position="unsupported"),
+    lambda d:d["shared_navigation"]["items"][1].update(hidden_on=["missing"])
+])
+def test_phase91_rejects_invalid_navigation_and_action_references(tamper):
+    doc=starter_app()
+    doc["screens"][0]["nodes"]=[
+        {"id":"panel","type":"container","parent_id":None,"props":{}},
+        {"id":"child","type":"text","parent_id":"panel","props":{"text":"Text"}},
+        {"id":"button","type":"button","parent_id":None,
+         "action":{"type":"toggle_container","target_node":"panel"}}
+    ]
+    doc["shared_navigation"]={"enabled":True,"position":"left","items":[
+        {"id":"group","label":"Group"},
+        {"id":"home-link","label":"Home","target_screen":"home","parent_id":"group"}
+    ]}
+    tamper(doc)
+    with pytest.raises(FormatError):
+        make_document(doc)
