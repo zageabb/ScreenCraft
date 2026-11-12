@@ -128,5 +128,11 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 ### UDA integration merge and validation (2026-11-12)
 - PR [#8](https://github.com/zageabb/ScreenCraft/pull/8) merged into main as `9e36ad7dd082b3ba2959b7272014167855d2ef0e`.
 - All five GitHub Actions jobs (docs, Python, React, Playwright browser, Docker) passed on PR SHA `cac24984fe88d58c40243ba712859cb4a6987934` (run [43264058633](https://github.com/zageabb/ScreenCraft/actions/runs/43264058633)).
-- **Runtime status:** UDA sign-on is implemented but **not enabled or accepted on the live Ubuntu server**. Local login remains the default until Desktop establishes a verified identity header and server-protected assertion from the actual UDA/Caddy configuration, verifies existing admin identity mapping and tests denial of spoofed/anonymous requests.
+- **Runtime status (updated 2026-11-12):** User confirms UDA SSO is working on the live Ubuntu ScreenCraft deployment. The verified UDA identity contract uses `X-UDA-User` populated from `/auth/check`, with the administrator email matching the existing ScreenCraft account. This confirms the sign-in path works; user has not separately reported evidence for anonymous/forged-header denial, logout/session expiry, role isolation or rollback testing. Keep those as outstanding security acceptance checks.
 - No database migration required; do not reset existing users or project ACLs. Rollback: `SCREENCRAFT_AUTH_MODE=local`.
+
+### Live UDA SSO acceptance update (2026-11-12)
+- **SSO login — CONFIRMED WORKING by user on Ubuntu**, following configuration by ChatGPT Desktop.
+- Identity mapping: UDA provides the verified authenticated email in `X-UDA-User`, matching the existing ScreenCraft administrator username.
+- Remaining verification not independently evidenced in this chat: unauthenticated and forged-header rejection through public ingress and direct backend, prior-cookie rejection, role/ownership isolation for another UDA account, sign-out/session expiry, and documented local-mode rollback.
+- No additional application code or live server changes were made for this status update.
