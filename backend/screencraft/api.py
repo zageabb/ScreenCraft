@@ -1,12 +1,15 @@
 """Flask HTTP API, scoped for Caddy /apps/screencraft/ and direct-root development."""
 from __future__ import annotations
 import io
+import json
+import base64
 import os
 import re
 from functools import wraps
 from pathlib import Path
 from urllib.parse import quote
-import requests
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from flask import Flask, request, jsonify, session, send_file, abort, send_from_directory
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -137,9 +140,7 @@ def create_app(config=None):
     def export_html(project_id):
         p=get_project(engine,project_id,session["user_id"])
         _,document,assets=read_document(p["archive"])
-        # PNG image embedding is a later-phase item; do not silently emit incomplete asset representations.
-        if assets:return jsonify(error="Interactive HTML export with embedded binary assets not yet supported"),501
-        return send_file(io.BytesIO(interactive_html(document).encode()),mimetype="text/html",as_attachment=True,download_name="prototype.html")
+        return send_file(io.BytesIO(interactive_html(document, assets).encode()),mimetype="text/html",as_attachment=True,download_name="prototype.html")
     @app.post("/api/projects/<project_id>/members")
     @auth
     def member(project_id):
@@ -162,23 +163,94 @@ def create_app(config=None):
                            values=body.get("values"),row_index=body.get("row_index"),session_id=body.get("session_id"),expected_revision=body.get("revision"))
         return jsonify(result)
 
+    def github_allowed(owner,repo,path):
+        allowed={s.strip().lower() for s in os.environ.get("SCREENCRAFT_ALLOWED_REPOS","").split(",") if s.strip()}
+        if (owner+"/"+repo).lower() not in allowed:
+            raise PermissionError("Repository is not allowlisted by administrator")
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+",owner) or not re.fullmatch(r"[A-Za-z0-9_.-]+",repo) or not re.fullmatch(r"[A-Za-z0-9_./-]{1,200}",path) or ".." in path.split("/") or not path.endswith(".scraft"):
+            raise ValueError("Invalid repository path")
+
+    def github_request(owner,repo,endpoint,method="GET",payload=None):
+        token=app.config["GITHUB_TOKEN"]
+        if not token:raise ValueError("GitHub integration not_configured")
+        url=f"https://api.github.com/repos/{owner}/{repo}/"+endpoint
+        args={"headers":{"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","User-Agent":"ScreenCraft"},"method":method,"timeout":12}
+        if payload is not None:
+            args["data"]=json.dumps(payload).encode("utf-8")
+            args["headers"]["Content-Type"]="application/json"
+        try:
+            with urlopen(Request(url,**{k:v for k,v in args.items() if k!="timeout"}),timeout=12) as response:
+                return json.load(response)
+        except HTTPError as e:
+            raise ValueError("GitHub API rejected request: "+str(e.code)) from e
+
     @app.get("/api/github/<owner>/<repo>/scraft")
     @auth
     def repo_read(owner,repo):
-        token=app.config["GITHUB_TOKEN"]
-        if not token:return jsonify(error="GitHub integration not_configured"),503
         path=request.args.get("path","design/screencraft/application.scraft")
         ref=request.args.get("ref","main")
-        if not re.fullmatch(r"[A-Za-z0-9_.-]+",owner) or not re.fullmatch(r"[A-Za-z0-9_.-]+",repo) or not re.fullmatch(r"[A-Za-z0-9_./-]{1,200}",path) or ".." in path.split("/"):
-            return jsonify(error="Invalid repository path"),400
-        import base64
-        from urllib.request import Request, urlopen
-        url=f"https://api.github.com/repos/{owner}/{repo}/contents/{quote(path,safe='/')}?ref={quote(ref,safe='')}"
-        req=Request(url,headers={"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","User-Agent":"ScreenCraft"})
-        with urlopen(req,timeout=12) as resp:result=json.load(resp)
+        github_allowed(owner,repo,path)
+        result=github_request(owner,repo,"contents/"+quote(path,safe="/")+"?ref="+quote(ref,safe=""))
         data=base64.b64decode(result["content"])
         read_document(data)
         return send_file(io.BytesIO(data),as_attachment=True,download_name="application.scraft",mimetype="application/zip")
+
+    @app.post("/api/projects/<project_id>/github-pull")
+    @auth
+    def github_pull(project_id):
+        data=request.get_json() or {}
+        owner=data.get("owner","");repo=data.get("repo","");path=data.get("path","design/screencraft/application.scraft")
+        ref=data.get("ref","main")
+        github_allowed(owner,repo,path)
+        old=get_project(engine,project_id,session["user_id"])
+        if old["role"] not in ("owner","admin","designer"):raise PermissionError("Project edit denied")
+        result=github_request(owner,repo,"contents/"+quote(path,safe="/")+"?ref="+quote(ref,safe=""))
+        blob=base64.b64decode(result["content"])
+        read_document(blob)
+        revision=update_project(engine,project_id,session["user_id"],blob,int(data.get("revision",0)))
+        return jsonify(revision=revision,source_sha=result["sha"])
+
+    @app.post("/api/projects/<project_id>/github-pr")
+    @auth
+    def github_push(project_id):
+        data=request.get_json() or {}
+        owner=data.get("owner","");repo=data.get("repo","");path=data.get("path","design/screencraft/application.scraft")
+        base=data.get("base","main")
+        github_allowed(owner,repo,path)
+        p=get_project(engine,project_id,session["user_id"])
+        if p["role"] not in ("owner","admin","designer"):raise PermissionError("Project edit denied")
+        # New unique branch per proposed save; do not overwrite protected main.
+        from uuid import uuid4
+        heads=github_request(owner,repo,"git/ref/heads/"+quote(base,safe="/"))
+        branch="screencraft/design-"+uuid4().hex[:12]
+        github_request(owner,repo,"git/refs",method="POST",payload={"ref":"refs/heads/"+branch,"sha":heads["object"]["sha"]})
+        existing_sha=None
+        try:
+            existing=github_request(owner,repo,"contents/"+quote(path,safe="/")+"?ref="+quote(base,safe=""))
+            existing_sha=existing.get("sha")
+        except ValueError:
+            pass
+        file_payload={"message":"design: update ScreenCraft .scraft prototype","content":base64.b64encode(p["archive"]).decode("ascii"),"branch":branch}
+        if existing_sha:file_payload["sha"]=existing_sha
+        github_request(owner,repo,"contents/"+quote(path,safe="/"),method="PUT",payload=file_payload)
+        pr=github_request(owner,repo,"pulls",method="POST",payload={"title":"ScreenCraft: update application design","body":"Portable .scraft UI prototype update. Review design file and run validation before merge.","head":branch,"base":base})
+        return jsonify(url=pr["html_url"],branch=branch,number=pr["number"]),201
+
+    @app.post("/api/users")
+    @auth
+    def add_user():
+        body=request.get_json() or {}
+        # First setup-created user is the server administrator; other users are provisioned by them.
+        with Session(engine) as db:
+            first=db.scalar(select(User.id).order_by(User.username.asc()).limit(1))
+            # For production, use a dedicated admin role/migration rather than username ordering.
+            if session["user_id"]!=first:return jsonify(error="Only administrator can create accounts"),403
+        username=str(body.get("username","")).strip()
+        password=str(body.get("password",""))
+        if len(username)<3 or len(password)<12:return jsonify(error="Invalid credentials"),400
+        try: uid=create_user(engine,username,generate_password_hash(password))
+        except Exception:return jsonify(error="Unable to create user"),409
+        return jsonify(id=uid,username=username),201
 
     dist=Path(__file__).resolve().parents[2]/"frontend"/"dist"
     @app.get("/")
