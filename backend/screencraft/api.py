@@ -36,8 +36,7 @@ def create_app(config=None):
         GITHUB_TOKEN=os.environ.get("SCREENCRAFT_GITHUB_TOKEN",""),
         AUTH_MODE=os.environ.get("SCREENCRAFT_AUTH_MODE","local").lower(),
         UDA_IDENTITY_HEADER=os.environ.get("SCREENCRAFT_UDA_IDENTITY_HEADER","X-UDA-User"),
-        UDA_PROXY_SECRET=os.environ.get("SCREENCRAFT_UDA_PROXY_SECRET",""),
-        UDA_USERNAME=os.environ.get("SCREENCRAFT_UDA_ADMIN_USERNAME",""))
+        UDA_PROXY_SECRET=os.environ.get("SCREENCRAFT_UDA_PROXY_SECRET",""))
     if config:app.config.update(config)
     if not app.config["SECRET_KEY"] and not app.config.get("TESTING"):
         raise RuntimeError("Set SCREENCRAFT_SECRET_KEY before deployment")
