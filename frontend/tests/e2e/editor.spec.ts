@@ -67,3 +67,21 @@ test('drag from component gallery and resize on canvas',async({page})=>{
  const newWidth=await added.evaluate(e=>e.getBoundingClientRect().width);
  expect(newWidth).toBeGreaterThan(oldWidth);
 });
+
+test('reports exact API endpoint and status when proxy returns HTML instead of JSON',async({page})=>{
+ await page.goto('/');
+ // Start with app/project list, then intercept only the create request.
+ await page.route('**/api/projects',async route=>{
+    if(route.request().method()==='POST') {
+      await route.fulfill({status:502,contentType:'text/html',body:'<!doctype html><html><body>Proxy error</body></html>'});
+    } else {
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({projects:[]})});
+    }
+ });
+ await page.getByRole('button',{name:'Create application'}).click();
+ const error=page.locator('.status');
+ await expect(error).toContainText('POST /api/projects');
+ await expect(error).toContainText('HTTP 502');
+ await expect(error).toContainText('text/html');
+ await expect(error).not.toContainText('Unexpected token');
+});
