@@ -1,13 +1,13 @@
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from screencraft.package import starter_app,make_document
-from screencraft.store import Base,create_user,create_project,get_project,update_project,set_membership,mutate_rows
+from screencraft.store import Base,connect,create_user,create_project,get_project,update_project,set_membership,mutate_rows
 
 @pytest.fixture
 def store():
-    engine=create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
+    engine=connect("sqlite:///:memory:",auto_create=True)
     a=create_user(engine,"owner","hash")
     b=create_user(engine,"designer","hash")
     c=create_user(engine,"viewer","hash")
@@ -40,3 +40,26 @@ def test_mock_data_session_isolation_and_shared(store):
     with pytest.raises(PermissionError):mutate_rows(eng,pid,c,"customers","project-shared",seeds,"add",{"Name":"Denied"})
     with pytest.raises(ValueError):mutate_rows(eng,pid,a,"customers","project-shared",seeds,"add",{"Name":"Conflict"},expected_revision=1)
     assert len(common["rows"])==2
+
+
+def test_sqlite_foreign_keys_are_enforced(store):
+    engine, owner_id, _, _, project_id = store
+    with engine.connect() as connection:
+        assert connection.execute(text("PRAGMA foreign_keys")).scalar() == 1
+        with pytest.raises(IntegrityError):
+            connection.execute(text("""
+                INSERT INTO sc_memberships (project_id,user_id,role)
+                VALUES (:project,:user,'viewer')
+            """), {"project":"missing-project","user":owner_id})
+
+
+def test_owner_membership_created_with_valid_parent(store):
+    engine, owner_id, _, _, project_id = store
+    with engine.connect() as connection:
+        count=connection.execute(text("""
+            SELECT COUNT(*) FROM sc_memberships AS m
+            JOIN sc_projects AS p ON p.id=m.project_id
+            WHERE m.project_id=:project AND m.user_id=:user
+            AND m.role='owner'
+        """), {"project":project_id,"user":owner_id}).scalar_one()
+    assert count == 1

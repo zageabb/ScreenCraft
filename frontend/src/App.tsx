@@ -2,7 +2,21 @@ import React,{useState,useRef,useEffect} from 'react';
 import{blank,palette,newNode,updateNode,insertNode,cloneDoc}from './model';import type{Document,Node,Screen,Action}from './model';
 type Project={id:string;name:string;revision:number;role:string};
 function apiUrl(path:string){const prefix=location.pathname.startsWith('/apps/screencraft/')?'/apps/screencraft':'';return prefix+path}
-async function request(path:string,options:RequestInit={}){const r=await fetch(apiUrl(path),{credentials:'same-origin',headers:{'Content-Type':'application/json',...options.headers},...options});const body=await r.json();if(!r.ok)throw Error(body.error||'Request failed');return body}
+async function request(path:string,options:RequestInit={}) {
+ const url=apiUrl(path);
+ const r=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json',...options.headers},...options});
+ const type=r.headers.get('content-type')||'';
+ if(!type.toLowerCase().includes('application/json')){
+   // A proxy error, authentication redirect, wrong subpath or SPA fallback can return HTML.
+   // Do not print the HTML response: it may contain sensitive infrastructure details.
+   const note=r.redirected?' (redirected to '+new URL(r.url).pathname+')':'';
+   throw new Error('API '+(options.method||'GET')+' '+url+' returned HTTP '+r.status+' ('+(type||'no content type')+') instead of JSON'+note+'. Check the reverse-proxy route and server logs.');
+ }
+ let body:any;
+ try{body=await r.json()}catch{throw new Error('API '+(options.method||'GET')+' '+url+' returned invalid JSON (HTTP '+r.status+').')}
+ if(!r.ok)throw new Error('API '+(options.method||'GET')+' '+url+' failed ('+r.status+'): '+(body?.error||'Request failed'));
+ return body;
+}
 function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows,projectId}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;doc:Document;rows:Record<string,any>[];projectId:string}) {
  const drag=useRef<{x:number;y:number;startX:number;startY:number}|null>(null);
  const resize=useRef<{x:number;y:number;w:number;h:number}|null>(null);
