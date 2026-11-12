@@ -1,6 +1,6 @@
 export type Action={type:string;target_screen?:string;target_node?:string;dataset_id?:string;text?:string;values?:Record<string,unknown>;field_bindings?:Record<string,string>}
 export type Node={id:string;type:string;parent_id:string|null;props:Record<string,any>;layout:Record<string,any>;style?:Record<string,string>;action?:Action;bindings?:Record<string,any>;responsive?:any[];accessibility?:Record<string,any>}
-export type Screen={id:string;name:string;viewport:{width:number;height:number};layout:Record<string,any>;nodes:Node[]}
+export type Screen={id:string;name:string;viewport:{width:number;height:number};layout:Record<string,any>;nodes:Node[];shared_navigation_hidden?:boolean}
 export type Dataset={id:string;columns:{id:string;type:string}[];rows:Record<string,any>[];persistence?:string}
 export type SharedNavItem={id:string;label:string;target_screen?:string;parent_id?:string|null;icon?:string;hidden_on?:string[]};
 export type SharedNavigation={enabled:boolean;position:'left'|'right'|'top';collapsible:boolean;initial_collapsed?:boolean;mobile_collapsed?:boolean;items:SharedNavItem[]};
