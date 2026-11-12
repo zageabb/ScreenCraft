@@ -1,5 +1,5 @@
 import React,{useState,useRef,useEffect} from 'react';
-import{blank,palette,newNode,updateNode,insertNode,cloneDoc}from './model';import type{Document,Node,Screen,Action}from './model';
+import{blank,palette,newNode,updateNode,insertNode,cloneDoc,catalogueEntries,catalogueInfo,isContainer,isSupported,removeNodeTree,reparentNode,reorderScreen,cloneSubtree}from './model';import type{Document,Node,Screen,Action}from './model';
 import TableDataEditor from './TableDataEditor';
 import {withTableDataset,updateDataset} from './datasets';
 type Project={id:string;name:string;revision:number;role:string};
@@ -19,7 +19,7 @@ async function request(path:string,options:RequestInit={}) {
  if(!r.ok)throw new Error('API '+(options.method||'GET')+' '+url+' failed ('+r.status+'): '+(body?.error||'Request failed'));
  return body;
 }
-function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows,projectId}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;doc:Document;rows:Record<string,any>[];projectId:string}) {
+function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows,projectId,children,onDropChild}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void}) {
  const drag=useRef<{x:number;y:number;startX:number;startY:number}|null>(null);
  const resize=useRef<{x:number;y:number;w:number;h:number}|null>(null);
  const l=node.layout||{},p=node.props||{};const style:React.CSSProperties={position:'absolute',left:l.x||0,top:l.y||0,width:typeof l.width==='number'?l.width:200,height:typeof l.height==='number'?l.height:44,overflowX:l.overflow_x||'visible',overflowY:l.overflow_y||'visible',outline:selected&&mode==='design'?'2px solid #2878e0':'none',boxSizing:'border-box'};
@@ -37,10 +37,14 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows
  case 'image':child=p.asset?<img alt={p.alt||'Design image'} src={apiUrl('/api/projects/'+projectId+'/images/'+encodeURIComponent(String(p.asset).replace('assets/','')))} style={{maxWidth:'100%',maxHeight:'100%'}}/>:<span className="muted">Choose an image asset</span>;break;
  case 'tabs':child=<div className="tabs">Tab 1　 Tab 2</div>;break;
  case 'modal':child=<div className="modal-preview">Modal: {p.label||'Dialog'}</div>;break;
- case 'container':child=<div className="container-outline">Container</div>;break;
- default:child=<span>{p.text||p.label||'Text'}</span>;
+ case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':child=<div className={'container-outline nested-'+node.type.replace(/[^a-z0-9-]/g,'')}><strong>{p.label||node.type}</strong><div className="nested-content">{children}</div></div>;break;
+ case 'x-date':child=<label>{p.label||'Date'} <input type="date" disabled={mode==='design'}/></label>;break;
+ case 'x-number':child=<input type="number" placeholder={p.placeholder||'0'} disabled={mode==='design'}/>;break;
+ case 'x-textarea':child=<textarea placeholder={p.placeholder||'Enter text'} disabled={mode==='design'}/>;break;
+ case 'x-kpi':child=<div className="kpi-tile"><small>{p.label||'KPI'}</small><strong>{p.value||'0'}</strong></div>;break;
+ default:child=<div className="unsupported-object" role="note">Unsupported object: {node.type} (preserved)</div>;
  }
- return <div className={'canvas-node'+(mode==='design'?' editable':'')} style={style} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={e=>{if(mode==='design'){e.stopPropagation();onPick()}}} >{child}{mode==='design'&&selected&&<span className="resize-handle" title="Resize" onPointerDown={e=>{e.stopPropagation();resize.current={x:e.clientX,y:e.clientY,w:Number(l.width||200),h:Number(l.height||44)};e.currentTarget.setPointerCapture(e.pointerId)}} onPointerMove={e=>{e.stopPropagation();resizeMove(e)}} onPointerUp={e=>{e.stopPropagation();resize.current=null}}/>}</div>
+ return <div className={'canvas-node'+(mode==='design'?' editable':'')} style={style} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onClick={e=>{if(mode==='design'){e.stopPropagation();onPick()}}} onDragOver={e=>{if(mode==='design'&&isContainer(node.type)){e.stopPropagation();e.preventDefault()}}} onDrop={e=>{if(mode==='design'&&isContainer(node.type)){e.stopPropagation();e.preventDefault();onDropChild?.(e)}}} >{child}{mode==='design'&&selected&&<span className="resize-handle" title="Resize" onPointerDown={e=>{e.stopPropagation();resize.current={x:e.clientX,y:e.clientY,w:Number(l.width||200),h:Number(l.height||44)};e.currentTarget.setPointerCapture(e.pointerId)}} onPointerMove={e=>{e.stopPropagation();resizeMove(e)}} onPointerUp={e=>{e.stopPropagation();resize.current=null}}/>}</div>
 }
 function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {doc:Document;setDoc:(v:Document)=>void;onSave:()=>void;onExport:()=>void;canEdit:boolean;projectId:string;onImageUpload:(file:File,screenId:string,nodeId:string)=>void}) {
  const [mode,setMode]=useState<'design'|'preview'>('design'),[screenId,setScreenId]=useState(doc.start_screen),[screenNameDraft,setScreenNameDraft]=useState(''),[selected,setSelected]=useState<string|null>(null),[theme,setTheme]=useState(doc.default_theme),[message,setMessage]=useState(''),[modal,setModal]=useState<string|null>(null),[rows,setRows]=useState<Record<string,Record<string,any>[]>>({});
