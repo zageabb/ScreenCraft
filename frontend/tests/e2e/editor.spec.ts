@@ -323,7 +323,7 @@ test('Phase 9 editable grid previews selection, inline editing and row insertion
  await grid.getByRole('checkbox',{name:'Select row 1'}).check();
  await grid.getByRole('button',{name:'Delete selected'}).click();
  await expect(grid.locator('tbody tr')).toHaveCount(1);
- await expect(grid.locator('tbody')).toContainText('Zephyr Ltd');
+ await expect(grid.getByRole('textbox',{name:'Edit row 1 Name'})).toHaveValue('Zephyr Ltd');
 });
 test('Phase 9 sortable table filters records and saves configuration',async({page})=>{
  await page.locator('[data-catalogue-type="table"]').click();
