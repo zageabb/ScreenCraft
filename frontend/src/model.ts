@@ -1,4 +1,4 @@
-export type Action={type:string;target_screen?:string;target_node?:string;dataset_id?:string;text?:string;values?:Record<string,unknown>}
+export type Action={type:string;target_screen?:string;target_node?:string;dataset_id?:string;text?:string;values?:Record<string,unknown>;field_bindings?:Record<string,string>}
 export type Node={id:string;type:string;parent_id:string|null;props:Record<string,any>;layout:Record<string,any>;style?:Record<string,string>;action?:Action;bindings?:Record<string,any>;responsive?:any[];accessibility?:Record<string,any>}
 export type Screen={id:string;name:string;viewport:{width:number;height:number};layout:Record<string,any>;nodes:Node[]}
 export type Dataset={id:string;columns:{id:string;type:string}[];rows:Record<string,any>[];persistence?:string}
