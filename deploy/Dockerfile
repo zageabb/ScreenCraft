@@ -13,4 +13,4 @@ COPY backend/ /app/backend/
 COPY --from=frontend /build/dist/ /app/frontend/dist/
 ENV PYTHONPATH=/app/backend PYTHONUNBUFFERED=1
 EXPOSE 8085
-CMD ["sh","-c","alembic -c backend/alembic.ini upgrade head && exec gunicorn --bind 0.0.0.0:8085 --workers 2 screencraft.api:create_app()"]
+CMD ["sh","-c","alembic -c backend/alembic.ini upgrade head && exec gunicorn --bind 0.0.0.0:8085 --workers 2 'screencraft.api:create_app()'"]
