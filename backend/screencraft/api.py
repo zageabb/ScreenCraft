@@ -12,6 +12,7 @@ from pathlib import Path
 from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
+from secrets import compare_digest
 from flask import Flask, request, jsonify, session, send_file, abort, send_from_directory
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -32,7 +33,11 @@ def create_app(config=None):
         SESSION_COOKIE_PATH=os.environ.get("SCREENCRAFT_COOKIE_PATH","/"),
         SESSION_COOKIE_SECURE=os.environ.get("SCREENCRAFT_COOKIE_SECURE","1")=="1",
         MAX_CONTENT_LENGTH=MAX_ARCHIVE+4096,
-        GITHUB_TOKEN=os.environ.get("SCREENCRAFT_GITHUB_TOKEN",""))
+        GITHUB_TOKEN=os.environ.get("SCREENCRAFT_GITHUB_TOKEN",""),
+        AUTH_MODE=os.environ.get("SCREENCRAFT_AUTH_MODE","local").lower(),
+        UDA_IDENTITY_HEADER=os.environ.get("SCREENCRAFT_UDA_IDENTITY_HEADER","X-UDA-User"),
+        UDA_PROXY_SECRET=os.environ.get("SCREENCRAFT_UDA_PROXY_SECRET",""),
+        UDA_USERNAME=os.environ.get("SCREENCRAFT_UDA_ADMIN_USERNAME",""))
     if config:app.config.update(config)
     if not app.config["SECRET_KEY"] and not app.config.get("TESTING"):
         raise RuntimeError("Set SCREENCRAFT_SECRET_KEY before deployment")
@@ -40,8 +45,53 @@ def create_app(config=None):
     # LOCAL_UBUNTU_PROXY_COMPAT: forwarded prefix must only be trusted from private Caddy hop.
     if os.environ.get("SCREENCRAFT_TRUST_PROXY")=="1":
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=1,x_proto=1,x_host=1,x_prefix=1)
+    if app.config["AUTH_MODE"] not in ("local","uda"):
+        raise RuntimeError("SCREENCRAFT_AUTH_MODE must be local or uda")
+    if app.config["AUTH_MODE"]=="uda":
+        identity_header=app.config["UDA_IDENTITY_HEADER"]
+        if not re.fullmatch(r"[A-Za-z][A-Za-z0-9-]{2,79}",identity_header):
+            raise RuntimeError("Invalid configured UDA identity header")
+        if len(app.config["UDA_PROXY_SECRET"])<32:
+            raise RuntimeError("UDA mode requires a random SCREENCRAFT_UDA_PROXY_SECRET (32+ chars)")
     engine=connect(app.config["SQLALCHEMY_URL"],auto_create=bool(app.config.get("TESTING")) or os.environ.get("SCREENCRAFT_AUTO_CREATE_SCHEMA")=="1")
     app.extensions["screencraft_engine"]=engine
+
+    def uda_user():
+        # LOCAL_UBUNTU_PROXY_COMPAT: trust only UDA-verified identity passed
+        # through private, authenticated Caddy ingress. Neither forwarded
+        # headers nor a prior Flask session alone authenticate a user.
+        identity=request.headers.get(app.config["UDA_IDENTITY_HEADER"],"").strip()
+        secret=request.headers.get("X-ScreenCraft-Proxy-Secret","")
+        if not identity or not compare_digest(secret,app.config["UDA_PROXY_SECRET"]):
+            return None
+        if not re.fullmatch(r"[A-Za-z0-9_.+@-]{3,254}",identity):
+            return None
+        username=identity.lower()
+        with Session(engine) as db:
+            existing=db.scalar(select(User).where(User.username==username))
+            if existing:
+                return (existing.id,existing.username)
+            from uuid import uuid4
+            # First-time UDA users are never implicitly application admins.
+            created=User(id=str(uuid4()),username=username,
+                password_hash="!uda-auth-only",is_admin=False)
+            db.add(created)
+            db.commit()
+            return (created.id,created.username)
+
+    @app.before_request
+    def uda_authentication():
+        if app.config["AUTH_MODE"]!="uda" or request.path in ("/api/health","/api/auth-mode"):
+            return None
+        if not request.path.startswith("/api/"):
+            return None
+        identity=uda_user()
+        if not identity:
+            session.clear()
+            return jsonify(error="Verified UDA identity required"),401
+        session["user_id"]=identity[0]
+        session["auth_mode"]="uda"
+        return None
 
     @app.before_request
     def same_origin_mutations():
@@ -78,8 +128,13 @@ def create_app(config=None):
 
     @app.get("/api/health")
     def health():return jsonify(status="ok",version="0.1.0")
+
+    @app.get("/api/auth-mode")
+    def auth_mode():return jsonify(mode=app.config["AUTH_MODE"])
     @app.post("/api/bootstrap")
     def bootstrap():
+        if app.config["AUTH_MODE"]=="uda":
+            return jsonify(error="Local accounts are disabled when UDA authentication is enabled"),403
         with Session(engine) as db:
             if db.scalar(select(User.id).limit(1)):
                 return jsonify(error="Already initialized"),403
@@ -94,6 +149,8 @@ def create_app(config=None):
 
     @app.post("/api/login")
     def login():
+        if app.config["AUTH_MODE"]=="uda":
+            return jsonify(error="Use UDA login"),403
         username=(request.json or {}).get("username","")
         password=(request.json or {}).get("password","")
         with Session(engine) as db:
@@ -103,7 +160,11 @@ def create_app(config=None):
             session.clear();session["user_id"]=user.id
             return jsonify(id=user.id,username=user.username,is_admin=user.is_admin)
     @app.post("/api/logout")
-    def logout():session.clear();return jsonify(ok=True)
+    def logout():
+        if app.config["AUTH_MODE"]=="uda":
+            return jsonify(error="Sign out through UDA"),403
+        session.clear()
+        return jsonify(ok=True)
     @app.get("/api/me")
     @auth
     def me():
@@ -314,6 +375,8 @@ def create_app(config=None):
     @app.post("/api/users")
     @auth
     def add_user():
+        if app.config["AUTH_MODE"]=="uda":
+            return jsonify(error="Accounts are managed through UDA; invite an existing UDA user by project membership"),403
         body=request.get_json() or {}
         with Session(engine) as db:
             actor=db.get(User,session["user_id"])
