@@ -124,3 +124,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - Frontend detects the auth mode and suppresses the ScreenCraft login/password form for UDA sessions. Local mode remains available for non-UDA installations and rollback.
 - Security design and Caddy handoff documented in docs/UDA_AUTHENTICATION.md. **The actual UDA username header or verified identity placeholder is not documented in Application-Standard and must be confirmed by Desktop from the live UDA configuration before enabling**. Never forward user-supplied identity headers.
 - Validation: Python trust-boundary and legacy-account-preservation tests; React build and browser regression still to verify. No deployment/security assertion until Caddy live identity mapping is tested. Existing server has not been reconfigured in this PR.
+
+### UDA integration merge and validation (2026-11-12)
+- PR [#8](https://github.com/zageabb/ScreenCraft/pull/8) merged into main as `9e36ad7dd082b3ba2959b7272014167855d2ef0e`.
+- All five GitHub Actions jobs (docs, Python, React, Playwright browser, Docker) passed on PR SHA `cac24984fe88d58c40243ba712859cb4a6987934` (run [43264058633](https://github.com/zageabb/ScreenCraft/actions/runs/43264058633)).
+- **Runtime status:** UDA sign-on is implemented but **not enabled or accepted on the live Ubuntu server**. Local login remains the default until Desktop establishes a verified identity header and server-protected assertion from the actual UDA/Caddy configuration, verifies existing admin identity mapping and tests denial of spoofed/anonymous requests.
+- No database migration required; do not reset existing users or project ACLs. Rollback: `SCREENCRAFT_AUTH_MODE=local`.
