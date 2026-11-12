@@ -326,7 +326,7 @@ function renderSharedNav(){
  mobile.setAttribute('aria-expanded',String(mobileOpen));mobile.onclick=()=>{mobileOpen=!mobileOpen;render()};controls.append(mobile);panel.append(controls);
  const listing=el('div');listing.className='sc-shared-nav-items';panel.append(listing);
  const valid=new Set(Object.keys(screens));
- const items=(nav.items||[]).filter(item=>item.target_screen&&valid.has(item.target_screen)&&!(item.hidden_on||[]).includes(active));
+ const items=(nav.items||[]).filter(item=>(!item.target_screen||valid.has(item.target_screen))&&!(item.hidden_on||[]).includes(active));
  const ids=new Set(items.map(item=>item.id));
  function make(item,trail=new Set()){
   if(trail.has(item.id))return null;
