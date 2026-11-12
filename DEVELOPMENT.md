@@ -93,3 +93,11 @@ All items remain proposals, not implemented or tested.
 - **Security checks:** concurrent project saves use atomic SQL conditional revision; project-shared dataset writes require a matching revision and use row locking; server GitHub credentials restricted to ScreenCraft administrator and allowlisted repos.
 - **Manual acceptance still pending:** live PostgreSQL migration/restore; Ubuntu Caddy /apps/screencraft/ route; authentication across actual UDA session and cookie path; actual GitHub repo PR round trip; browser accessibility/200% zoom and design fidelity; multi-user concurrent end-to-end test; Figma import is a later phase.
 - **Merge policy:** code may enter main as a documented prototype when CI green, but do not tag it production-ready or claim deployment. A release acceptance checklist remains open in docs/ACCEPTANCE.md.
+
+## Ubuntu manual acceptance: project creation returned HTML, 2026-11-12
+- User confirmed ScreenCraft renders through `/apps/screencraft/` and first administrator login succeeded.
+- On Applications screen, UI displayed `SyntaxError: Unexpected token '<', '<!doctype ...' is not valid JSON`. This means **an API fetch received an HTML response**, but the screenshot does not establish which URL, HTTP status or upstream service returned it. Root cause NOT yet confirmed; do not mark resolved from static review alone.
+- Fix branch `fix/caddy-api-html-response-diagnostics`: frontend checks response Content-Type and reports request method/path, HTTP status, MIME type and redirect path (without printing response contents); Flask returns JSON for missing/method-invalid `/api/*` routes.
+- New tests: Caddy-style prefix bootstrap and project creation; JSON errors; Playwright HTML/proxy-response diagnostics.
+- Manual acceptance after deployment: reproduce Create application, record exact displayed API path/status, inspect browser Network request and Caddy/upstream logs, confirm new project opens and reloads. Never send passwords, setup keys, session cookies or authentication headers into an issue or chat.
+- If the diagnostic shows `/api/projects` with HTML, inspect Caddy route priority and whether `handle_path /apps/screencraft/*` is reached before catch-all SPA/site routes. If upstream returns HTML for an internal error, use logs to locate the exception; do not assume a proxy rewrite is the cause.
