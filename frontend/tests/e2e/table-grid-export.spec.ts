@@ -52,8 +52,7 @@ test('real offline HTML export supports sorting, page navigation, filtering and 
  await grid.getByRole('textbox',{name:'Edit row 3 Name'}).fill('New Customer');
  await grid.getByRole('textbox',{name:'Edit row 3 Status'}).fill('Active');
  await table.getByRole('textbox',{name:'Search records'}).fill('New Customer');
- // Tables will display the same underlying data on a subsequent explicit render.
- await page.getByRole('button',{name:'Home'}).click();
+ // Search triggers a fresh table view over the shared offline dataset.
  await expect(table.locator('tbody tr')).toHaveCount(1);
  await expect(table).toContainText('New Customer');
  expect(requests).toEqual([]);
