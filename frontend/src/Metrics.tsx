@@ -1,6 +1,5 @@
 import React from 'react';
 export type MetricProps={dataset_id?:string;label?:string;value?:string;aggregation?:string;value_column?:string;category_column?:string;chart_type?:string};
-const validOps=['count','sum','average','min','max'] as const;
 export function aggregate(rows:Record<string,any>[],op:string,column:string):number{
  if(op==='count')return rows.length;
  const values=rows.map(r=>Number(r[column])).filter(Number.isFinite);
@@ -42,8 +41,8 @@ export function DataChart({props,rows}: {props:MetricProps;rows:Record<string,an
     {type==='pie'&&data.map((d,i)=>{const fraction=total?Math.max(0,d.value)/total:0;const r=74,cx=240,cy=105;const start=cumulative; cumulative+=fraction;
       if(fraction===0)return null;
       if(fraction>=1)return <circle key={d.name} cx={cx} cy={cy} r={r} fill={palette[i%palette.length]}/>;
-      const angle=a=>(a-.25)*2*Math.PI;
-      const at=a=>[cx+r*Math.cos(angle(a)),cy+r*Math.sin(angle(a))];
+      const angle=(a:number)=>(a-.25)*2*Math.PI;
+      const at=(a:number)=>[cx+r*Math.cos(angle(a)),cy+r*Math.sin(angle(a))];
       const p1=at(start),p2=at(cumulative);
       return <path key={d.name} d={`M ${cx} ${cy} L ${p1.join(' ')} A ${r} ${r} 0 ${fraction>.5?1:0} 1 ${p2.join(' ')} Z`} fill={palette[i%palette.length]}/>;
     })}
