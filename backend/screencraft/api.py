@@ -66,7 +66,7 @@ def create_app(config=None):
         username=request.json.get("username","").strip()
         password=request.json.get("password","")
         if len(username)<3 or len(password)<12:return jsonify(error="Invalid credentials"),400
-        uid=create_user(engine,username,generate_password_hash(password))
+        uid=create_user(engine,username,generate_password_hash(password),is_admin=True)
         session["user_id"]=uid
         return jsonify(id=uid,username=username),201
 
@@ -240,11 +240,10 @@ def create_app(config=None):
     @auth
     def add_user():
         body=request.get_json() or {}
-        # First setup-created user is the server administrator; other users are provisioned by them.
         with Session(engine) as db:
-            first=db.scalar(select(User.id).order_by(User.username.asc()).limit(1))
-            # For production, use a dedicated admin role/migration rather than username ordering.
-            if session["user_id"]!=first:return jsonify(error="Only administrator can create accounts"),403
+            actor=db.get(User,session["user_id"])
+            if not actor or not actor.is_admin:
+                return jsonify(error="Only administrator can create accounts"),403
         username=str(body.get("username","")).strip()
         password=str(body.get("password",""))
         if len(username)<3 or len(password)<12:return jsonify(error="Invalid credentials"),400
