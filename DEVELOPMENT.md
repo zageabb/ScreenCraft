@@ -266,3 +266,11 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Testing:** Playwright Preview and real Python-generated offline HTML browser tests verify required/short/out-of-range rejection and successful insertion after correction. CI React, Python, browser, Docker and docs as usual. Live Ubuntu user acceptance separate.
 
 **Limitations:** This is prototype validation, not production backend enforcement or a generalized submission form object. Cross-field rules, server trust, custom regex and multi-field validation summaries are future design decisions. FigmaBridge remains deferred.
+
+### Phase 9 continuation — merged implementation and acceptance (2026-11-12)
+
+- **Phase 9B charts & KPIs:** PR #15 https://github.com/zageabb/ScreenCraft/pull/15 merged as `b03a1c8bdb12d953649d4ba16e97740c76a610ab`. All five CI checks passed on branch head `8f3d19945821c197c293a6eb47ceeba1d8910666` (run https://github.com/zageabb/ScreenCraft/actions/runs/43310042195).
+- **Phase 9C layout/navigation:** PR #17 https://github.com/zageabb/ScreenCraft/pull/17 merged as `b441273eb0411e1148df4cbf543aea0ab50656fc`. All five CI checks passed on reconciled branch head `fe9c36f7ea27484bc4e43f9f4e03875f31d3b2e9` (run https://github.com/zageabb/ScreenCraft/actions/runs/43311895519). Superseded PR #16 was closed, preserving the concurrent Phase 9.1 planned work on main.
+- **Phase 9D input validation:** PR #18 https://github.com/zageabb/ScreenCraft/pull/18 merged as `bbb64ea9bd8658c4ce4a2aae56959ea395c8b19f`. All five CI checks passed on branch head `186eb1c9022ea2557a57edc523609ae1e7b5ad4e` (run https://github.com/zageabb/ScreenCraft/actions/runs/43312512510).
+- **Deployment:** Changes are in GitHub main but have not been deployed to or manually accepted on live Ubuntu in this chat. No database schema migration is needed; after Desktop updates main, verify UDA sign-in, chart/KPI aggregation, step switching, accordion nested content and input validation in Preview **and** Interactive HTML export.
+- **Future:** Phase 9.1 collapsible containers/shared app-level navigation remains a distinct PLANNED specification, not completed by the Phase 9C local sidebar/accordion work. FigmaBridge remains deferred. Production hardening (Phase 10) and accessibility/mobile acceptance remain open.
