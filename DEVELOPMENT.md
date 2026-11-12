@@ -44,18 +44,27 @@ All items remain proposals, not implemented or tested.
 
 ## Phase 5 — AI-governed application design authority (future scope, approved direction 2026-11-12)
 
-**Decision:** ScreenCraft is intended to govern the **complete application design**, not screens alone: UI/layout and responsive behaviour, navigation and interactions, database schemas/data models, API contracts, business workflows, permissions/roles, and associated validation and acceptance criteria. ScreenCraft supplies the approved, versioned design contract; AI coding agents implement it in the target repository; automated and human checks verify conformance. This does **not** mandate a particular implementation framework.
+**Decision (refined 2026-11-12):** Screen layouts and their identifiable components are the **only mandatory authored design baseline**. Other areas—behaviour, bindings, navigation details, database/data models, API contracts, workflows, permissions/roles and acceptance criteria—are **optional design inputs** and may be absent, incomplete or revised. ScreenCraft should be capable of governing these areas when provided or subsequently approved, but must not require users to completely specify them before AI-assisted development can proceed. The goal is **controlled, progressive development, not rigid specification completeness**. This does **not** mandate a particular implementation framework.
 
 **Scheduling / non-interference:** This section is a requirement and roadmap addition only. Continue the existing Phase 1–4 scope, development, CI, testing and acceptance independently. Do **not** divert, block, rebase, or restart the current Phase 1–4 work for Phase 5. Phase 5 implementation requires separate planning and acceptance after the core foundation is sufficiently stable.
 
 | ID | Future workstream | Status | First acceptance |
 |---|---|---|---|
 | SC-019 | Versioned, stable-ID declarative design contracts for screens/components, behaviour, bindings, navigation and responsive rules | PLANNED (Phase 5) | A design change produces a deterministic and machine-readable diff |
-| SC-020 | Application architecture contracts: relational entities, schema migrations, API request/response schemas, integrations and workflow definitions | PLANNED (Phase 5) | Contracts are validated and referenceable without prescribing generated code |
-| SC-021 | Identity, role/permission models and server-enforced security requirements | PLANNED (Phase 5) | Access rules have traceable positive and negative acceptance tests |
+| SC-020 | Optional, incrementally enrichable application architecture contracts: entities, schema migrations, API schemas, integrations and workflows | PLANNED (Phase 5) | Absent contracts do not block development; approved additions are versioned and validated |
+| SC-021 | Optional authored identity/role/permission design, plus mandatory enforcement of applicable security requirements | PLANNED (Phase 5) | AI can propose missing role rules; required backend security is still verified |
 | SC-022 | Design-to-development handoff: export .scraft to application repos, produce change requests/issues and agent-readable tasks | PLANNED (Phase 5) | Agent can identify changed contract elements and required work |
 | SC-023 | Implementation conformance: structural checks, browser/visual regression, API, workflow, data and permission tests | PLANNED (Phase 5) | CI reports pass/fail and traceability to design requirements |
-| SC-024 | Governance: approval baselines, version history, deviations, design-to-code status and reverse feedback | PLANNED (Phase 5) | Implementation may report differences but cannot silently overwrite approved design |
+| SC-024 | Governance: approval baselines, version history, deviations, design-to-code status and reverse feedback | PLANNED (Phase 5) | AI proposals and approved changes update the baseline transparently; no silent overwrite |
+
+### Progressive AI design-change policy
+- **Mandatory minimum:** a valid screen design with stable screen/component identifiers. Optional specification fields must not be mandatory checkboxes or hard development gates.
+- **AI initiative:** when an unspecified interaction, field, screen, endpoint, workflow step or rule is needed, the agent proposes a sensible addition with rationale, impact and tests. It should not freeze the entire task because the designer omitted a detail.
+- **Approval tiers:** (1) Within already-approved intent, low-risk implementation decisions may proceed autonomously and be recorded; (2) Material changes to approved screens, user-visible behaviour, data contracts, workflows or permissions are proposed as reviewable design amendments and require approval before becoming authoritative; (3) Destructive migrations, access expansion, sensitive data exposure, external actions and deployment always require the appropriate explicit approval.
+- **Nonblocking execution:** while approval is pending, the AI continues independent development and testing, and may use clearly marked provisional assumptions or non-destructive mocks for dependent work. It must not quietly treat an unapproved proposal as a new baseline.
+- **Change lifecycle:** identify gap → propose change with diff, rationale, risk and acceptance tests → classify approval tier → continue safe independent work → approve/reject/amend → version .scraft design and implementation trace → validate in CI.
+- **Guardrails:** optional specification does not mean optional security, accessibility or correctness. Apply repository standards and safe defaults; ask for approval when a meaningful product/security choice cannot be made safely.
+- **Traceability:** distinguish approved requirements, agent proposals, provisional assumptions, implemented changes and rejected changes. Capture decisions and outstanding approvals in DEVELOPMENT.md or linked issues.
 
 ### Format constraints to preserve during Phases 1–4 (forward compatibility, not new implementation blockers)
 - Preserve stable unique IDs for screens, components, interactions and other schema entities; avoid position-dependent identification.
@@ -72,4 +81,4 @@ All items remain proposals, not implemented or tested.
 - Screen similarity alone is insufficient: visual, functional, persistence, data migration, API, workflow and security evidence are distinct.
 - Record contract revisions, implementation traceability, approvals, deviations and test evidence in DEVELOPMENT.md or linked repository artefacts.
 
-**Phase 5 acceptance (future):** Given an approved change to an application design, ScreenCraft generates a reproducible versioned change contract and development task, the AI agent can implement it on a review branch, automated checks report conformance across UI/data/API/workflow/security, and the approved baseline remains unchanged until explicit sign-off.
+**Phase 5 acceptance (future):** Starting with screens alone and no authored API/database/workflow/permission contracts, the AI can develop a working implementation, propose missing requirements without deadlock, continue safe independent work while awaiting material decisions, and record all assumptions and approvals. Once a design change is approved, ScreenCraft generates a reproducible versioned contract and development task; tests report compliance for the specified areas and applicable safety standards, with no silent alteration to the approved baseline.
