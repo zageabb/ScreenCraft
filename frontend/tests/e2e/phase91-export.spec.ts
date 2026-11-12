@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {execFileSync} from 'node:child_process';
 import {resolve} from 'node:path';
 
-function html(){
+function html(optOut=false){
  const python=`
 from screencraft.package import starter_app
 from screencraft.export import interactive_html
@@ -42,9 +42,10 @@ doc["screens"][0]["nodes"]=[
  {"id":"add","type":"button","parent_id":None,"props":{"label":"Add record"},"layout":{"x":480,"y":160,"width":160,"height":40},
   "action":{"type":"add_mock_row","dataset_id":"records","field_bindings":{"Name":"name"}}}
 ]
+doc['screens'][1]['shared_navigation_hidden']=__OPTOUT__
 print(interactive_html(doc))
 `;
- return execFileSync('python3',['-c',python],{
+ return execFileSync('python3',['-c',python.replace('__OPTOUT__',optOut?'True':'False')],{
   env:{...process.env,PYTHONPATH:resolve(process.cwd(),'../backend')},
   encoding:'utf8',maxBuffer:10*1024*1024
  });
@@ -92,10 +93,12 @@ test('offline shared app menu is single-source, nested, active, responsive and h
  await expect(nav).toHaveClass(/mobile-open/);
 });
 
-test('offline document screen-level opt-out hides shared menu only on that screen',async({page})=>{
- const modified=html().replace('"id":"details","name":"Details"', '"id":"details","name":"Details"');
- // Use an actual document-based opt-out by patching the embedded data rather than DOM only.
- const source=modified.replace('"shared_navigation_hidden":false','"shared_navigation_hidden":true');
- await page.setContent(source,{waitUntil:'load'});
- await expect(page.getByRole('navigation',{name:'Application navigation'})).toHaveCount(1);
+test('offline per-screen opt-out suppresses global menu without deleting its definition',async({page})=>{
+ await page.setContent(html(true),{waitUntil:'load'});
+ const nav=page.getByRole('navigation',{name:'Application navigation'});
+ await nav.getByRole('button',{name:'Expand General'}).click();
+ await nav.getByRole('button',{name:'Details link'}).click();
+ await expect(nav).toHaveCount(0);
+ await page.getByRole('button',{name:'Prototype home'}).click();
+ await expect(nav).toHaveCount(1);
 });
