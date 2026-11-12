@@ -6,7 +6,7 @@ import json
 import re
 from pathlib import PurePosixPath
 from uuid import uuid4
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZIP_DEFLATED, BadZipFile
 
 MAX_ARCHIVE = 25 * 1024 * 1024
 MAX_EXPANDED = 100 * 1024 * 1024
@@ -110,7 +110,7 @@ def read_document(blob: bytes):
                         raise FormatError("Invalid WebP")
                     assets[name] = data
             return manifest, app, assets
-    except (OSError, ValueError, KeyError, EOFError) as exc:
+    except (OSError, ValueError, KeyError, EOFError, BadZipFile) as exc:
         if isinstance(exc, FormatError):
             raise
         raise FormatError("Corrupt .scraft archive") from exc
