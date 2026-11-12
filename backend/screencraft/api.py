@@ -3,6 +3,8 @@ from __future__ import annotations
 import io
 import json
 import base64
+import hashlib
+import mimetypes
 import os
 import re
 from functools import wraps
@@ -149,6 +151,53 @@ def create_app(config=None):
         p=get_project(engine,project_id,session["user_id"])
         _,document,assets=read_document(p["archive"])
         return send_file(io.BytesIO(interactive_html(document, assets).encode()),mimetype="text/html",as_attachment=True,download_name="prototype.html")
+    @app.post("/api/projects/<project_id>/images")
+    @auth
+    def upload_image(project_id):
+        old=get_project(engine,project_id,session["user_id"])
+        if old["role"] not in ("owner","admin","designer"):
+            raise PermissionError("Project edit denied")
+        if "file" not in request.files:
+            return jsonify(error="Missing image"),400
+        uploaded=request.files["file"]
+        data=uploaded.read(12*1024*1024+1)
+        if len(data)>12*1024*1024:
+            return jsonify(error="Image exceeds 12 MB"),413
+        ext=Path(uploaded.filename or "").suffix.lower()
+        from .package import ALLOWED_IMAGES
+        if ext not in ALLOWED_IMAGES or not data.startswith(ALLOWED_IMAGES[ext]):
+            return jsonify(error="Unsupported image or invalid image signature"),400
+        if ext==".webp" and data[8:12]!=b"WEBP":
+            return jsonify(error="Invalid WebP image"),400
+        digest=hashlib.sha256(data).hexdigest()
+        name="assets/"+digest+ext
+        manifest,document,assets=read_document(old["archive"])
+        assets[name]=data
+        document.setdefault("assets",[])
+        if not any(a.get("path")==name for a in document["assets"]):
+            document["assets"].append({"id":digest[:16],"path":name,"media_type":mimetypes.guess_type(name)[0],"sha256":digest})
+        node_id=request.form.get("node_id")
+        screen_id=request.form.get("screen_id")
+        if node_id and screen_id:
+            for screen in document.get("screens",[]):
+                if screen.get("id")==screen_id:
+                    for node in screen.get("nodes",[]):
+                        if node.get("id")==node_id and node.get("type")=="image":
+                            node.setdefault("props",{})["asset"]=name
+        manifest["document_revision"]=manifest.get("document_revision",1)+1
+        packed=make_document(document,assets,manifest)
+        revision=update_project(engine,project_id,session["user_id"],packed,int(request.form.get("revision",0)))
+        return jsonify(revision=revision,path=name,sha256=digest),201
+
+    @app.get("/api/projects/<project_id>/images/<path:asset_name>")
+    @auth
+    def get_image(project_id,asset_name):
+        p=get_project(engine,project_id,session["user_id"])
+        _,_,assets=read_document(p["archive"])
+        name="assets/"+asset_name
+        if name not in assets:abort(404)
+        return send_file(io.BytesIO(assets[name]),mimetype=mimetypes.guess_type(name)[0] or "application/octet-stream",max_age=3600)
+
     @app.post("/api/projects/<project_id>/members")
     @auth
     def member(project_id):
