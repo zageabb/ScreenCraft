@@ -52,3 +52,8 @@ No runnable ScreenCraft application has been released.
 - Added table and grid search, sortable headers, fixed column filtering and configurable pagination in the Properties inspector.
 - Mirrored the data controls in fully self-contained offline HTML export; mock writes never target production SQL.
 - Added browser tests for editor Preview and generated HTML parity including sorted/index-stable row deletion.
+
+## Phase 9B — Charts and KPIs
+- Activated canonical x-chart object with SVG bar, line and pie charts, dataset grouping and numeric/count aggregation.
+- Enhanced x-kpi with dataset-linked count, sum, average, min and max, while preserving existing static-value designs.
+- Added right-side metric properties and standalone offline HTML equivalents with real browser tests.
