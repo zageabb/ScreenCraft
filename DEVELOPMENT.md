@@ -172,3 +172,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Tests:** Two-screen responsive design with nested/extension types, images, synthetic datasets and navigation; invalid IDs/references/actions/asset checksums, unsupported major and forward v1 minor versions, local JSON refs including cyclic/remote rejection, JSON depth/duplicate keys, API read-only inspection and failed import preserving the current project, plus browser warning and approval flow.
 
 **Known limitations:** This phase does not claim formal external certification or full rendering of every catalogue extension. Uploaded image decoding/dimension inspection and complete content provenance scanning need additional hardening; the accepted file types/byte limits and signature checks remain in force. Self-contained zip ref expansion on import is supported; unknown extra unreferenced JSON entries are not preserved on re-pack. No DB schema or UDA/Caddy changes. Live Ubuntu manual acceptance remains separate from CI.
+
+### Phase 6 merge and automated acceptance (2026-11-12)
+- **Merged:** PR #11 (https://github.com/zageabb/ScreenCraft/pull/11), squash commit `9636464fe3bea298f81a54fb0dd014af8b002ac0`.
+- **All five CI jobs passed** for final branch SHA `534f7490612737b8a6d95186eea100f7162469be` in workflow https://github.com/zageabb/ScreenCraft/actions/runs/43277489317 (Python, React, browser/Playwright, Docker, documentation).
+- **Deployment status:** Included in GitHub main; live Ubuntu Caddy/UDA deployment and real-file import acceptance are not yet verified. No database migration required.
+- **Follow-up hardening:** Real image decoding/dimension enforcement, expanded component capability checks, audit log of imports, and retaining unrelated extra JSON ZIP entries are not yet complete. These do not block the tested SCRAFT-1 validation/import workflow, but they are not claimed as finished.
