@@ -24,3 +24,5 @@ Optional. Set `SCREENCRAFT_ALLOWED_REPOS` (comma-separated owner/repo) to explic
 
 ## Verification status
 Deployment not performed; GitHub Actions checks and local tests must be recorded in DEVELOPMENT.md. No exposure of live service has been requested from this chat.
+
+**Cookie configuration:** production Compose sets `SCREENCRAFT_COOKIE_PATH=/apps/screencraft` to scope the unique application session cookie to its Caddy prefix. For direct root-path local development set cookie path to `/` and keep the backend isolated.
