@@ -309,7 +309,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  }
  x.dataset.nodeId=n.id;x.classList.add('sc-node');
  if(typeof l.width==='number')x.style.width=l.width+'px';else if(l.width==='fill')x.style.width='100%';
- if(typeof l.height==='number')x.style.height=l.height+'px';
+ if(x._hideChildren)x.style.height='40px';else if(typeof l.height==='number')x.style.height=l.height+'px';
  if(typeof l.max_height==='number')x.style.maxHeight=l.max_height+'px';
  if(l.overflow_x)x.style.overflowX=l.overflow_x;if(l.overflow_y)x.style.overflowY=l.overflow_y;
  if(l.x!==undefined||l.y!==undefined){x.style.position='absolute';x.style.left=(l.x||0)+'px';x.style.top=(l.y||0)+'px'}
