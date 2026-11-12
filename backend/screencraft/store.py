@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from uuid import uuid4
-from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select
+from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select, update
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 class Base(DeclarativeBase): pass
@@ -65,9 +65,13 @@ def update_project(engine, project_id, user_id, archive, expected_revision):
     with Session(engine) as db:
         if get_role(db,project_id,user_id) not in ("owner","admin","designer"):
             raise PermissionError("Project edit denied")
-        p=db.get(Project,project_id)
-        if not p or p.revision != expected_revision: raise ValueError("Revision conflict")
-        p.archive=archive;p.revision+=1;db.commit();return p.revision
+        result=db.execute(update(Project).where(Project.id==project_id,Project.revision==expected_revision).values(
+            archive=archive,revision=Project.revision+1))
+        if result.rowcount!=1:
+            db.rollback()
+            raise ValueError("Revision conflict")
+        db.commit()
+        return expected_revision+1
 
 def set_membership(engine, project_id, actor_id, user_id, role):
     if role not in ("owner","admin","designer","viewer"): raise ValueError("Invalid role")
