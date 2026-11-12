@@ -17,3 +17,13 @@ Read README.md, DEVELOPMENT.md, DID.md, STANDARD_VERSION.md and docs/ARCHITECTUR
 
 ## Interactive prototype approved direction (2026-11-12)
 Read docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md before implementing editor, data store or deployment. First runnable version must be Ubuntu/Caddy /apps/screencraft/ compatible; single .scraft ZIP packages include images; SQL-backed mock data must have explicitly isolated and shared preview modes; standalone one-file interactive HTML export must work offline and never claim production database behaviour.
+
+## Mandatory interactive HTML export parity
+
+**Every editor or Preview behaviour change MUST be checked against the standalone interactive HTML exporter in the same pull request.** Keep `backend/screencraft/export.py` and its offline browser tests in sync whenever changing object properties, data types, input controls, action bindings, dataset columns/rows, navigation, modals, themes or responsive layout.
+
+- The standalone HTML must behave equivalently for supported prototype-safe interactions, including `add_mock_row` with `field_bindings` that read the current values of text/number/date/select/checkbox/textarea inputs.
+- Preserve the published `.scraft` action schema; avoid duplicate incompatible binding formats. Static `action.values` are defaults, and bound input values override the respective dataset columns at click time.
+- Export must remain a **single self-contained offline HTML file** with no network dependencies or production data mutations. Mock table changes must be in-memory only.
+- Add or update automated tests that **open the actual generated export in a browser** and exercise the changed behaviour, not just check for JavaScript source strings. Compare the result with editor Preview where relevant.
+- A feature is not complete if it works in ScreenCraft Preview but fails after Interactive HTML export. Document any intentionally unsupported feature as a visible limitation and keep the export safe.
