@@ -38,3 +38,19 @@ def test_unauthorized_github(app):
     c=app.test_client()
     c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
     assert c.get("/api/github/random/unapproved/scraft").status_code==403
+
+def test_image_upload_bundled_export(app):
+    import io
+    c=app.test_client()
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    pid=c.post("/api/projects",json={"name":"Image demo"}).json["id"]
+    data={"revision":"1","screen_id":"home","node_id":"heading",
+          "file":(io.BytesIO(b"\\x89PNG\\r\\n\\x1a\\n"+b"dummy"),"logo.png")}
+    response=c.post("/api/projects/"+pid+"/images",data=data,content_type="multipart/form-data")
+    assert response.status_code==201,response.json
+    path=response.json["path"]
+    saved=c.get("/api/projects/"+pid+"/download")
+    _,app_doc,assets=read_document(saved.data)
+    assert path in assets and any(a["path"]==path for a in app_doc["assets"])
+    assert c.get("/api/projects/"+pid+"/images/"+path.replace("assets/","")).status_code==200
+    assert b"data:image/png;base64," in c.get("/api/projects/"+pid+"/export/html").data
