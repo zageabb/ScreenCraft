@@ -44,6 +44,6 @@ test('standalone HTML tabs/wizard show only assigned content; accordion state is
 test('offline HTML renders configurable split and sidebar containers',async({page})=>{
  await page.setContent(exportedHtml(),{waitUntil:'load'});
  const split=page.locator('[data-node-id="splitter"]'),sidebar=page.locator('[data-node-id="sidebar"]');
- await expect(split.locator('.sc-layout-content')).toHaveCSS('grid-template-columns',/35%/);
+ await expect(split.locator('.sc-layout-content')).toHaveAttribute('style',/grid-template-columns:\\s*35%/);
  await expect(sidebar.locator('.sc-layout-content')).toHaveCSS('display','flex');
 });
