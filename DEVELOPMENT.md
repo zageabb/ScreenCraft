@@ -148,3 +148,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Evidence:** Browser tests cover screen ordering, deletion, nested objects, reusable components, preview recovery and unknown extension preservation. Backend tests cover default blank screen and SCRAFT v1 nested round-trip. React, Python, Docker, browser and documentation jobs must pass before merge.
 
 **Not claimed:** All 39 types are fully interactive; full pixel-perfect preview/export parity, accessibility, production data, Figma import and live Ubuntu manual acceptance are separate gates. Live UDA SSO remains configured independently.
+
+### Phase 5 merge verification — 2026-11-12
+- **Merged:** PR #9 (https://github.com/zageabb/ScreenCraft/pull/9), squash commit `2869d68defeb4959618c8660eba9f81e9c9b7730`.
+- **CI green on final feature head** `18575e62e55c1955b1ad78a7f094ea2ee9598142`, workflow run https://github.com/zageabb/ScreenCraft/actions/runs/43269997302: Python, React/TypeScript build, Playwright Chromium browser tests, Docker/container and docs all passed.
+- **Implementation acceptance:** Phase 5 available on GitHub main, including the editable/deletable legacy Get started button, blank new-project starter, screen order and Preview Back/Home. **Live Ubuntu deployment and manual feature acceptance remain pending**. No server changes performed in this chat.
+- **Limitations:** Not all 39 catalogue types are functional. Inert unsupported objects round-trip with warnings, and extended object fidelity/mobile/accessibility require future work. FigmaBridge integration remains a separate phase.
