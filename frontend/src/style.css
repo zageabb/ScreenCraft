@@ -58,3 +58,13 @@
 .sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
 .sc-chart-legend span{display:inline-flex;gap:3px;align-items:center}
 .sc-chart-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* Phase 9C — prototype navigation and layout objects */
+.sc-panel-container{display:flex;flex-direction:column;min-height:100%;height:100%;border:1px solid #cbd5e1;background:white;padding:4px}
+.sc-panel-nav,.sc-wizard-buttons{display:flex;gap:4px;flex-wrap:wrap}
+.sc-panel-nav button[aria-pressed="true"]{background:#cfe2fd;border-color:#5e8bc4}
+.sc-panel-content{min-height:60px;flex:1;position:relative}
+.sc-accordion{height:100%;background:white;border:1px solid #cbd5e1}
+.sc-accordion>button{width:100%;text-align:left}
+.sc-accordion .nested-content{position:relative;min-height:60px}
+.sc-wizard-buttons{justify-content:flex-end}
