@@ -45,7 +45,7 @@ test('offline HTML export maps six input controls into table columns and keeps c
  await control('status').selectOption('Active');
  await control('approved').locator('input').check();
  await control('notes').fill('Delivered by courier');
- await control('add').getByRole('button',{name:'Add record'}).click();
+ await control('add').click();
  const table=control('table').locator('table');
  await expect(table.locator('tr')).toHaveCount(2);
  const cells=table.locator('tr').nth(1).locator('td');
@@ -69,7 +69,7 @@ test('export stays self-contained and uses no network for bound Add record',asyn
  page.on('request',req=>requests.push(req.url()));
  await page.setContent(exportedHtml(),{waitUntil:'load'});
  await page.locator('[data-node-id="customer"]').fill('Local test');
- await page.locator('[data-node-id="add"] button').click();
+ await page.locator('[data-node-id="add"]').click();
  await expect(page.locator('[data-node-id="table"] tr')).toHaveCount(2);
  expect(requests).toEqual([]);
 });
