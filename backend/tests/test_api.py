@@ -83,7 +83,7 @@ def test_shared_github_token_requires_server_admin(app,monkeypatch):
 
 def test_api_error_is_json_not_spa(app):
     c=app.test_client()
-    missing=c.post("/api/does-not-exist",json={"test":True})
+    missing=c.get("/api/does-not-exist")
     assert missing.status_code==404
     assert missing.is_json
     assert missing.json["error"]=="Unknown API endpoint"
@@ -103,15 +103,21 @@ def test_create_project_through_caddy_prefix(tmp_path,monkeypatch):
     })
     c=deployed.test_client()
     headers={"X-Forwarded-Prefix":"/apps/screencraft","X-Forwarded-Proto":"https"}
-    setup=c.post("/api/bootstrap",headers=headers,json={
+    # Use the actual public prefix for the test client so its path-scoped
+    # session cookie is returned as a real browser would return it.
+    setup=c.post("/apps/screencraft/api/bootstrap",headers=headers,
+        environ_overrides={"SCRIPT_NAME":"/apps/screencraft","PATH_INFO":"/api/bootstrap"},json={
         "setup_key":"prefix-test-key",
         "username":"routeadmin",
         "password":"long-enough-test-password"
     })
     assert setup.status_code==201
-    created=c.post("/api/projects",headers=headers,json={"name":"Test Application"})
+    created=c.post("/apps/screencraft/api/projects",headers=headers,
+        environ_overrides={"SCRIPT_NAME":"/apps/screencraft","PATH_INFO":"/api/projects"},
+        json={"name":"Test Application"})
     assert created.status_code==201
     assert created.is_json and created.json["id"]
-    loaded=c.get("/api/projects",headers=headers)
+    loaded=c.get("/apps/screencraft/api/projects",headers=headers,
+        environ_overrides={"SCRIPT_NAME":"/apps/screencraft","PATH_INFO":"/api/projects"})
     assert loaded.status_code==200 and loaded.is_json
     assert loaded.json["projects"][0]["name"]=="Test Application"
