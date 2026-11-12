@@ -46,6 +46,8 @@ All items remain proposals, not implemented or tested.
 
 ## Phase 5 — AI-governed application design authority (future scope, approved direction 2026-11-12)
 
+**Shared design principle (canonical source: `zageabb/Application-Standard`):** **“Design what matters, let AI propose what's missing, and approve what changes.”** ScreenCraft applies this centrally defined principle rather than maintaining a separate variant.
+
 **Decision (refined 2026-11-12):** Screen layouts and their identifiable components are the **only mandatory authored design baseline**. Other areas—behaviour, bindings, navigation details, database/data models, API contracts, workflows, permissions/roles and acceptance criteria—are **optional design inputs** and may be absent, incomplete or revised. ScreenCraft should be capable of governing these areas when provided or subsequently approved, but must not require users to completely specify them before AI-assisted development can proceed. The goal is **controlled, progressive development, not rigid specification completeness**. This does **not** mandate a particular implementation framework.
 
 **Scheduling / non-interference:** This section is a requirement and roadmap addition only. Continue the existing Phase 1–4 scope, development, CI, testing and acceptance independently. Do **not** divert, block, rebase, or restart the current Phase 1–4 work for Phase 5. Phase 5 implementation requires separate planning and acceptance after the core foundation is sufficiently stable.
