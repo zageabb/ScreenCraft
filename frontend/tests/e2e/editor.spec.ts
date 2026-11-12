@@ -368,7 +368,7 @@ test('Phase 9B KPI and chart use dataset values and persist configured metric pr
 test('Phase 9C wizard and accordion preview controls have editable properties and navigation',async({page})=>{
  await page.locator('.palette details').filter({has:page.locator('[data-catalogue-type="x-wizard"]')}).locator('summary').click();
  await page.locator('[data-catalogue-type="x-wizard"]').click();
- await expect(page.getByLabel('Step labels (comma separated)')).toBeVisible();
+ await expect(page.getByLabel('Step labels')).toBeVisible();
  await page.getByRole('button',{name:'▶ Preview'}).click();
  const wizard=page.locator('.canvas [data-panel-kind="x-wizard"]');
  await expect(wizard.getByRole('button',{name:'Step 1'})).toHaveAttribute('aria-pressed','true');
@@ -378,7 +378,6 @@ test('Phase 9C wizard and accordion preview controls have editable properties an
  await expect(wizard.getByRole('button',{name:'Step 1'})).toHaveAttribute('aria-pressed','true');
 });
 test('Phase 9C accordion can collapse and expand its content',async({page})=>{
- await page.locator('.palette details').filter({has:page.locator('[data-catalogue-type="x-accordion"]')}).locator('summary').click();
  await page.locator('[data-catalogue-type="x-accordion"]').click();
  await expect(page.getByLabel('Expanded initially')).toBeVisible();
  await page.getByRole('button',{name:'▶ Preview'}).click();
