@@ -41,3 +41,35 @@ See [docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md](docs/INTERACTIVE_PROTOTYPE_PROPOSAL
 - SC-017: Multi-user ACL and SQL-backed prototype data sessions, isolated/shared modes — PLANNED.
 - SC-018: Single .scraft ZIP application document with integrated asset bundling and unpacked Git-friendly export — PLANNED.
 All items remain proposals, not implemented or tested.
+
+## Phase 5 — AI-governed application design authority (future scope, approved direction 2026-11-12)
+
+**Decision:** ScreenCraft is intended to govern the **complete application design**, not screens alone: UI/layout and responsive behaviour, navigation and interactions, database schemas/data models, API contracts, business workflows, permissions/roles, and associated validation and acceptance criteria. ScreenCraft supplies the approved, versioned design contract; AI coding agents implement it in the target repository; automated and human checks verify conformance. This does **not** mandate a particular implementation framework.
+
+**Scheduling / non-interference:** This section is a requirement and roadmap addition only. Continue the existing Phase 1–4 scope, development, CI, testing and acceptance independently. Do **not** divert, block, rebase, or restart the current Phase 1–4 work for Phase 5. Phase 5 implementation requires separate planning and acceptance after the core foundation is sufficiently stable.
+
+| ID | Future workstream | Status | First acceptance |
+|---|---|---|---|
+| SC-019 | Versioned, stable-ID declarative design contracts for screens/components, behaviour, bindings, navigation and responsive rules | PLANNED (Phase 5) | A design change produces a deterministic and machine-readable diff |
+| SC-020 | Application architecture contracts: relational entities, schema migrations, API request/response schemas, integrations and workflow definitions | PLANNED (Phase 5) | Contracts are validated and referenceable without prescribing generated code |
+| SC-021 | Identity, role/permission models and server-enforced security requirements | PLANNED (Phase 5) | Access rules have traceable positive and negative acceptance tests |
+| SC-022 | Design-to-development handoff: export .scraft to application repos, produce change requests/issues and agent-readable tasks | PLANNED (Phase 5) | Agent can identify changed contract elements and required work |
+| SC-023 | Implementation conformance: structural checks, browser/visual regression, API, workflow, data and permission tests | PLANNED (Phase 5) | CI reports pass/fail and traceability to design requirements |
+| SC-024 | Governance: approval baselines, version history, deviations, design-to-code status and reverse feedback | PLANNED (Phase 5) | Implementation may report differences but cannot silently overwrite approved design |
+
+### Format constraints to preserve during Phases 1–4 (forward compatibility, not new implementation blockers)
+- Preserve stable unique IDs for screens, components, interactions and other schema entities; avoid position-dependent identification.
+- Version the .scraft document/schema, retain explicit extension points and a documented migration mechanism.
+- Keep the .scraft ZIP open, portable and machine-readable (canonical JSON plus assets), with Git-friendly unpacked representation; do not make the image preview the authoritative source.
+- Allow optional references to contracts for data, APIs, workflows and permissions, even if their Phase 5 interpretation is not yet implemented. Existing Phase 1–4 artefacts must remain valid.
+- Keep the authoritative design in each consuming application's repository, with ScreenCraft able to read/write via controlled GitHub sync and tracked revisions; changes to other repositories must be explicit and reviewable.
+- Treat imported Figma designs as inputs for review and normalisation, not automatic approval of functional or security contracts.
+
+### Boundaries and safeguards
+- Design contract owns **what** must be implemented; the AI agent/developer owns **how**, subject to repository architecture and standards.
+- Generated code, database migrations and external actions are never automatically deployed from a design edit; use review, approvals and normal CI/merge controls.
+- Never infer authorisation solely from client-side visibility; permissions must be validated in the backend and tested.
+- Screen similarity alone is insufficient: visual, functional, persistence, data migration, API, workflow and security evidence are distinct.
+- Record contract revisions, implementation traceability, approvals, deviations and test evidence in DEVELOPMENT.md or linked repository artefacts.
+
+**Phase 5 acceptance (future):** Given an approved change to an application design, ScreenCraft generates a reproducible versioned change contract and development task, the AI agent can implement it on a review branch, automated checks report conformance across UI/data/API/workflow/security, and the approved baseline remains unchanged until explicit sign-off.
