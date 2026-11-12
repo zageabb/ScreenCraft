@@ -34,14 +34,14 @@ test('real offline HTML export supports sorting, page navigation, filtering and 
  await expect(grid.locator('tbody tr')).toHaveCount(2);
  await expect(table.locator('tbody tr')).toHaveCount(2);
  await grid.getByRole('button',{name:'Sort Name'}).click();
- await expect(grid.locator('tbody tr').first()).toContainText('Alpha');
+ await expect(grid.locator('tbody tr').first().getByRole('textbox',{name:/Edit row .* Name/})).toHaveValue('Alpha');
  await grid.getByRole('button',{name:'Next page'}).click();
  await expect(grid.locator('tbody tr')).toHaveCount(1);
- await expect(grid.locator('tbody tr').first()).toContainText('Zephyr');
+ await expect(grid.locator('tbody tr').first().getByRole('textbox',{name:/Edit row .* Name/})).toHaveValue('Zephyr');
  await grid.getByRole('button',{name:'Previous page'}).click();
  await grid.getByRole('textbox',{name:'Search records'}).fill('Beta');
  await expect(grid.locator('tbody tr')).toHaveCount(1);
- await expect(grid.locator('tbody tr').first()).toContainText('Beta');
+ await expect(grid.locator('tbody tr').first().getByRole('textbox',{name:/Edit row .* Name/})).toHaveValue('Beta');
  await grid.getByRole('textbox',{name:'Search records'}).fill('');
  await grid.getByRole('checkbox',{name:'Select row 2'}).check();
  await grid.getByRole('button',{name:'Delete selected'}).click();
