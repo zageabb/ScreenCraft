@@ -79,3 +79,9 @@ All items remain proposals, not implemented or tested.
 - CI now includes a `browser` job with a Vite test server and intercepted synthetic API fixtures. This is editor behavioural verification, **not** a complete real-backend/browser integration test.
 - Added initial Alembic upgrade/downgrade test and Caddy forwarded-prefix/cookie-scope test.
 - New acceptance gate: Playwright browser job green; verify errors and correct before marking these browser behaviours tested. Real Ubuntu/Caddy remains manual acceptance pending.
+
+## Concurrency and GitHub privilege refinement
+- Project writes now use a single conditional SQL update against the expected revision, avoiding silent lost updates from concurrent saves.
+- Shared mock-data writes now require a matching dataset revision and use row locking where the SQL backend supports it; editor preview tracks returned revisions.
+- The shared server-side GitHub token is accessible only to the ScreenCraft server administrator. Per-user OAuth/delegated permissions remain future work; this must be assessed before enabling non-admin repository access.
+- Added regression tests for shared-dataset optimistic locking and GitHub admin-only access. New CI run pending; earlier passing CI remains recorded above, not assumed to cover the latest changes.
