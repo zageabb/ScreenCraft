@@ -243,7 +243,7 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 
 **Acceptance:** Browser tests cover button toggle/expand/collapse, nested objects, initial state, persistence, invalid targets, keyboard operation, and reopening with existing user-entered values. Run the same interaction against the **actual generated standalone HTML export**, not just its source. Keep manual and automated verification separate and document deviations.
 
-**Status:** IMPLEMENTED IN PHASE 9.1 FEATURE BRANCH — detailed implementation and acceptance in docs/PHASE_9_1.md. CI/merge and live deployment status tracked separately; prior wording remains as historical plan.
+**Status:** MERGED INTO MAIN via PR #19 (2026-11-12); detailed implementation and acceptance in docs/PHASE_9_1.md. CI green; live Ubuntu deployment/manual acceptance pending.
 
 ## Phase 9C — Interactive layout and navigation objects (2026-11-12)
 
@@ -274,3 +274,8 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - **Phase 9D input validation:** PR #18 https://github.com/zageabb/ScreenCraft/pull/18 merged as `bbb64ea9bd8658c4ce4a2aae56959ea395c8b19f`. All five CI checks passed on branch head `186eb1c9022ea2557a57edc523609ae1e7b5ad4e` (run https://github.com/zageabb/ScreenCraft/actions/runs/43312512510).
 - **Deployment:** Changes are in GitHub main but have not been deployed to or manually accepted on live Ubuntu in this chat. No database schema migration is needed; after Desktop updates main, verify UDA sign-in, chart/KPI aggregation, step switching, accordion nested content and input validation in Preview **and** Interactive HTML export.
 - **Future:** Phase 9.1 collapsible containers/shared app-level navigation remains a distinct PLANNED specification, not completed by the Phase 9C local sidebar/accordion work. FigmaBridge remains deferred. Production hardening (Phase 10) and accessibility/mobile acceptance remain open.
+
+### Phase 9.1 merge and automated acceptance (2026-11-12)
+- Merged PR #19: https://github.com/zageabb/ScreenCraft/pull/19; squash commit `7d478374ef45f20809fec20c2e6943fc3fd2cc2d`.
+- CI run https://github.com/zageabb/ScreenCraft/actions/runs/43319304058 passed all five jobs (React, Python, Chromium Playwright against real generated HTML, Docker and documentation) on head `f7f2c6e6dfc7242447221fd1386a6502598f9b7e`.
+- No DB schema migration or Caddy/UDA configuration change. Live Ubuntu deployment, keyboard/mobile manual acceptance, and optional formalization of the navigation extension in Application-Standard remain open.
