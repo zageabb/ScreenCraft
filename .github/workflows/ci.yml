@@ -1,0 +1,20 @@
+name: ScreenCraft baseline checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate documentation baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in README.md AGENTS.md DEVELOPMENT.md DID.md STANDARD_VERSION.md CHANGELOG.md docs/ARCHITECTURE.md docs/SCREEN_BUILDING_STANDARD.md docs/SCREEN_QA_CHECKLIST.md docs/SECURITY.md docs/TEST_STRATEGY.md docs/USER_MANUAL.md templates/SCREEN_SPEC.md; do
+            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          done
+          grep -q 'SC-014' DEVELOPMENT.md
+          echo 'Docs baseline passed; no application runtime validated.'
+# Runtime lint, backend/frontend tests, security and browser E2E must be added when code exists.
