@@ -434,7 +434,7 @@ test('Phase 9.1 collapsible container has button target and retains entered valu
  await page.locator('[data-catalogue-type="input"]').click();
  await page.getByLabel('Parent container').selectOption({index:1});
  await page.locator('[data-catalogue-type="button"]').click();
- await page.locator('.inspector select').filter({has:page.locator('option[value="toggle_container"]')}).selectOption('toggle_container');
+ await page.locator('.inspector select').filter({hasText:'toggle_container'}).selectOption('toggle_container');
  await page.getByLabel('Target container').selectOption({index:1});
  const saved=page.waitForRequest(r=>r.url().endsWith('/api/projects/p1')&&r.method()==='PUT');
  await page.getByRole('button',{name:'Save',exact:true}).click();
