@@ -21,7 +21,8 @@ test.beforeEach(async({page})=>{
  await page.route('**/api/**',async route=>{
   const url=new URL(route.request().url()),method=route.request().method();
   let json:any={error:'Not mocked'};let status=200;
-  if(url.pathname==='/api/me')json={username:'tester',id:'u1',is_admin:true};
+  if(url.pathname==='/api/auth-mode')json={mode:'local'};
+  else if(url.pathname==='/api/me')json={username:'tester',id:'u1',is_admin:true};
   else if(url.pathname==='/api/projects')json={projects:[{id:'p1',name:'Demo',revision:1,role:'owner'}]};
   else if(url.pathname==='/api/projects/p1' && method==='GET')json={id:'p1',revision:1,role:'owner',document:app};
   else if(url.pathname==='/api/projects/p1' && method==='PUT')json={revision:2};
@@ -149,4 +150,16 @@ test('additional new screens have distinct names and can be renamed',async({page
  await page.getByRole('textbox',{name:'Screen name'}).fill('Reporting');
  await page.getByRole('textbox',{name:'Screen name'}).press('Enter');
  await expect(page.locator('.sidebar button').filter({hasText:'Reporting'})).toBeVisible();
+});
+
+test('UDA mode does not display a second ScreenCraft password form',async({page})=>{
+ await page.route('**/api/auth-mode',async route=>
+   route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({mode:'uda'})}));
+ await page.route('**/api/me',async route=>
+   route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:'Verified UDA identity required'})}));
+ await page.reload();
+ await expect(page.getByRole('heading',{name:'ScreenCraft'})).toBeVisible();
+ await expect(page.getByText('Sign in through UDA')).toBeVisible();
+ await expect(page.getByRole('textbox',{name:'Username'})).toHaveCount(0);
+ await expect(page.locator('input[type="password"]')).toHaveCount(0);
 });

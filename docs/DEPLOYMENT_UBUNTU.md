@@ -38,3 +38,6 @@ curl -i http://127.0.0.1:8085/api/health
 curl -i https://YOUR_HOST/apps/screencraft/api/health
 ```
 Both should be JSON. Health alone does not establish that project POST works; use the Network tab when reproducing the project creation error. Caddy example must strip exactly one `/apps/screencraft` prefix before forwarding. Verify route ordering against existing Caddy/UDA handlers; preserve all other applications. Do not expose an unprotected production API to bypass gateway authentication.
+
+## Optional UDA authentication instead of application passwords
+ScreenCraft supports `SCREENCRAFT_AUTH_MODE=uda` so authenticated users from UDA do not need a second password. Do **not** enable it until your Caddy/UDA deployment has a verified, server-generated identity value and sets the protected proxy-secret header, as described in [UDA_AUTHENTICATION.md](UDA_AUTHENTICATION.md). In UDA mode, the existing project's administrator account is retained only when the authenticated UDA username maps to the existing ScreenCraft username. App-level permissions remain active. The default mode remains `local` to avoid an accidental lockout during installation.

@@ -25,3 +25,5 @@ No runnable ScreenCraft application has been released.
 - Added a direct Table sample-data editor with editable column names, sample cell values and add/remove rows and columns. New table objects now have visible default sample data; existing unbound tables offer explicit dataset creation. Kept button action JSON separate from the table data editor.
 
 - Added an editable screen name field in the inspector and distinct default names for new screens. Renaming preserves screen IDs and existing navigation links.
+
+- Added opt-in UDA single sign-on to reuse the reverse-proxy authenticated identity without a second ScreenCraft password. Preserves accounts/projects by matching the existing username, creates least-privilege accounts for new UDA users and disables local credential endpoints in UDA mode. Deployment requires verified UDA identity forwarding plus protected proxy secret; live integration is pending.
