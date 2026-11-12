@@ -70,3 +70,13 @@ def test_caddy_prefix_headers_and_cookie_scope(tmp_path,monkeypatch):
     assert "Path=/apps/screencraft" in cookie
     assert "Secure" in cookie and "HttpOnly" in cookie
     assert "screencraft_session" in cookie
+
+def test_shared_github_token_requires_server_admin(app,monkeypatch):
+    monkeypatch.setenv("SCREENCRAFT_ALLOWED_REPOS","zageabb/example-app")
+    c=app.test_client()
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    created=c.post("/api/users",json={"username":"designer","password":"A-Designer-Password!"})
+    assert created.status_code==201,created.json
+    c.post("/api/logout")
+    assert c.post("/api/login",json={"username":"designer","password":"A-Designer-Password!"}).status_code==200
+    assert c.get("/api/github/zageabb/example-app/scraft").status_code==403
