@@ -16,7 +16,7 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
     asset_payload=json.dumps(images,ensure_ascii=True).replace("<","\\u003c").replace(">","\\u003e").replace("&","\\u0026")
     title=html.escape(str(app.get("name","ScreenCraft Prototype")),quote=True)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>"""+title+"""</title><style>
-:root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-chart{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;overflow:auto}.sc-chart svg{width:100%;height:65%;min-height:110px}.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}.sc-chart-legend span{display:inline-flex;align-items:center;gap:3px}.sc-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
+:root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-chart{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;overflow:auto}.sc-chart svg{width:100%;height:65%;min-height:110px}.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}.sc-chart-legend span{display:inline-flex;align-items:center;gap:3px}.sc-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}.sc-panel-container{border:1px solid #cbd5e1;background:white;min-height:100%;padding:6px}.sc-panel-nav,.sc-wizard-buttons{display:flex;gap:5px;flex-wrap:wrap}.sc-panel-nav button[aria-pressed="true"]{background:#cbdff9}.sc-panel-content{position:relative;min-height:100px}.sc-accordion{background:white;border:1px solid #cbd5e1;min-height:55px}.sc-accordion>button{width:100%;text-align:left}.sc-accordion-content{position:relative;min-height:50px}.sc-layout-content{position:relative;min-height:80%;height:calc(100% - 25px)}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
 </style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
@@ -79,6 +79,7 @@ function action(a){if(!a||!a.type)return;
  else if(a.type==='set_mock_field' && datasets[a.dataset_id]){let row=datasets[a.dataset_id][Number(a.row_index||0)];if(row&&typeof a.field==='string')row[a.field]=a.value}
  render();}
 const gridState=Object.create(null);
+const panelState=Object.create(null);
 function tableView(n){
  const p=n.props||{},id=n.id,editable=n.type==='x-editable-grid';
  const dataset=(app.datasets||[]).find(d=>d.id===p.dataset_id);
@@ -224,12 +225,38 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
  case 'table':case 'x-editable-grid':x=tableView(n);break;
  case 'modal':x=el('div');if(modal!==n.id)return; x.className='sc-modal';x.append(el('h3',p.label||'Dialog'));break;
- case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':x=el('section');x.className='sc-box'+(n.type==='x-card'?' sc-card':'');x.append(el('strong',p.label||n.type));break;
+ case 'tabs':case 'x-wizard':{
+  x=el('section');x.className='sc-panel-container';x.dataset.panelKind=n.type;
+  const labels=Array.isArray(p.tab_labels)&&p.tab_labels.length?p.tab_labels:['Step 1','Step 2'];
+  const selected=Math.max(0,Math.min(labels.length-1,panelState[n.id]||0));
+  const nav=el('nav');nav.setAttribute('aria-label',n.type==='tabs'?'Tabs':'Wizard steps');nav.className='sc-panel-nav';
+  labels.forEach((label,i)=>{const btn=el('button',label);btn.setAttribute('aria-pressed',String(selected===i));btn.onclick=()=>{panelState[n.id]=i;render()};nav.append(btn)});
+  x.append(nav);const content=el('div');content.className='sc-panel-content';x.append(content);x._childContainer=content;
+  if(n.type==='x-wizard'){const buttons=el('div');buttons.className='sc-wizard-buttons';
+   const previous=el('button','Previous step');previous.disabled=selected===0;previous.onclick=()=>{panelState[n.id]=Math.max(0,selected-1);render()};
+   const next=el('button','Next step');next.disabled=selected===labels.length-1;next.onclick=()=>{panelState[n.id]=Math.min(labels.length-1,selected+1);render()};
+   buttons.append(previous,next);x.append(buttons)}
+  break
+ }
+ case 'x-accordion':{
+  x=el('section');x.className='sc-accordion';
+  const expanded=Object.prototype.hasOwnProperty.call(panelState,n.id)?panelState[n.id]:p.expanded!==false;
+  const button=el('button',(p.label||'Details')+(expanded?' ▾':' ▸'));
+  button.setAttribute('aria-expanded',String(expanded));button.onclick=()=>{panelState[n.id]=!expanded;render()};
+  x.append(button);const content=el('div');content.className='sc-accordion-content';content.hidden=!expanded;x.append(content);
+  x._childContainer=expanded?content:null;x._hideChildren=!expanded;break
+ }
+ case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':case 'x-sidebar':case 'x-splitter':{
+  x=el('section');x.className='sc-box'+(n.type==='x-card'?' sc-card':'');
+  x.append(el('strong',p.label||n.type));const content=el('div');content.className='sc-layout-content';
+  if(n.type==='x-sidebar'){content.style.display='flex';content.style.gap='8px'}
+  if(n.type==='x-splitter'){content.style.display='grid';content.style.gridTemplateColumns=Math.max(10,Math.min(90,Number(p.split_percent)||50))+'% 1fr';content.style.gap='8px'}
+  x.append(content);x._childContainer=content;break
+ }
  case 'x-date':x=el('input');x.type='date';x.value=p.value||'';captureInput(n,x,'date');break;
  case 'x-number':x=el('input');x.type='number';x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
  case 'x-textarea':x=el('textarea');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
  case 'x-kpi':case 'x-chart':x=metricView(n);break;
- case 'tabs':x=el('div',p.label||'Tabs');break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
  }
  x.dataset.nodeId=n.id;x.classList.add('sc-node');
@@ -246,7 +273,14 @@ function render(){root.replaceChildren();menu.replaceChildren();
  let heading=el('h2',s.name);root.append(heading);
  let wrapper=el('section');wrapper.style.overflowX=s.layout?.overflow_x||'auto';wrapper.style.overflowY=s.layout?.overflow_y||'auto';wrapper.style.minHeight='60vh';root.append(wrapper);
  let nodes=new Map((s.nodes||[]).map(n=>[n.id,n]));let rendered=new Set();
- function build(n,parent,trail=new Set()){if(rendered.has(n.id)||trail.has(n.id))return;rendered.add(n.id);let box=renderNode(n,parent);if(!box)return;for(const child of s.nodes||[])if(child.parent_id===n.id)build(child,box,new Set([...trail,n.id]))}
+ function build(n,parent,trail=new Set()){if(rendered.has(n.id)||trail.has(n.id))return;rendered.add(n.id);let box=renderNode(n,parent);if(!box)return;
+ if(box._hideChildren)return;
+ for(const child of s.nodes||[]){
+  if(child.parent_id!==n.id)continue;
+  if((n.type==='tabs'||n.type==='x-wizard')&&(Number(child.props?.tab_index)||0)!==(panelState[n.id]||0))continue;
+  build(child,box._childContainer||box,new Set([...trail,n.id]));
+ }
+}
  (s.nodes||[]).filter(n=>!n.parent_id||!nodes.has(n.parent_id)).forEach(n=>build(n,wrapper));
  if(message)root.append(el('div',message));}
 render();
