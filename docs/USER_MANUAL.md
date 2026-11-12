@@ -19,3 +19,9 @@ An administrator can configure `SCREENCRAFT_ALLOWED_REPOS` and an optional fine-
 
 ## Image assets
 Add an Image object to the canvas, select it and use the Image File property to upload PNG, JPEG, GIF or WebP. The backend stores the image in the .scraft ZIP and preview serves it only to project members. Save again after editing; export embeds packaged binary images into the standalone HTML prototype. Image upload and export have unit test coverage, while rendered browser fidelity still needs acceptance.
+
+### GitHub access restriction
+Until per-user OAuth and repository permissions are designed, only a ScreenCraft **server administrator** may use GitHub remote import and PR save-back through the shared configured GitHub token. Project Designer rights alone do not grant access to that token.
+
+### Shared preview data
+For project-shared SQL mock datasets the API enforces an expected revision and locks the edited row-set transactionally. If another user has changed it, reload the preview and retry instead of overwriting their changes.
