@@ -80,3 +80,38 @@ def test_shared_github_token_requires_server_admin(app,monkeypatch):
     c.post("/api/logout")
     assert c.post("/api/login",json={"username":"designer","password":"A-Designer-Password!"}).status_code==200
     assert c.get("/api/github/zageabb/example-app/scraft").status_code==403
+
+def test_api_error_is_json_not_spa(app):
+    c=app.test_client()
+    missing=c.post("/api/does-not-exist",json={"test":True})
+    assert missing.status_code==404
+    assert missing.is_json
+    assert missing.json["error"]=="Unknown API endpoint"
+    wrong=c.get("/api/login")
+    assert wrong.status_code==405
+    assert wrong.is_json
+
+def test_create_project_through_caddy_prefix(tmp_path,monkeypatch):
+    """Simulate Caddy handle_path stripping /apps/screencraft and forwarding trusted headers."""
+    monkeypatch.setenv("SCREENCRAFT_TRUST_PROXY","1")
+    monkeypatch.setenv("SCREENCRAFT_SETUP_KEY","prefix-test-key")
+    deployed=create_app({
+        "TESTING":True,
+        "SQLALCHEMY_URL":"sqlite:///"+str(tmp_path/"routed.db"),
+        "SESSION_COOKIE_SECURE":False,
+        "SESSION_COOKIE_PATH":"/apps/screencraft",
+    })
+    c=deployed.test_client()
+    headers={"X-Forwarded-Prefix":"/apps/screencraft","X-Forwarded-Proto":"https"}
+    setup=c.post("/api/bootstrap",headers=headers,json={
+        "setup_key":"prefix-test-key",
+        "username":"routeadmin",
+        "password":"long-enough-test-password"
+    })
+    assert setup.status_code==201
+    created=c.post("/api/projects",headers=headers,json={"name":"Test Application"})
+    assert created.status_code==201
+    assert created.is_json and created.json["id"]
+    loaded=c.get("/api/projects",headers=headers)
+    assert loaded.status_code==200 and loaded.is_json
+    assert loaded.json["projects"][0]["name"]=="Test Application"
