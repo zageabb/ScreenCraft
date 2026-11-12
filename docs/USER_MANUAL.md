@@ -28,3 +28,6 @@ For project-shared SQL mock datasets the API enforces an expected revision and l
 
 ## Editing table sample data
 Select a Table in Design mode. In Properties > Table dataset, choose an existing dataset or click **Create sample dataset** for older table objects without one. Newly inserted tables start with a dedicated dataset, two example columns (Name and Status), and an example record so they are immediately visible. Under **Table sample data**, add/rename/remove columns and add/edit/remove sample rows. Changes appear on the canvas immediately; click **Save** to store them in the project and its .scraft ZIP document. Table sample data is separate from the **Sample action row (JSON)** field on a button, which defines what a button's Add Row prototype action inserts.
+
+## Renaming screens
+Select a screen from the **Screens** list on the left. In the right-hand **Screen** panel, edit **Screen name**, then press Enter or click outside the field to apply it. Click **Save** to retain the name in the application and `.scraft` document. The underlying screen ID does not change, so existing navigation buttons keep working. New screens receive distinct default names until renamed.
