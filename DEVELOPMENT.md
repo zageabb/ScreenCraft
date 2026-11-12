@@ -178,3 +178,10 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - **All five CI jobs passed** for final branch SHA `534f7490612737b8a6d95186eea100f7162469be` in workflow https://github.com/zageabb/ScreenCraft/actions/runs/43277489317 (Python, React, browser/Playwright, Docker, documentation).
 - **Deployment status:** Included in GitHub main; live Ubuntu Caddy/UDA deployment and real-file import acceptance are not yet verified. No database migration required.
 - **Follow-up hardening:** Real image decoding/dimension enforcement, expanded component capability checks, audit log of imports, and retaining unrelated extra JSON ZIP entries are not yet complete. These do not block the tested SCRAFT-1 validation/import workflow, but they are not claimed as finished.
+
+## Interactive HTML export parity — field-to-table bindings (2026-11-12)
+- Added a permanent AGENTS.md requirement that every Preview/editor feature change must update the standalone interactive HTML exporter in the same PR. Working Preview alone is not sufficient for feature acceptance.
+- Fixed the exported offline HTML action engine to honour `add_mock_row.field_bindings` and current input values. Supported source types: text input, number, date, dropdown, checkbox, and textarea; static `action.values` remain defaults, with explicitly bound fields overriding them.
+- The exporter now maintains in-memory input state across table rerenders so controls do not reset after adding records. These changes are prototype-local only and make no production or network requests.
+- Added Playwright regression tests that generate a real HTML document with the Python exporter, load it in Chromium, enter values, add two rows, verify mapped columns and state persistence, and verify no network requests.
+- Relevant checks: Python, React, browser, docs and Docker CI. Live Ubuntu/desktop user acceptance remains separate.

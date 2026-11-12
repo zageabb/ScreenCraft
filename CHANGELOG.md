@@ -43,3 +43,6 @@ No runnable ScreenCraft application has been released.
 - Resolves local ZIP JSON references and preserves compatible v1 minor metadata without silent version downgrades; rejects unsupported major formats and remote references.
 - Added a read-only /api/scraft/inspect endpoint and a two-step browser import workflow with visible compatibility warnings and user approval.
 - Added conformance and browser regression tests covering round trips, safety failures and failed imports without project mutation.
+
+- Fixed Interactive HTML export to honour button Add Row field bindings from text, number, date, select, checkbox and textarea controls. Bound values override fixed defaults; controls retain their values after the table rerenders.
+- Added AGENTS.md mandatory parity rule: whenever Preview or editor functionality changes, update and browser-test exported interactive HTML in the same change.

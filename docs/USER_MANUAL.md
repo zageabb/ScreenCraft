@@ -61,3 +61,8 @@ Choose **Import validated design** to replace the current project design, or **C
 Validation covers screen IDs, screen order and initial screen, navigation actions, node hierarchy, dataset identifiers, asset paths and optional SHA-256 checksums, and rejects executable/unsupported actions, unsafe ZIP paths, malformed JSON, remote references and incompatible format major versions. Local JSON references within the ZIP are resolved into the portable application on import; when saved, the package uses a self-contained application.json.
 
 This is a prototype interchange validator, not a virus scanner or a guarantee that all extension objects render fully. Test your imported design in Preview and review any warnings before distribution.
+
+## Interactive HTML export parity — input fields to table records
+When a button is configured with **Action: add_mock_row**, choose the destination dataset and select **Input source for [column]** for each destination column. Supported inputs are text, number, date, dropdown, checkbox and textarea. Fixed values remain available for columns without an input binding.
+
+**Interactive HTML export now uses the same field bindings as ScreenCraft Preview.** Users can enter values into those controls and click Add Record; the exported standalone HTML app appends a record containing the current field values. Input values survive the table rerender after the new record is added. The standalone export stores mock data only in browser memory; refreshing the page returns to the seed data. No backend, database or internet connection is needed.
