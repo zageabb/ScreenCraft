@@ -60,6 +60,15 @@ All items remain proposals, not implemented or tested.
 | SC-022 | Design-to-development handoff: export .scraft to application repos, produce change requests/issues and agent-readable tasks | PLANNED (Phase 5) | Agent can identify changed contract elements and required work |
 | SC-023 | Implementation conformance: structural checks, browser/visual regression, API, workflow, data and permission tests | PLANNED (Phase 5) | CI reports pass/fail and traceability to design requirements |
 | SC-024 | Governance: approval baselines, version history, deviations, design-to-code status and reverse feedback | PLANNED (Phase 5) | AI proposals and approved changes update the baseline transparently; no silent overwrite |
+| SC-025 | Standard object catalogue and nested/reusable components, centrally maintained in Application-Standard | PLANNED (Phase 5; format catalogue drafted) | Read/version core + extension object definitions; nested objects and safe unsupported-object warnings; tests for round-trip and containment |
+
+### Central object catalogue adoption (SC-025)
+- Canonical catalogue: `zageabb/Application-Standard/standards/screencraft/object-catalogue.json` and `standards/screencraft/README.md`. ScreenCraft must **consume and validate against** this standard, not fork its definition.
+- All ten v1 core types are specified; expanded `x-` prefixed objects are optional capabilities, not required editor support during Phase 1–4.
+- Support nested object hierarchy using v1 `parent_id` semantics. Preserve stable IDs, prohibit parent cycles, and validate containment; composed screens should include buttons inside cards, grids inside panels and forms inside modals.
+- Missing functional specifications must not block AI development; unsupported custom objects must be preserved, visibly warned about and never claimed functional.
+- Future ScreenCraft editor gallery should load versioned catalogue descriptors, advertise supported renderers/exporters, and allow controlled proposals to extend the central catalogue.
+- This is **future scope only**. No new Phase 1–4 dependency, gate, CI requirement or implementation diversion is authorised by this entry.
 
 ### Progressive AI design-change policy
 - **Mandatory minimum:** a valid screen design with stable screen/component identifiers. Optional specification fields must not be mandatory checkboxes or hard development gates.
