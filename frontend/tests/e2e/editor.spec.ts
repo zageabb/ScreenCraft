@@ -127,3 +127,26 @@ test('existing unbound table can create its own dataset',async({page})=>{
  await page.getByRole('button',{name:'Create sample dataset'}).click();
  await expect(page.locator('.canvas table')).toContainText('Example record');
 });
+
+test('rename screen, persist its name, and preserve navigation target IDs',async({page})=>{
+ await page.getByRole('button',{name:'Customers',exact:true}).first().click();
+ const field=page.getByRole('textbox',{name:'Screen name'});
+ await expect(field).toHaveValue('Customers');
+ await field.fill('Customer Accounts');
+ await field.press('Enter');
+ await expect(page.locator('.sidebar button').filter({hasText:'Customer Accounts'})).toBeVisible();
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const data=(await saved).postDataJSON().document;
+ expect(data.screens.find((s:any)=>s.id==='customers').name).toBe('Customer Accounts');
+ expect(data.screens.find((s:any)=>s.id==='home').nodes.find((n:any)=>n.id==='go').action.target_screen).toBe('customers');
+});
+test('additional new screens have distinct names and can be renamed',async({page})=>{
+ await page.getByRole('button',{name:'+ Screen'}).click();
+ await expect(page.getByRole('textbox',{name:'Screen name'})).toHaveValue('New Screen');
+ await page.getByRole('button',{name:'+ Screen'}).click();
+ await expect(page.getByRole('textbox',{name:'Screen name'})).toHaveValue('New Screen 2');
+ await page.getByRole('textbox',{name:'Screen name'}).fill('Reporting');
+ await page.getByRole('textbox',{name:'Screen name'}).press('Enter');
+ await expect(page.locator('.sidebar button').filter({hasText:'Reporting'})).toBeVisible();
+});
