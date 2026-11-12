@@ -117,3 +117,10 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - New screen names were fixed to `New Screen`, making multiple screens indistinguishable.
 - Added a screen-name input in the inspector, committing on blur/Enter. Screen IDs are preserved so existing button navigation and other references remain valid. Empty names are rejected and restored; Escape cancels the rename.
 - New screens use distinct initial names (`New Screen`, `New Screen 2`, etc.). Browser tests validate rename and saved JSON, stable navigation IDs and distinct default names. Live Ubuntu acceptance after deploy is pending.
+
+## Authentication enhancement — UDA sign-on (2026-11-12)
+- User requested use of the existing UDA login rather than building a second ScreenCraft password-reset flow.
+- Added opt-in `SCREENCRAFT_AUTH_MODE=uda` with authenticated reverse-proxy identity and server-only assertion. In UDA mode every API request requires trusted headers; local login and bootstrap are disabled. Username matching retains existing owner/admin identity; new UDA users are non-admin by default. Current project ACL is unchanged.
+- Frontend detects the auth mode and suppresses the ScreenCraft login/password form for UDA sessions. Local mode remains available for non-UDA installations and rollback.
+- Security design and Caddy handoff documented in docs/UDA_AUTHENTICATION.md. **The actual UDA username header or verified identity placeholder is not documented in Application-Standard and must be confirmed by Desktop from the live UDA configuration before enabling**. Never forward user-supplied identity headers.
+- Validation: Python trust-boundary and legacy-account-preservation tests; React build and browser regression still to verify. No deployment/security assertion until Caddy live identity mapping is tested. Existing server has not been reconfigured in this PR.
