@@ -352,6 +352,12 @@ function renderSharedNav(){
 function render(){root.replaceChildren();menu.replaceChildren();
  const shared=app.shared_navigation?.enabled;
  if(!shared)screenList.forEach(s=>{let b=el('button',s.name);b.disabled=s.id===active;b.onclick=()=>action({type:'navigate',target_screen:s.id});menu.append(b)});
+ else {
+  const back=el('button','← Back');back.setAttribute('aria-label','Prototype back');back.disabled=!history.length;
+  back.onclick=()=>action({type:'back'});menu.append(back);
+  const home=el('button','⌂ Home');home.setAttribute('aria-label','Prototype home');home.disabled=active===app.start_screen;
+  home.onclick=()=>action({type:'navigate',target_screen:app.start_screen});menu.append(home);
+ }
  let s=screens[active];if(!s)return;
  const layout=el('div');layout.className='sc-shared-layout nav-layout-'+(app.shared_navigation?.position||'left');root.append(layout);
  if(shared&&!s.shared_navigation_hidden)layout.append(renderSharedNav());
