@@ -210,7 +210,7 @@ test('Phase 5 preview always has a route home after navigation',async({page})=>{
 test('Phase 5 unsupported extension stays editable and visibly warned',async({page})=>{
  await page.locator('.palette details').filter({has:page.locator('[data-catalogue-type="x-diagram"]')}).locator('summary').click();
  await page.locator('[data-catalogue-type="x-diagram"]').click();
- await expect(page.locator('.canvas .unsupported-object')).toContainText('Unsupported object: x-diagram');
+ await expect(page.locator('.canvas .unsupported-object').first()).toContainText('Unsupported object: x-diagram');
  const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
  await page.getByRole('button',{name:'Save',exact:true}).click();
  const savedDoc=(await saved).postDataJSON().document;
