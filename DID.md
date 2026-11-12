@@ -7,3 +7,8 @@ Flask Python project/asset API, browser JavaScript editor, local JSON/assets, op
 JSON schema; canvas library; undo/redo; file storage locking/versioning; import fidelity; native .fig feasibility; authenticated multiuser hosting; export semantics; licence/security review.
 ## Evidence
 Ideas above are design statements, not implemented features. Record accepted architecture/exception through ADRs with tests and owner approval.
+
+## Design direction extension — 2026-11-12
+User requested SQL-backed mock data for multi-user prototypes, approved .scraft as a ZIP application archive with PNG support, selected standalone interactive single-file HTML export, and required Ubuntu/Caddy readiness from the first running build. See docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md.
+**Proposed implementation:** React + TypeScript + HTML5/CSS editor with Flask API, PostgreSQL project/mock dataset persistence (in-browser preview state for offline mode); .scraft ZIP includes JSON/screens/themes/assets and **seed mock data only**, not runtime SQL data. Application interface supports declarative navigation, modal, filter and Add Record behaviours; not production business processing. Separate authenticated server multi-user sessions from optional future live collaboration.
+Deployment: /apps/screencraft/ via trusted Caddy reverse proxy is an MVP acceptance gate, not a post-release enhancement. Detailed library selection, JSON schema and SQL structure remain implementation decisions to validate.
