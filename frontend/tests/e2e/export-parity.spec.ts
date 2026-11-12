@@ -39,12 +39,12 @@ print(interactive_html(app))
 test('offline HTML export maps six input controls into table columns and keeps current values',async({page})=>{
  await page.setContent(exportedHtml(),{waitUntil:'load'});
  const control=(id:string)=>page.locator('[data-node-id="'+id+'"]');
- await control('customer').locator('input').fill('Acme Ltd');
- await control('amount').locator('input').fill('250');
- await control('when').locator('input').fill('2026-11-12');
- await control('status').locator('select').selectOption('Active');
+ await control('customer').fill('Acme Ltd');
+ await control('amount').fill('250');
+ await control('when').fill('2026-11-12');
+ await control('status').selectOption('Active');
  await control('approved').locator('input').check();
- await control('notes').locator('textarea').fill('Delivered by courier');
+ await control('notes').fill('Delivered by courier');
  await control('add').getByRole('button',{name:'Add record'}).click();
  const table=control('table').locator('table');
  await expect(table.locator('tr')).toHaveCount(2);
@@ -68,7 +68,7 @@ test('export stays self-contained and uses no network for bound Add record',asyn
  const requests:string[]=[];
  page.on('request',req=>requests.push(req.url()));
  await page.setContent(exportedHtml(),{waitUntil:'load'});
- await page.locator('[data-node-id="customer"] input').fill('Local test');
+ await page.locator('[data-node-id="customer"]').fill('Local test');
  await page.locator('[data-node-id="add"] button').click();
  await expect(page.locator('[data-node-id="table"] tr')).toHaveCount(2);
  expect(requests).toEqual([]);
