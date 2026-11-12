@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from uuid import uuid4
-from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, select
+from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 class Base(DeclarativeBase): pass
@@ -12,6 +12,7 @@ class User(Base):
     id: Mapped[str]=mapped_column(String(36),primary_key=True)
     username: Mapped[str]=mapped_column(String(120),unique=True)
     password_hash: Mapped[str]=mapped_column(String(256))
+    is_admin: Mapped[bool]=mapped_column(Boolean,default=False)
 class Project(Base):
     __tablename__="sc_projects"
     id: Mapped[str]=mapped_column(String(36),primary_key=True)
@@ -39,9 +40,9 @@ def connect(url: str):
     Base.metadata.create_all(engine) # TODO: replace schema creation with Alembic migration before production
     return engine
 
-def create_user(engine, username, hashed_password):
+def create_user(engine, username, hashed_password, is_admin=False):
     with Session(engine) as db:
-        u=User(id=str(uuid4()),username=username,password_hash=hashed_password)
+        u=User(id=str(uuid4()),username=username,password_hash=hashed_password,is_admin=is_admin)
         db.add(u);db.commit();return u.id
 
 def create_project(engine, user_id, name, archive):
