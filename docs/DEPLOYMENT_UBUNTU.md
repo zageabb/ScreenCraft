@@ -17,7 +17,7 @@ The Caddy `handle_path` strips the external prefix and sets `X-Forwarded-Prefix`
 Ensure path-scoped cookie routing and CSRF checks before broad access; see docs/SECURITY.md.
 
 ## Persistence, backups and upgrades
-PostgreSQL `screencraft-postgres` volume holds projects, packed .scraft blobs, users and mock data. Back up the database volume regularly; test restore. Schema migrations (Alembic) are not implemented yet. Do not treat the current create_all model as production-ready upgrade migration. To upgrade: take backup, test schema changes against copy, build/restart with rollback image available.
+PostgreSQL `screencraft-postgres` volume holds projects, packed .scraft blobs, users and mock data. Back up the database volume regularly; test restore. Alembic revision 0001_initial now defines the baseline schema; Docker starts by applying `alembic -c backend/alembic.ini upgrade head`. PostgreSQL upgrade/rollback against the real Ubuntu database is NOT yet validated; back up before changes. To upgrade: take backup, test schema changes against copy, build/restart with rollback image available.
 
 ## GitHub integration
 Optional. Set `SCREENCRAFT_ALLOWED_REPOS` (comma-separated owner/repo) to explicitly permitted repos and use a fine-grained token with Contents read/write and Pull Requests write for those repositories. Never put token into a .scraft package or frontend. Opening/saving other repos must honor the allowlist. The GitHub write path opens a branch and PR, never silently commits to main.
