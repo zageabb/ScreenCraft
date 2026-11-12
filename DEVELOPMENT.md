@@ -20,6 +20,8 @@
 | SC-014 | User manual/release/deployment | PLANNED | Fresh clone + root/prefix tests |
 
 ## Standards adoption
+- **Canonical .scraft format authority:** `zageabb/Application-Standard` is the single source of truth for the .scraft specification, schemas, versioning and evolution. ScreenCraft and every application repository reference the central specification; do not fork, copy-and-diverge or redefine the format independently. Record the compatible standard version/reference in each consuming project. Proposed format changes go through Application-Standard review first; existing designs remain compatible through documented versioning/migration.
+- **Separate standard from application instance:** each application's own .scraft design document may still live in that application's repository as its version-controlled design artefact; the *format definition* lives only in Application-Standard. ScreenCraft edits design instances and validates them against the centrally referenced specification.
 - Source: zageabb/Application-Standard, proposed v1.0 baseline; profile P6 design tooling with P3 editor characteristics.
 - Copied master standard, reusable screen/proxy/integration/reuse guidance, QA and templates.
 - Adaptation: Flask plus JavaScript allowed; Figma optional; no private corporate screenshots or official brand token claims.
@@ -68,10 +70,10 @@ All items remain proposals, not implemented or tested.
 
 ### Format constraints to preserve during Phases 1–4 (forward compatibility, not new implementation blockers)
 - Preserve stable unique IDs for screens, components, interactions and other schema entities; avoid position-dependent identification.
-- Version the .scraft document/schema, retain explicit extension points and a documented migration mechanism.
+- Version .scraft documents against the canonical schema owned in `zageabb/Application-Standard`; retain explicit extension points and a documented migration mechanism. Do not create a competing ScreenCraft-owned schema.
 - Keep the .scraft ZIP open, portable and machine-readable (canonical JSON plus assets), with Git-friendly unpacked representation; do not make the image preview the authoritative source.
 - Allow optional references to contracts for data, APIs, workflows and permissions, even if their Phase 5 interpretation is not yet implemented. Existing Phase 1–4 artefacts must remain valid.
-- Keep the authoritative design in each consuming application's repository, with ScreenCraft able to read/write via controlled GitHub sync and tracked revisions; changes to other repositories must be explicit and reviewable.
+- Keep the application-specific approved design artefact in each consuming application's repository, referencing the shared .scraft standard in `zageabb/Application-Standard`; ScreenCraft reads/writes design instances via controlled GitHub sync and tracked revisions. Do not duplicate the standard definition in individual applications; cross-repository modifications must be explicit and reviewable.
 - Treat imported Figma designs as inputs for review and normalisation, not automatic approval of functional or security contracts.
 
 ### Boundaries and safeguards
