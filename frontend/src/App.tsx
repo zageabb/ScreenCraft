@@ -75,6 +75,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  const previewSession=useRef('preview-'+crypto.randomUUID());
  const [previewRevision,setPreviewRevision]=useState<Record<string,number>>({});
  const [inputValues,setInputValues]=useState<Record<string,unknown>>({});
+ const [containerStates,setContainerStates]=useState<Record<string,boolean>>({});
  useEffect(()=>{if(mode!=='preview')return;doc.datasets.filter(d=>d.persistence==='session-persisted'||d.persistence==='project-shared').forEach(async d=>{try{const result=await request('/api/projects/'+projectId+'/data/'+encodeURIComponent(d.id),{method:'POST',body:JSON.stringify({mode:d.persistence,operation:'list',session_id:previewSession.current})});setRows(v=>({...v,[d.id]:result.rows}));setPreviewRevision(v=>({...v,[d.id]:result.revision}))}catch(e){setMessage(String(e))}})},[mode,projectId]);
  const [history,setHistory]=useState<Document[]>([]),[future,setFuture]=useState<Document[]>([]),[screensBack,setScreensBack]=useState<string[]>([]);
  const screen=doc.screens.find(s=>s.id===screenId)||doc.screens[0];const node=screen.nodes.find(n=>n.id===selected);
@@ -87,7 +88,22 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  const dataRows=(id:string)=>rows[id]||doc.datasets.find(d=>d.id===id)?.rows||[];
  function edit(next:Document){if(!canEdit)return;setHistory(h=>[...h.slice(-40),cloneDoc(doc)]);setFuture([]);setDoc(next)}
  function property(key:string,value:any,section:'props'|'layout'='props'){if(!node)return;edit(updateNode(doc,screen.id,node.id,n=>({...n,[section]:{...n[section],[key]:value}})))}
- async function act(a:Action|undefined){if(!a)return;if(a.type==='navigate'&&doc.screens.some(s=>s.id===a.target_screen)){setScreensBack(h=>[...h,screenId]);setScreenId(a.target_screen!)}
+ function toggleContainer(id:string,kind:'toggle_container'|'collapse_container'|'expand_container'='toggle_container'){
+  const target=screen.nodes.find(n=>n.id===id&&COLLAPSIBLE_TYPES.has(n.type));
+  if(!target)return;
+  const current=containerStates[id]??(target.props.expanded!==false);
+  setContainerStates(states=>({...states,[id]:kind==='collapse_container'?false:kind==='expand_container'?true:!current}));
+ }
+ function navigateShared(id:string){
+  if(!doc.screens.some(s=>s.id===id)||id===screenId)return;
+  setScreensBack(h=>[...h,screenId]);setScreenId(id);setSelected(null);setModal(null);
+ }
+ async function act(a:Action|undefined){if(!a)return;
+ if(['toggle_container','collapse_container','expand_container'].includes(a.type)){
+  if(a.target_node)toggleContainer(a.target_node,a.type as 'toggle_container'|'collapse_container'|'expand_container');
+  return;
+ }
+ if(a.type==='navigate'&&doc.screens.some(s=>s.id===a.target_screen)){setScreensBack(h=>[...h,screenId]);setScreenId(a.target_screen!)}
  else if(a.type==='back')setScreensBack(h=>{const copy=[...h];setScreenId(copy.pop()||screenId);return copy});
  else if(a.type==='message')setMessage(a.text||'');
  else if(a.type==='add_mock_row'&&a.dataset_id){const id=a.dataset_id;const data=doc.datasets.find(d=>d.id===id);if(!data){setMessage('Choose an existing dataset for this button.');return}const errors=validateBoundInputs(a,screen.nodes,inputValues);if(errors.length){setMessage('Validation: '+errors.join('; '));return}setMessage('');const row=resolveActionRow(a,screen.nodes,inputValues);if(!Object.keys(row).length){setMessage('Configure fixed values or bind input fields for the new row.');return}const kind=data.persistence||'seed-reset';if(kind==='seed-reset')setRows(v=>({...v,[id]:[...dataRows(id),row]}));else try{const result=await request('/api/projects/'+projectId+'/data/'+encodeURIComponent(id),{method:'POST',body:JSON.stringify({mode:kind,operation:'add',values:row,session_id:previewSession.current,revision:previewRevision[id]})});setRows(v=>({...v,[id]:result.rows}));setPreviewRevision(v=>({...v,[id]:result.revision}))}catch(e){setMessage(String(e))}}
@@ -151,7 +167,9 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
      onMove={(x,y)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,x,y}}))) }}
      onResize={(width,height)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,width,height}}))) }}
      onAction={act} onInputChange={(id,value)=>setInputValues(v=>({...v,[id]:value}))} inputValues={inputValues} onRowsChange={(id,updated)=>setRows(v=>({...v,[id]:updated}))} projectId={projectId} doc={doc} rows={dataRows(n.props.dataset_id||'')} activeModal={modal} parentMode={screen.nodes.find(v=>v.id===n.parent_id)?.layout.mode}
-     onDropChild={e=>placeFromDrop(e,n.id)} sectionIndices={screen.nodes.filter(child=>child.parent_id===n.id).map(child=>Number(child.props.tab_index)||0)}>
+     onDropChild={e=>placeFromDrop(e,n.id)}
+     containerOpen={containerStates[n.id]??(n.props.expanded!==false)}
+     onContainerToggle={()=>toggleContainer(n.id)} sectionIndices={screen.nodes.filter(child=>child.parent_id===n.id).map(child=>Number(child.props.tab_index)||0)}>
        {screen.nodes.filter(child=>child.parent_id===n.id).map(child=>renderTree(child,path))}
      </CanvasNode>
  }
