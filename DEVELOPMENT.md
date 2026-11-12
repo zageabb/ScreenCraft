@@ -256,3 +256,13 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Tests:** React editor and actual generated HTML Playwright checks cover step switching, content selection, accordion toggling, split dimensions and offline operation; Python/React/Docker/docs CI gates. Deployment/manual Ubuntu testing remains a separate acceptance step.
 
 **Follow-ups:** Responsive sidebar drawer behavior, keyboard-focused tab patterns, production workflow validation and advanced layout resizing are separately tracked; not claimed as production-grade. Form validation remains next.
+
+## Phase 9D — Prototype input validation and data-entry constraints (2026-11-12)
+
+**Scope:** Add declarative input rules to existing canonical `.scraft` input objects and validate before `add_mock_row` actions that bind to those fields. No new action type or competing object standard.
+
+**Implementation:** Right-side Properties allow required inputs (including required checkbox), text/textarea minimum and maximum length, number/date minimum and maximum values, and editable dropdown choices. When a button runs `add_mock_row`, each configured input binding is checked against its source control's current Preview value. If any rule fails the mock record is not inserted; a visible validation message identifies the offending field and constraint. Existing unbound fixed action values remain supported. The standalone offline HTML export enforces the same rules and preserves entered values after a rejected submit.
+
+**Testing:** Playwright Preview and real Python-generated offline HTML browser tests verify required/short/out-of-range rejection and successful insertion after correction. CI React, Python, browser, Docker and docs as usual. Live Ubuntu user acceptance separate.
+
+**Limitations:** This is prototype validation, not production backend enforcement or a generalized submission form object. Cross-field rules, server trust, custom regex and multi-field validation summaries are future design decisions. FigmaBridge remains deferred.
