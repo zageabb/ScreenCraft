@@ -221,6 +221,12 @@ def create_app(config=None):
         return jsonify(result)
 
     def github_allowed(owner,repo,path):
+        # Server token is shared; only the server administrator may use it.
+        # Delegated repo access requires per-user credentials and a separate security review.
+        with Session(engine) as db:
+            actor=db.get(User,session["user_id"])
+            if not actor or not actor.is_admin:
+                raise PermissionError("Server administrator required for GitHub integration")
         allowed={s.strip().lower() for s in os.environ.get("SCREENCRAFT_ALLOWED_REPOS","").split(",") if s.strip()}
         if (owner+"/"+repo).lower() not in allowed:
             raise PermissionError("Repository is not allowlisted by administrator")
