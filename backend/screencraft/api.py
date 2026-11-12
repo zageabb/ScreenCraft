@@ -57,6 +57,18 @@ def create_app(config=None):
             return fn(*args,**kwargs)
         return wrapper
 
+    @app.errorhandler(404)
+    def missing_route(e):
+        if request.path.startswith("/api/"):
+            return jsonify(error="Unknown API endpoint",path=request.path),404
+        return e
+
+    @app.errorhandler(405)
+    def wrong_method(e):
+        if request.path.startswith("/api/"):
+            return jsonify(error="Method not allowed",path=request.path),405
+        return e
+
     @app.errorhandler(FormatError)
     def format_error(e):return jsonify(error=str(e)),400
     @app.errorhandler(PermissionError)
