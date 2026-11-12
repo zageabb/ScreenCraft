@@ -7,7 +7,7 @@ import catalogue from './catalogue.snapshot.json';
 export const palette=catalogue.objects.map(o=>o.id);
 export const catalogueEntries=catalogue.objects;
 export const catalogueInfo={source:catalogue.canonical_source,sha:catalogue.source_blob_sha,version:catalogue.catalogue_version};
-export function isContainer(type:string){return !!catalogueEntries.find(o=>o.id===type)?.container?.supports_children}
+export function isContainer(type:string){return type!=='table'&&isSupported(type)&&!!catalogueEntries.find(o=>o.id===type)?.container?.supports_children}
 export function isSupported(type:string){return new Set(['text','button','input','select','checkbox','table','image','container','tabs','modal','x-card','x-grid','x-flex','x-toolbar','x-date','x-number','x-textarea','x-kpi']).has(type)}
 export function descendants(screen:Screen,nodeId:string){const result=new Set<string>();let frontier=[nodeId];while(frontier.length){const id=frontier.pop()!;for(const n of screen.nodes){if(n.parent_id===id&&!result.has(n.id)){result.add(n.id);frontier.push(n.id)}}}return result}
 export function removeNodeTree(doc:Document,screenId:string,nodeId:string){const screen=doc.screens.find(s=>s.id===screenId);if(!screen)return doc;const removed=descendants(screen,nodeId);removed.add(nodeId);return {...doc,screens:doc.screens.map(s=>s.id!==screenId?s:{...s,nodes:s.nodes.filter(n=>!removed.has(n.id)).map(n=>n.action?.target_node&&removed.has(n.action.target_node)?{...n,action:undefined}:n)})}}
