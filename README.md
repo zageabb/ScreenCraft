@@ -28,3 +28,7 @@ Python Flask backend and JavaScript-based editor (evaluate libraries for canvas 
 Initial documentation and quality controls are being established. **Do not treat the sketches, import claims or export formats as implemented.** When the first prototype exists, this README will gain tested setup/run instructions and a user manual.
 
 The repository is public: no secrets, user/customer data, proprietary design assets, original private Figma files or copyrighted brand/screenshot material without authorisation.
+
+
+## Standards adoption (proposed in PR)
+ScreenCraft follows the [Application-Standard v1.0 policy](standards/Application_Design_Development_Standard_v1.0.md) as a P6 design-tool/P3 specialist editor, with a proposed Flask/JavaScript stack. See [STANDARD_VERSION.md](STANDARD_VERSION.md), [AGENTS.md](AGENTS.md), [DEVELOPMENT.md](DEVELOPMENT.md) and [DID.md](DID.md). UI work follows [Screen Building Standard](docs/SCREEN_BUILDING_STANDARD.md), [Screen QA](docs/SCREEN_QA_CHECKLIST.md) and [Screen Specification](templates/SCREEN_SPEC.md). [Architecture](docs/ARCHITECTURE.md), [Security](docs/SECURITY.md), [Test Strategy](docs/TEST_STRATEGY.md), [User Manual](docs/USER_MANUAL.md) and [Changelog](CHANGELOG.md) record project-specific requirements and actual evidence. The new CI workflow checks documentation only; this is **not** a verified executable application.
