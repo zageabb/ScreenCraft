@@ -26,3 +26,18 @@
 - Review and CI evidence pending on this branch. Documentation checks alone do not demonstrate a working editor.
 - User manual: docs/USER_MANUAL.md records not yet released; update in every future user-visible feature change.
 - Source discussion and feature details: docs/INITIAL_IDEA.md.
+
+## Interactive prototype extension — 2026-11-12 (proposal)
+See [docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md](docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md) for requirements, acceptance criteria and phased delivery.
+- SC-002: portable versioned application document schema; .scraft ZIP with PNG/SVG/JPEG and editable screen/component trees.
+- SC-003: PostgreSQL-backed multi-user project and prototype mock-data API; SQLite only as optional single-user development mode.
+- SC-004: evaluate React/TypeScript + native HTML5 DOM renderer and drag/drop library for full editing/preview parity.
+- SC-005: configurable object gallery and functional native HTML controls.
+- SC-006: viewport/content distinction, nested scroll, resizable layout and responsive breakpoints.
+- SC-010: **single self-contained interactive HTML application** with screen navigation, dropdowns, modal actions, table Add Record and offline in-memory mock data.
+- SC-014: Ubuntu 24.04 and Caddy /apps/screencraft/ **from first running milestone**, with direct-root and prefixed smoke tests.
+- SC-015: Prototype-only declarative interaction engine — PLANNED.
+- SC-016: Application-wide, independently editable light/dark theme and component tokens — PLANNED.
+- SC-017: Multi-user ACL and SQL-backed prototype data sessions, isolated/shared modes — PLANNED.
+- SC-018: Single .scraft ZIP application document with integrated asset bundling and unpacked Git-friendly export — PLANNED.
+All items remain proposals, not implemented or tested.
