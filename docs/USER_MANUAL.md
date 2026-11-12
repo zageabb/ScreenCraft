@@ -51,3 +51,13 @@ When `SCREENCRAFT_AUTH_MODE=uda` is enabled by the administrator, users sign in 
 
 ## Deleting screens
 Each entry in **Screens** (left sidebar) has up/down arrows followed by **× Delete screen** on the right. Click × and confirm to delete the screen and every object it contains. You cannot delete the last remaining screen. When removing the Home/entry screen, ScreenCraft automatically selects the next remaining screen as the entry screen. Buttons elsewhere that navigated to the deleted screen lose that invalid navigation action. Use **Undo** before saving to restore the screen; click **Save** to persist the deletion in the application and exported .scraft file.
+
+## Phase 6: validating and importing portable .scraft designs
+
+Open an application and choose **Import .scraft**. ScreenCraft first sends the file through a **read-only validation** endpoint. The inspector displays the document name, format version, screen count, packaged asset count and any warnings. **The current project is not changed at this stage.** Review compatibility warnings for unsupported extension objects or newer v1 features; unsupported objects are preserved as inert placeholders, not runnable behaviour.
+
+Choose **Import validated design** to replace the current project design, or **Cancel import** to keep your current design. Invalid or unsafe archives cannot be approved. A concurrent project revision change can still reject import; reload and reconcile instead of overwriting other edits.
+
+Validation covers screen IDs, screen order and initial screen, navigation actions, node hierarchy, dataset identifiers, asset paths and optional SHA-256 checksums, and rejects executable/unsupported actions, unsafe ZIP paths, malformed JSON, remote references and incompatible format major versions. Local JSON references within the ZIP are resolved into the portable application on import; when saved, the package uses a self-contained application.json.
+
+This is a prototype interchange validator, not a virus scanner or a guarantee that all extension objects render fully. Test your imported design in Preview and review any warnings before distribution.
