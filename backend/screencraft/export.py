@@ -71,7 +71,7 @@ function render(){root.replaceChildren();menu.replaceChildren();
  let heading=el('h2',s.name);root.append(heading);
  let wrapper=el('section');wrapper.style.overflowX=s.layout?.overflow_x||'auto';wrapper.style.overflowY=s.layout?.overflow_y||'auto';wrapper.style.minHeight='60vh';root.append(wrapper);
  let nodes=new Map((s.nodes||[]).map(n=>[n.id,n]));let rendered=new Set();
- function build(n,parent,trail=new Set()){if(rendered.has(n.id)||trail.has(n.id))return;rendered.add(n.id);let box=renderNode(n,parent);for(const child of s.nodes||[])if(child.parent_id===n.id)build(child,box,new Set([...trail,n.id]))}
+ function build(n,parent,trail=new Set()){if(rendered.has(n.id)||trail.has(n.id))return;rendered.add(n.id);let box=renderNode(n,parent);if(!box)return;for(const child of s.nodes||[])if(child.parent_id===n.id)build(child,box,new Set([...trail,n.id]))}
  (s.nodes||[]).filter(n=>!n.parent_id||!nodes.has(n.parent_id)).forEach(n=>build(n,wrapper));
  if(message)root.append(el('div',message));}
 render();
