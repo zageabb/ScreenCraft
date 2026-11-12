@@ -19,3 +19,5 @@ No runnable ScreenCraft application has been released.
 - Return JSON 404/405 for unknown API routes and unsupported API methods.
 - Add regression tests for prefixed bootstrap/project creation and HTML error handling.
 - Production cause pending actual request/status evidence from Ubuntu; no remote deployment performed by this change.
+
+- Corrected PostgreSQL project creation: flush the new project row before creating the foreign-key dependent owner membership, atomically within one transaction. Enabled SQLite foreign-key enforcement in test DB connections and added regression coverage. Confirmed independent Desktop investigation excluded Caddy as the cause.
