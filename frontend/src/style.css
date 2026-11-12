@@ -35,3 +35,17 @@
 .unsupported-object{border:1px dashed #bc8345;background:#fff5e8;color:#744b22;padding:6px;font-size:12px}
 .kpi-tile{border:1px solid #d1dbe8;border-radius:7px;background:#f5f8fc;padding:8px;display:flex;flex-direction:column;gap:7px;height:100%}
 .kpi-tile strong{font-size:22px}
+
+/* Phase 9 — table and editable-grid parity */
+.data-grid{display:flex;flex-direction:column;gap:5px;width:100%;height:100%;font-size:12px;min-width:0}
+.data-grid-search{display:flex;align-items:center;gap:6px}
+.data-grid-search input{min-width:0;flex:1}
+.data-grid-actions,.data-grid-pages{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.data-grid-pages{justify-content:space-between}
+.data-grid .table-scroll{min-height:0;flex:1;overflow:auto}
+.data-grid th button{padding:3px 5px;border:0;background:transparent;color:inherit;font-weight:650}
+.data-grid th button:hover{text-decoration:underline}
+.data-grid .selected-row{background:#e6f1ff}
+.data-grid td>input:not([type="checkbox"]){min-width:70px;width:100%;max-width:200px;padding:3px 4px}
+.data-grid td>input[type="checkbox"]{margin:2px}
+.data-grid .muted{font-size:11px}

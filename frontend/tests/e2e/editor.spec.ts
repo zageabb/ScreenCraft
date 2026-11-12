@@ -309,3 +309,38 @@ test('Phase 6 invalid ZIP shows error and cannot be approved',async({page})=>{
  await expect(page.locator('.status')).toContainText('Invalid screen order');
  await expect(page.getByRole('button',{name:'Import validated design'})).toHaveCount(0);
 });
+
+test('Phase 9 editable grid previews selection, inline editing and row insertion',async({page})=>{
+ await page.locator('[data-catalogue-type="x-editable-grid"]').click();
+ await expect(page.locator('.canvas .data-grid')).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Table / grid behaviour'})).toBeVisible();
+ await expect(page.getByLabel('Table dataset')).not.toHaveValue('');
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const grid=page.locator('.canvas .data-grid');
+ await grid.getByRole('button',{name:'+ Row'}).click();
+ await expect(grid.locator('tbody tr')).toHaveCount(2);
+ await grid.getByRole('textbox',{name:'Edit row 2 Name'}).fill('Zephyr Ltd');
+ await grid.getByRole('checkbox',{name:'Select row 1'}).check();
+ await grid.getByRole('button',{name:'Delete selected'}).click();
+ await expect(grid.locator('tbody tr')).toHaveCount(1);
+ await expect(grid.getByRole('textbox',{name:'Edit row 1 Name'})).toHaveValue('Zephyr Ltd');
+});
+test('Phase 9 sortable table filters records and saves configuration',async({page})=>{
+ await page.locator('[data-catalogue-type="table"]').click();
+ await page.getByLabel('Filter column').selectOption('Status');
+ await page.getByLabel('Filter contains').fill('Active');
+ await page.getByLabel('Page size').fill('10');
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const doc=(await saved).postDataJSON().document;
+ const table=doc.screens[0].nodes.find((n:any)=>n.type==='table');
+ expect(table.props.filter_column).toBe('Status');
+ expect(table.props.filter_value).toBe('Active');
+ expect(table.props.page_size).toBe(10);
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const grid=page.locator('.canvas .data-grid');
+ await expect(grid.locator('tbody tr')).toHaveCount(1);
+ await grid.getByRole('textbox',{name:'Search records'}).fill('absent');
+ await expect(grid.locator('tbody tr')).toHaveCount(0);
+ await expect(grid).toContainText('No matching records');
+});

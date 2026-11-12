@@ -185,3 +185,17 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - The exporter now maintains in-memory input state across table rerenders so controls do not reset after adding records. These changes are prototype-local only and make no production or network requests.
 - Added Playwright regression tests that generate a real HTML document with the Python exporter, load it in Chromium, enter values, add two rows, verify mapped columns and state persistence, and verify no network requests.
 - Relevant checks: Python, React, browser, docs and Docker CI. Live Ubuntu/desktop user acceptance remains separate.
+
+## Phase 9A — Tables and editable data grids (2026-11-12)
+
+**Scope approved:** Begin advanced object functionality with tables and grids, independent of FigmaBridge. Canonical object IDs remain `table` and `x-editable-grid` from Application-Standard; `x-grid` is a separate **layout** object, not an editable data table.
+
+**Implementation:** Shared React DataGrid supports opt-in search, numeric/text sorting, column filtering, row selection and bounded page size. `x-editable-grid` is now an active prototype object with inline cell editing and preview-local insert/delete; new tables and editable grids provision isolated sample datasets. Right-side Properties configure dataset, searchable/sortable/selectable, filter column/value and page size. Existing TableDataEditor continues to define columns and saved seed records in .scraft.
+
+**Data semantics:** Grid mutations in ScreenCraft Preview are enabled for `seed-reset` mock datasets only. For server-persisted/shared datasets, the grid explicitly displays a limitation rather than incorrectly mutating other users' records. This phase does not introduce production SQL editing or grant extra permissions.
+
+**Mandatory export parity:** Standalone one-file HTML implements the same search, sorting, filtering, pagination, selection, inline editing and preview-local row addition/deletion in browser memory; no network requests, dependencies or backend SQL. Exported grid changes do not modify server data. Field-to-table Add Row button bindings remain compatible.
+
+**Acceptance:** Existing editable table inspector tests; additional Playwright editor Preview and generated-offline-HTML browser tests for grid insert/edit/delete, query/filter/sort, pagination and stable source row selection. Python/React/docs/Docker checks as applicable. Manual Ubuntu runtime verification remains independent of CI.
+
+**Deferred:** True shared/session dataset inline write API, rich cell types/validation, bulk edit, column drag-reorder, server-side filtering/sorting, and advanced layout grid responsive column sizing. FigmaBridge remains deferred.

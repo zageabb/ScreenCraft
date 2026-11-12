@@ -66,3 +66,13 @@ This is a prototype interchange validator, not a virus scanner or a guarantee th
 When a button is configured with **Action: add_mock_row**, choose the destination dataset and select **Input source for [column]** for each destination column. Supported inputs are text, number, date, dropdown, checkbox and textarea. Fixed values remain available for columns without an input binding.
 
 **Interactive HTML export now uses the same field bindings as ScreenCraft Preview.** Users can enter values into those controls and click Add Record; the exported standalone HTML app appends a record containing the current field values. Input values survive the table rerender after the new record is added. The standalone export stores mock data only in browser memory; refreshing the page returns to the seed data. No backend, database or internet connection is needed.
+
+## Phase 9A: Advanced tables and editable grids
+
+Add a **table** or **x-editable-grid** object from the Object Gallery. Both create their own sample dataset automatically. Use the right-hand **Properties > Table / grid behaviour** section to enable/disable **searchable**, **sortable**, and **selectable** controls, set **Page size** (0 displays all records) or filter a specific column by text. The **Table dataset** editor below these settings controls the field names and saved sample rows.
+
+In **Preview**, tables support search, column-header sorting, fixed-column filters, pagination and optional row selection. Editable grids additionally permit inline cell changes, **+ Row**, and **Delete selected** for **seed-reset** datasets. Row selection and editing target original record indices even when the view is sorted, filtered or paginated. Preview updates are temporary; change the sample dataset in the right-side editor and Save to persist intended design seed data in .scraft.
+
+Standalone **Interactive HTML** supports the same controls entirely offline using browser-memory mock data. Reloading the exported page restores packaged seed rows. No production database is updated, and session-persisted or project-shared preview datasets are not editable through the ScreenCraft inline grid until separately approved and implemented.
+
+The **x-grid** object is a layout container for arranging objects; **x-editable-grid** is the spreadsheet-like data control.

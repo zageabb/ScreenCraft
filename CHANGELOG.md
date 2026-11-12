@@ -46,3 +46,9 @@ No runnable ScreenCraft application has been released.
 
 - Fixed Interactive HTML export to honour button Add Row field bindings from text, number, date, select, checkbox and textarea controls. Bound values override fixed defaults; controls retain their values after the table rerenders.
 - Added AGENTS.md mandatory parity rule: whenever Preview or editor functionality changes, update and browser-test exported interactive HTML in the same change.
+
+## Phase 9A — Advanced tables and editable grids
+- Activated canonical x-editable-grid as a functional mock-data control, with auto-created sample datasets and inline Preview row editing, insertion, deletion and selection.
+- Added table and grid search, sortable headers, fixed column filtering and configurable pagination in the Properties inspector.
+- Mirrored the data controls in fully self-contained offline HTML export; mock writes never target production SQL.
+- Added browser tests for editor Preview and generated HTML parity including sorted/index-stable row deletion.

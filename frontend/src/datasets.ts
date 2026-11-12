@@ -2,7 +2,7 @@ import type {Dataset,Document,Node} from './model';
 
 /** Every table has a dedicated editable sample dataset, independent from action JSON. */
 export function withTableDataset(doc:Document,node:Node):{document:Document;node:Node}{
- if(node.type!=='table')return {document:doc,node};
+ if(node.type!=='table'&&node.type!=='x-editable-grid')return {document:doc,node};
  const id='dataset-'+node.id;
  const dataset:Dataset={
    id,
