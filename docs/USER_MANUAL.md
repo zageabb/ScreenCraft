@@ -25,3 +25,6 @@ Until per-user OAuth and repository permissions are designed, only a ScreenCraft
 
 ### Shared preview data
 For project-shared SQL mock datasets the API enforces an expected revision and locks the edited row-set transactionally. If another user has changed it, reload the preview and retry instead of overwriting their changes.
+
+## Editing table sample data
+Select a Table in Design mode. In Properties > Table dataset, choose an existing dataset or click **Create sample dataset** for older table objects without one. Newly inserted tables start with a dedicated dataset, two example columns (Name and Status), and an example record so they are immediately visible. Under **Table sample data**, add/rename/remove columns and add/edit/remove sample rows. Changes appear on the canvas immediately; click **Save** to store them in the project and its .scraft ZIP document. Table sample data is separate from the **Sample action row (JSON)** field on a button, which defines what a button's Add Row prototype action inserts.
