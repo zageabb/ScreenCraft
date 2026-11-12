@@ -67,3 +67,8 @@ No runnable ScreenCraft application has been released.
 - Added required, text-length, number/date ranges and dropdown choice properties for inputs in the right-hand inspector.
 - Add Row buttons validate bound inputs before writing mock records, with a visible user message and no partial insert on failure.
 - Mirrored form validation in standalone HTML export and added Preview and real generated HTML browser tests.
+
+## Phase 9.1 — Collapsible containers and shared navigation
+- Added declarative `toggle_container`, `collapse_container` and `expand_container` button actions, plus optional collapsible headers and saved initial state on nested containers.
+- Added a single shared application navigation definition with global inspector editing, active screen links, nested menu groups, left/right/top placement, mobile collapse and per-screen opt-out.
+- Added SCRAFT reference/cycle validation, screen deletion menu cleanup and matching offline Interactive HTML controls, verified by browser and backend conformance tests.
