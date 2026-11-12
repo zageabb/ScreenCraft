@@ -136,3 +136,15 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - Identity mapping: UDA provides the verified authenticated email in `X-UDA-User`, matching the existing ScreenCraft administrator username.
 - Remaining verification not independently evidenced in this chat: unauthenticated and forged-header rejection through public ingress and direct backend, prior-cookie rejection, role/ownership isolation for another UDA account, sign-out/session expiry, and documented local-mode rollback.
 - No additional application code or live server changes were made for this status update.
+
+## Phase 5 — Canonical objects, nesting and screen management (2026-11-12)
+
+**Approved scope:** Complete Phase 5 in one pass, including screen reorder and per-object delete on the right. The Get started demo button and preview navigation are also corrected.
+
+**Canonical source:** Application-Standard/standards/SCRAFT_FILE_FORMAT_v1.md plus standards/screencraft/object-catalogue.json. ScreenCraft uses a generated pinned snapshot of source blob SHA e7c91d3325988cfa07e39171b713dc919344e813; scripts/sync_scraft_catalogue.py refreshes the derived snapshot. No competing master object standard.
+
+**Features:** Grouped 39-type catalogue palette with unsupported placeholders; nested container/card/grid/flex/toolbar canvas and parent controls; reusable subtree templates; screen move up/down without changing stable IDs; delete selected object in right-side Properties (or at the right edge of Layers), including descendants; empty new Home screen instead of unrequested Get started; Preview Back and Home controls; standalone export using screen order and nested structure; initial support for x-card/x-grid/x-flex/x-toolbar/x-date/x-number/x-textarea/x-kpi. Legacy demo buttons remain ordinary editable/deletable objects. Unsupported extensions remain visible/inert and survive save/export.
+
+**Evidence:** Browser tests cover screen ordering, deletion, nested objects, reusable components, preview recovery and unknown extension preservation. Backend tests cover default blank screen and SCRAFT v1 nested round-trip. React, Python, Docker, browser and documentation jobs must pass before merge.
+
+**Not claimed:** All 39 types are fully interactive; full pixel-perfect preview/export parity, accessibility, production data, Figma import and live Ubuntu manual acceptance are separate gates. Live UDA SSO remains configured independently.
