@@ -427,3 +427,50 @@ test('Phase 9D required field validation prevents invalid Preview add-row action
  await expect(page.locator('.canvas table tbody tr')).toHaveCount(2);
  await expect(page.locator('.canvas table')).toContainText('Acme');
 });
+
+test('Phase 9.1 collapsible container has button target and retains entered values after reopen',async({page})=>{
+ await page.locator('[data-catalogue-type="container"]').click();
+ await page.getByLabel('Enable collapsible header').check();
+ await page.locator('[data-catalogue-type="input"]').click();
+ await page.getByLabel('Parent container').selectOption({index:1});
+ await page.locator('[data-catalogue-type="button"]').click();
+ await page.locator('.inspector').getByLabel('Action').selectOption('toggle_container');
+ await page.getByLabel('Target container').selectOption({index:1});
+ const saved=page.waitForRequest(r=>r.url().endsWith('/api/projects/p1')&&r.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const data=(await saved).postDataJSON().document;
+ const container=data.screens[0].nodes.find((n:any)=>n.type==='container');
+ const button=data.screens[0].nodes.find((n:any)=>n.type==='button'&&n.action?.type==='toggle_container');
+ expect(container.props.collapsible).toBe(true);
+ expect(button.action.target_node).toBe(container.id);
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const input=page.locator('.canvas .canvas-node input[placeholder="Input"]');
+ await input.fill('Still here');
+ await page.locator('.canvas .prototype-button').filter({hasText:'Button'}).click();
+ await expect(input).toHaveCount(0);
+ await page.locator('.canvas .prototype-button').filter({hasText:'Button'}).click();
+ await expect(input).toHaveValue('Still here');
+});
+
+test('Phase 9.1 global menu is edited once, persists separately and follows opt-out',async({page})=>{
+ await page.locator('.shared-nav-editor summary').click();
+ await page.getByLabel('Enable shared navigation').check();
+ await page.getByLabel('Navigation position').selectOption('right');
+ await page.getByLabel('Menu label 0').fill('Dashboard link');
+ const saved=page.waitForRequest(r=>r.url().endsWith('/api/projects/p1')&&r.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const doc=(await saved).postDataJSON().document;
+ expect(doc.shared_navigation.position).toBe('right');
+ expect(doc.shared_navigation.items[0].label).toBe('Dashboard link');
+ expect(doc.screens[0].nodes.filter((n:any)=>n.type==='x-menu')).toHaveLength(0);
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const nav=page.getByRole('navigation',{name:'Application navigation'});
+ await expect(nav).toHaveCount(1);
+ await expect(nav.getByRole('button',{name:'Dashboard link'})).toHaveAttribute('aria-current','page');
+ await nav.getByRole('button',{name:'Customers'}).click();
+ await expect(nav.getByRole('button',{name:'Customers'})).toHaveAttribute('aria-current','page');
+ await page.getByRole('button',{name:'✎ Design'}).click();
+ await page.getByLabel('Hide navigation on screen').check();
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ await expect(nav).toHaveCount(0);
+});
