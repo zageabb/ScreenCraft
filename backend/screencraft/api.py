@@ -7,7 +7,7 @@ import os
 import re
 from functools import wraps
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from flask import Flask, request, jsonify, session, send_file, abort, send_from_directory
@@ -26,7 +26,8 @@ def create_app(config=None):
         SQLALCHEMY_URL=os.environ.get("DATABASE_URL","sqlite:///screencraft.db"),
         SESSION_COOKIE_NAME="screencraft_session",
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_COOKIE_SAMESITE="Strict",
+        SESSION_COOKIE_PATH=os.environ.get("SCREENCRAFT_COOKIE_PATH","/"),
         SESSION_COOKIE_SECURE=os.environ.get("SCREENCRAFT_COOKIE_SECURE","1")=="1",
         MAX_CONTENT_LENGTH=MAX_ARCHIVE+4096,
         GITHUB_TOKEN=os.environ.get("SCREENCRAFT_GITHUB_TOKEN",""))
@@ -39,6 +40,13 @@ def create_app(config=None):
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=1,x_proto=1,x_host=1,x_prefix=1)
     engine=connect(app.config["SQLALCHEMY_URL"])
     app.extensions["screencraft_engine"]=engine
+
+    @app.before_request
+    def same_origin_mutations():
+        if request.method in ("POST","PUT","PATCH","DELETE"):
+            origin=request.headers.get("Origin")
+            if origin and urlsplit(origin).netloc != request.host:
+                return jsonify(error="Cross-origin modification denied"),403
 
     def auth(fn):
         @wraps(fn)
@@ -68,7 +76,7 @@ def create_app(config=None):
         if len(username)<3 or len(password)<12:return jsonify(error="Invalid credentials"),400
         uid=create_user(engine,username,generate_password_hash(password),is_admin=True)
         session["user_id"]=uid
-        return jsonify(id=uid,username=username),201
+        return jsonify(id=uid,username=username,is_admin=True),201
 
     @app.post("/api/login")
     def login():
@@ -79,7 +87,7 @@ def create_app(config=None):
             if not user or not check_password_hash(user.password_hash,password):
                 return jsonify(error="Invalid login"),401
             session.clear();session["user_id"]=user.id
-            return jsonify(id=user.id,username=user.username)
+            return jsonify(id=user.id,username=user.username,is_admin=user.is_admin)
     @app.post("/api/logout")
     def logout():session.clear();return jsonify(ok=True)
     @app.get("/api/me")
@@ -87,7 +95,7 @@ def create_app(config=None):
     def me():
         with Session(engine) as db:
             user=db.get(User,session["user_id"])
-            return jsonify(id=user.id,username=user.username)
+            return jsonify(id=user.id,username=user.username,is_admin=user.is_admin)
 
     @app.get("/api/projects")
     @auth
