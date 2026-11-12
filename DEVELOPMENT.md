@@ -218,7 +218,7 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 
 **Still pending in Phase 9:** advanced navigation/layout objects and form validation, additional accessibility and responsive layout checks. FigmaBridge phase 7 remains deferred.
 
-## Phase 9.1 — Collapsible containers and visibility actions (planned, 2026-11-12)
+## Phase 9.1 — Collapsible containers and shared application navigation (planned, 2026-11-12)
 
 **Scheduling:** A separate follow-on subphase. Phase 9 is already in active development; do not interrupt or replace its implementation. Begin 9.1 after Phase 9 is integrated or in an independent non-conflicting development stream.
 
@@ -231,6 +231,15 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - Ensure inputs, tables, charts, field bindings and mock dataset values are retained when a container is collapsed and reopened. Nested containers must work; moving/resizing the parent should retain child relationships.
 - Define predictable layout behaviour when collapsed (header-only compact height versus hidden content), as well as sensible keyboard and screen-reader semantics (`aria-expanded`, controls association, focus recovery).
 - Preserve the behaviour in .scraft save/reload and make editor Preview and standalone offline HTML export functionally equivalent, as required by AGENTS.md. No external JS dependency.
+
+**Shared application navigation:**
+- Provide a single application-level navigation component definition (shared sidebar/menu), editable once and displayed automatically on every configured screen; do not copy menu objects into each screen's editable node tree.
+- Support left/right fixed or collapsible sidebars, horizontal navigation, nested/accordion menu items, mobile hamburger/drawer behaviour, and configurable initial state by breakpoint.
+- Menu items support existing declarative screen navigation, active-screen indication, labels/icons, ordering and optional visibility by screen. Do not invent production permission enforcement; access control remains application-side.
+- Screen designers can opt a screen out of the shared menu (e.g. login/full-screen view), while retaining stable IDs and predictable preview/export parity.
+- Expose application-level navigation editing in the designer, including a clear distinction between global menu properties and per-screen content; shared changes propagate immediately to all participating screens.
+- Store shared navigation in the canonical .scraft application document with backward-compatible handling of documents without a shared menu; save/reopen and standalone HTML must preserve the same menu structure and interactions.
+- Test global edits across multiple screens, screen opt-outs, nested navigation, mobile collapse/restore, active states, invalid/deleted targets, and real offline HTML export behaviour.
 
 **Acceptance:** Browser tests cover button toggle/expand/collapse, nested objects, initial state, persistence, invalid targets, keyboard operation, and reopening with existing user-entered values. Run the same interaction against the **actual generated standalone HTML export**, not just its source. Keep manual and automated verification separate and document deviations.
 
