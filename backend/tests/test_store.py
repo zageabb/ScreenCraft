@@ -35,7 +35,7 @@ def test_mock_data_session_isolation_and_shared(store):
     assert len(r2["rows"])==1
     with pytest.raises(PermissionError):
         mutate_rows(eng,pid,b,"customers","session-persisted",seeds,"list",session_id="a-session")
-    common=mutate_rows(eng,pid,a,"customers","project-shared",seeds,"add",{"Name":"Shared"})
+    common=mutate_rows(eng,pid,a,"customers","project-shared",seeds,"add",{"Name":"Shared"},expected_revision=1)
     assert len(mutate_rows(eng,pid,b,"customers","project-shared",seeds,"list")["rows"])==2
     with pytest.raises(PermissionError):mutate_rows(eng,pid,c,"customers","project-shared",seeds,"add",{"Name":"Denied"})
     with pytest.raises(ValueError):mutate_rows(eng,pid,a,"customers","project-shared",seeds,"add",{"Name":"Conflict"},expected_revision=1)
