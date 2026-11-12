@@ -121,3 +121,46 @@ def test_create_project_through_caddy_prefix(tmp_path,monkeypatch):
         environ_overrides={"SCRIPT_NAME":"/apps/screencraft","PATH_INFO":"/api/projects"})
     assert loaded.status_code==200 and loaded.is_json
     assert loaded.json["projects"][0]["name"]=="Test Application"
+
+def test_readonly_scraft_inspection_does_not_change_project(app):
+    import io
+    from screencraft.package import make_document, starter_app
+    c=app.test_client()
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    project=c.post("/api/projects",json={"name":"Existing"}).json["id"]
+    doc=starter_app()
+    doc["screens"][0]["nodes"].append({"id":"future","type":"x-future-object",
+                                        "parent_id":None,"props":{"keep":True}})
+    blob=make_document(doc)
+    result=c.post("/api/scraft/inspect",data={"file":(io.BytesIO(blob),"future.scraft")},
+                  content_type="multipart/form-data")
+    assert result.status_code==200,result.json
+    assert result.json["valid"] is True and any("x-future-object" in w for w in result.json["warnings"])
+    assert c.get(f"/api/projects/{project}").json["revision"]==1
+
+def test_invalid_scraft_preflight_cannot_replace_project(app):
+    import io
+    from screencraft.package import make_document,starter_app
+    c=app.test_client()
+    assert c.post("/api/scraft/inspect",data={"file":(io.BytesIO(b"not-a-zip"),"bad.scraft")},
+                  content_type="multipart/form-data").status_code==401
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    project=c.post("/api/projects",json={"name":"Protected"}).json["id"]
+    inspect=c.post("/api/scraft/inspect",data={"file":(io.BytesIO(b"not-a-zip"),"bad.scraft")},
+                   content_type="multipart/form-data")
+    assert inspect.status_code==400
+    invalid_upload=c.post(f"/api/projects/{project}/upload",
+        data={"revision":"1","file":(io.BytesIO(b"not-a-zip"),"bad.scraft")},
+        content_type="multipart/form-data")
+    assert invalid_upload.status_code==400
+    assert c.get(f"/api/projects/{project}").json["revision"]==1
+    doc=starter_app()
+    doc["screens"][0]["nodes"].append({"id":"future","type":"x-custom",
+                                        "parent_id":None,"props":{"keep":"retained"}})
+    successful=c.post(f"/api/projects/{project}/upload",data={
+        "revision":"1","file":(io.BytesIO(make_document(doc)),"valid.scraft")},
+        content_type="multipart/form-data")
+    assert successful.status_code==200,successful.json
+    assert successful.json["revision"]==2
+    assert any("x-custom" in x for x in successful.json["warnings"])
+    assert c.get(f"/api/projects/{project}").json["document"]["screens"][0]["nodes"][0]["props"]["keep"]=="retained"
