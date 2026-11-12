@@ -57,3 +57,8 @@ No runnable ScreenCraft application has been released.
 - Activated canonical x-chart object with SVG bar, line and pie charts, dataset grouping and numeric/count aggregation.
 - Enhanced x-kpi with dataset-linked count, sum, average, min and max, while preserving existing static-value designs.
 - Added right-side metric properties and standalone offline HTML equivalents with real browser tests.
+
+## Phase 9C — Interactive navigation and layout objects
+- Added functional tabs and wizard step switching, configurable captions and per-child step assignment.
+- Enabled accordion expand/collapse, sidebar layout and percentage-based splitter containers.
+- Implemented equivalent behaviour in standalone offline HTML with real browser tests.
