@@ -154,3 +154,9 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - **CI green on final feature head** `18575e62e55c1955b1ad78a7f094ea2ee9598142`, workflow run https://github.com/zageabb/ScreenCraft/actions/runs/43269997302: Python, React/TypeScript build, Playwright Chromium browser tests, Docker/container and docs all passed.
 - **Implementation acceptance:** Phase 5 available on GitHub main, including the editable/deletable legacy Get started button, blank new-project starter, screen order and Preview Back/Home. **Live Ubuntu deployment and manual feature acceptance remain pending**. No server changes performed in this chat.
 - **Limitations:** Not all 39 catalogue types are functional. Inert unsupported objects round-trip with warnings, and extended object fidelity/mobile/accessibility require future work. FigmaBridge integration remains a separate phase.
+
+## Screen deletion (Phase 5 follow-up, 2026-11-12)
+- Added an explicit **Delete screen ×** button to the right of each screen's up/down reorder controls in the left Screens list.
+- Deletion requires confirmation; deleting the final remaining screen is disabled, and the entire operation can be undone before Save.
+- The deleted screen and its nodes are removed from screen_order and screens. If it was the start screen, the first remaining ordered screen becomes start_screen. Incoming navigate actions to the removed screen are cleared to preserve .scraft reference validity. Active screen, selected node, modal state and preview Back history are adjusted.
+- Browser acceptance covers delete/save, navigation cleanup, entry screen reassignment, Undo, confirmation dismissal and last-screen protection. Automated CI and manual Ubuntu acceptance are tracked separately.
