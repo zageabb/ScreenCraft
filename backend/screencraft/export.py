@@ -16,7 +16,7 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
     asset_payload=json.dumps(images,ensure_ascii=True).replace("<","\\u003c").replace(">","\\u003e").replace("&","\\u0026")
     title=html.escape(str(app.get("name","ScreenCraft Prototype")),quote=True)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>"""+title+"""</title><style>
-:root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
+:root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-chart{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;overflow:auto}.sc-chart svg{width:100%;height:65%;min-height:110px}.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}.sc-chart-legend span{display:inline-flex;align-items:center;gap:3px}.sc-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
 </style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
@@ -152,6 +152,68 @@ function tableView(n){
  }
  refresh();return box;
 }
+const metricPalette=['#2765be','#24a494','#e2a23c','#9562bc','#dc736c','#537b8c','#83af4c'];
+function aggregateMetric(rows,op,col){
+ if(op==='count')return rows.length;
+ const values=rows.map(row=>Number(row[col])).filter(Number.isFinite);
+ if(!values.length)return 0;
+ if(op==='sum')return values.reduce((a,b)=>a+b,0);
+ if(op==='average')return values.reduce((a,b)=>a+b,0)/values.length;
+ if(op==='min')return Math.min(...values);
+ if(op==='max')return Math.max(...values);
+ return 0;
+}
+function metricText(value){return Number.isFinite(value)?new Intl.NumberFormat('en-GB',{maximumFractionDigits:2}).format(value):'0'}
+function metricView(n){
+ const p=n.props||{},box=el('div');
+ const data=p.dataset_id?datasets[p.dataset_id]||[]:[];
+ const title=p.label||(n.type==='x-chart'?'Chart':'KPI');
+ box.append(el('strong',title));
+ if(n.type==='x-kpi'){
+  box.className='sc-kpi';
+  const value=p.dataset_id?metricText(aggregateMetric(data,p.aggregation||'count',p.value_column||'')):String(p.value??'0');
+  box.append(el('strong',value));box.dataset.metricKind='kpi';
+  return box;
+ }
+ box.className='sc-chart';const chartType=['bar','line','pie'].includes(p.chart_type)?p.chart_type:'bar';
+ box.dataset.chartType=chartType;box.setAttribute('role','img');
+ box.setAttribute('aria-label',title+' '+chartType+' chart');
+ if(!p.dataset_id){box.append(el('p','No dataset selected'));return box}
+ const groups=new Map();
+ for(const row of data){const key=String(row[p.category_column||'']??'(blank)');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row)}
+ const points=Array.from(groups,([name,records])=>({name,value:aggregateMetric(records,p.aggregation||'count',p.value_column||'')})).slice(0,30);
+ if(!points.length){box.append(el('p','No chart data'));return box}
+ const ns='http://www.w3.org/2000/svg';
+ const svg=document.createElementNS(ns,'svg');
+ svg.setAttribute('viewBox','0 0 480 220');
+ svg.setAttribute('preserveAspectRatio','xMidYMid meet');svg.setAttribute('aria-hidden','true');
+ const shape=(tag,attrs)=>{const item=document.createElementNS(ns,tag);for(const [key,val] of Object.entries(attrs))item.setAttribute(key,String(val));svg.append(item);return item};
+ const max=Math.max(1,...points.map(point=>Math.abs(point.value)));
+ if(chartType==='bar'){
+  points.forEach((point,i)=>{const w=440/points.length,h=Math.abs(point.value)/max*155;
+   shape('rect',{x:20+i*w+w*.16,y:175-h,width:w*.67,height:h,fill:metricPalette[i%metricPalette.length]})
+  });
+ }else if(chartType==='line'){
+  const places=points.map((point,i)=>[20+i*440/Math.max(1,points.length-1),175-point.value/max*155]);
+  shape('polyline',{fill:'none',stroke:metricPalette[0],'stroke-width':3,points:places.map(a=>a.join(',')).join(' ')});
+  places.forEach(([cx,cy])=>shape('circle',{cx,cy,r:4,fill:metricPalette[0]}));
+ }else{
+  const total=points.reduce((sum,point)=>sum+Math.max(0,point.value),0);
+  let cumulative=0;
+  points.forEach((point,i)=>{
+   const fraction=total?Math.max(0,point.value)/total:0,start=cumulative;
+   cumulative+=fraction;if(!fraction)return;
+   if(fraction>=1){shape('circle',{cx:240,cy:105,r:74,fill:metricPalette[i%metricPalette.length]});return}
+   const pos=a=>{const angle=(a-.25)*2*Math.PI;return [240+74*Math.cos(angle),105+74*Math.sin(angle)]};
+   const a=pos(start),b=pos(cumulative);
+   shape('path',{d:'M 240 105 L '+a.join(' ')+' A 74 74 0 '+(fraction>.5?1:0)+' 1 '+b.join(' ')+' Z',fill:metricPalette[i%metricPalette.length]});
+  })
+ }
+ box.append(svg);
+ const legend=el('div');legend.className='sc-chart-legend';
+ points.forEach((point,i)=>{const item=el('span',point.name+': '+metricText(point.value)),swatch=el('i');swatch.style.background=metricPalette[i%metricPalette.length];item.prepend(swatch);legend.append(item)});
+ box.append(legend);return box;
+}
 function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  switch(n.type){
  case 'text':x=el('div',p.text||'Text');break;
@@ -166,7 +228,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'x-date':x=el('input');x.type='date';x.value=p.value||'';captureInput(n,x,'date');break;
  case 'x-number':x=el('input');x.type='number';x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
  case 'x-textarea':x=el('textarea');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
- case 'x-kpi':x=el('div');x.className='sc-kpi';x.append(el('small',p.label||'KPI'),el('strong',p.value||'0'));break;
+ case 'x-kpi':case 'x-chart':x=metricView(n);break;
  case 'tabs':x=el('div',p.label||'Tabs');break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
  }

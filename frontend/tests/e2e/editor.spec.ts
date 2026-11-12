@@ -344,3 +344,23 @@ test('Phase 9 sortable table filters records and saves configuration',async({pag
  await expect(grid.locator('tbody tr')).toHaveCount(0);
  await expect(grid).toContainText('No matching records');
 });
+
+test('Phase 9B KPI and chart use dataset values and persist configured metric properties',async({page})=>{
+ await page.locator('[data-catalogue-type="x-kpi"]').click();
+ await page.getByLabel('Metric dataset').selectOption('people');
+ await page.getByLabel('Metric aggregation').selectOption('count');
+ await expect(page.locator('.canvas [data-metric-kind="kpi"]')).toContainText('1');
+ await page.locator('[data-catalogue-type="x-chart"]').click();
+ await page.getByLabel('Metric dataset').selectOption('people');
+ await page.getByLabel('Category column').selectOption('Status');
+ await page.getByLabel('Chart type').selectOption('pie');
+ await expect(page.locator('.canvas [data-chart-type="pie"]')).toBeVisible();
+ await expect(page.locator('.canvas .sc-chart-legend')).toContainText('Active: 1');
+ const save=page.waitForRequest(r=>r.url().endsWith('/api/projects/p1')&&r.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const document=(await save).postDataJSON().document;
+ const chart=document.screens[0].nodes.find((n:any)=>n.type==='x-chart');
+ const kpi=document.screens[0].nodes.find((n:any)=>n.type==='x-kpi');
+ expect(chart.props).toMatchObject({dataset_id:'people',chart_type:'pie',category_column:'Status'});
+ expect(kpi.props).toMatchObject({dataset_id:'people',aggregation:'count'});
+});

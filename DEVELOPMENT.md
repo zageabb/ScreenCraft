@@ -205,3 +205,15 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - **CI:** Python, React, browser Playwright, Docker and documentation all passed on final feature head `72f7f8bc6a78bd7347966571b48b980a5ec01513`, run https://github.com/zageabb/ScreenCraft/actions/runs/43308595277.
 - **Ubuntu deployment:** Not performed in this chat. Desktop should pull main and rebuild, then manually confirm grid sample dataset creation, selection/edit/delete/sort/filter, and standalone offline HTML parity.
 - **Remaining Phase 9:** Charts and dataset-bound KPIs; expanded layout/navigation; form validation; further production hardening. FigmaBridge/Phase 7 stays deferred.
+
+## Phase 9B — Dataset-bound KPI and charts (2026-11-12)
+
+**Scope:** Continue Phase 9 independently of deferred FigmaBridge. Activate the canonical `x-chart` extension and enhance `x-kpi` without creating a second object standard.
+
+**Capabilities:** KPI cards can display static values or select a dataset and aggregate `count`, `sum`, `average`, `min` and `max` over a field. Charts can group records by a chosen category field and show a bar, line or pie visualization using the same aggregation operations. The right-side Properties inspector exposes dataset, aggregation, value column, chart type and category column. Chart categories are capped at 30, with safe text labels and no external rendering libraries.
+
+**Parity:** React preview and the standalone offline HTML exporter use the same declarative `.scraft` property contract, source datasets and aggregation semantics. They reflect in-memory mock changes from Add Row actions; exported charts are SVG and work without network requests. No production SQL/data writes.
+
+**Testing:** Playwright validates inspector configuration and saved document properties, and separately generates a real offline HTML export to verify KPI values, bar/line/pie SVGs, grouped totals, live mock updates and network independence. CI Python, React, browser, Docker and docs required prior to merge.
+
+**Still pending in Phase 9:** advanced navigation/layout objects and form validation, additional accessibility and responsive layout checks. FigmaBridge phase 7 remains deferred.
