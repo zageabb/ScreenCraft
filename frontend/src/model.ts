@@ -13,6 +13,17 @@ export function descendants(screen:Screen,nodeId:string){const result=new Set<st
 export function removeNodeTree(doc:Document,screenId:string,nodeId:string){const screen=doc.screens.find(s=>s.id===screenId);if(!screen)return doc;const removed=descendants(screen,nodeId);removed.add(nodeId);return {...doc,screens:doc.screens.map(s=>s.id!==screenId?s:{...s,nodes:s.nodes.filter(n=>!removed.has(n.id)).map(n=>n.action?.target_node&&removed.has(n.action.target_node)?{...n,action:undefined}:n)})}}
 export function reparentNode(doc:Document,screenId:string,nodeId:string,parentId:string|null){const s=doc.screens.find(s=>s.id===screenId);if(!s)return doc;const node=s.nodes.find(n=>n.id===nodeId);if(!node||parentId===nodeId)return doc;if(parentId){const parent=s.nodes.find(n=>n.id===parentId);if(!parent||!isContainer(parent.type)||descendants(s,nodeId).has(parentId))return doc}return updateNode(doc,screenId,nodeId,n=>({...n,parent_id:parentId,layout:{...n.layout,x:24,y:24}}))}
 export function reorderScreen(doc:Document,screenId:string,direction:-1|1){const order=[...doc.screen_order];const i=order.indexOf(screenId);const j=i+direction;if(i<0||j<0||j>=order.length)return doc;[order[i],order[j]]=[order[j],order[i]];return {...doc,screen_order:order}}
+/** Remove a screen without orphaning navigation actions or the document entry screen. */
+export function removeScreen(doc:Document,screenId:string):Document {
+ if(doc.screens.length<=1||!doc.screens.some(s=>s.id===screenId))return doc;
+ const screens=doc.screens.filter(s=>s.id!==screenId).map(s=>({...s,nodes:s.nodes.map(n=>
+   n.action?.type==='navigate'&&n.action.target_screen===screenId
+     ?{...n,action:undefined}:n
+ )}));
+ const order=doc.screen_order.filter(id=>id!==screenId);
+ return {...doc,screens,screen_order:order,
+   start_screen:doc.start_screen===screenId?(order[0]||screens[0].id):doc.start_screen};
+}
 export function cloneSubtree(screen:Screen,nodeId:string){const ids=descendants(screen,nodeId);ids.add(nodeId);const idMap=new Map([...ids].map(id=>[id,crypto.randomUUID()]));return screen.nodes.filter(n=>ids.has(n.id)).map(n=>({...cloneDoc(n),id:idMap.get(n.id)!,parent_id:n.id===nodeId?null:(n.parent_id?idMap.get(n.parent_id)||null:null),action:n.action?.target_node&&idMap.has(n.action.target_node)?{...n.action,target_node:idMap.get(n.action.target_node)}:n.action}))}
 
 export function newNode(type:string,x=24,y=24):Node{

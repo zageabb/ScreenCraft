@@ -35,3 +35,5 @@ No runnable ScreenCraft application has been released.
 - New application templates no longer include Get started; existing demo buttons are deletable.
 - Preview Back/Home buttons and screen-order-aware standalone export.
 - Browser and package regression tests for deletion, nesting, ordering and unknown object preservation.
+
+- Added a per-screen Delete control to the Screens list beside reorder arrows. It confirms deletion, protects the last screen, updates the entry screen, clears dangling navigation references and supports Undo before Save.

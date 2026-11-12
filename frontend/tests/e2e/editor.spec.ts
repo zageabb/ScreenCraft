@@ -244,3 +244,35 @@ test('core text retains its content and is not an unsupported placeholder',async
  await expect(page.locator('.canvas')).toContainText('Home dashboard');
  await expect(page.locator('.canvas .unsupported-object')).toHaveCount(0);
 });
+
+test('screen delete removes target, clears inbound actions, saves and can undo',async({page})=>{
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('button',{name:'Delete screen Customers'}).click();
+ await expect(page.getByRole('button',{name:'Delete screen Customers'})).toHaveCount(0);
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const doc=(await saved).postDataJSON().document;
+ expect(doc.screens.map((s:any)=>s.id)).toEqual(['home']);
+ expect(doc.screen_order).toEqual(['home']);
+ expect(doc.screens[0].nodes.find((n:any)=>n.id==='go').action).toBeUndefined();
+ await page.getByRole('button',{name:'Undo'}).click();
+ await expect(page.getByRole('button',{name:'Delete screen Customers'})).toBeVisible();
+});
+test('screen delete updates start_screen and switches to the remaining screen',async({page})=>{
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('button',{name:'Delete screen Home'}).click();
+ await expect(page.getByRole('textbox',{name:'Screen name'})).toHaveValue('Customers');
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const doc=(await saved).postDataJSON().document;
+ expect(doc.start_screen).toBe('customers');
+ expect(doc.screen_order).toEqual(['customers']);
+ expect(doc.screens.map((s:any)=>s.id)).toEqual(['customers']);
+ await expect(page.getByRole('button',{name:'Delete screen Customers'})).toBeDisabled();
+});
+test('screen delete confirmation can cancel without modifying design',async({page})=>{
+ page.once('dialog',dialog=>dialog.dismiss());
+ await page.getByRole('button',{name:'Delete screen Customers'}).click();
+ await expect(page.getByRole('button',{name:'Delete screen Customers'})).toBeVisible();
+ await expect(page.locator('.canvas .prototype-button')).toContainText(['Open customers']);
+});

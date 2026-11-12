@@ -48,3 +48,6 @@ When `SCREENCRAFT_AUTH_MODE=uda` is enabled by the administrator, users sign in 
 **Reusable components:** Select an object (including a nested subtree) and choose Save as reusable component. The template appears in the left sidebar and can be inserted as a fresh editable copy with new node IDs.
 
 **Catalogue:** The grouped object gallery comes from a generated pinned snapshot of Application-Standard. Objects marked with a diamond are unsupported placeholders, not functional controls; their design JSON is preserved. To adopt a newer canonical catalogue, run scripts/sync_scraft_catalogue.py on the approved upstream JSON with its Git blob SHA, review and run tests. Do not maintain parallel object definitions in ScreenCraft.
+
+## Deleting screens
+Each entry in **Screens** (left sidebar) has up/down arrows followed by **× Delete screen** on the right. Click × and confirm to delete the screen and every object it contains. You cannot delete the last remaining screen. When removing the Home/entry screen, ScreenCraft automatically selects the next remaining screen as the entry screen. Buttons elsewhere that navigated to the deleted screen lose that invalid navigation action. Use **Undo** before saving to restore the screen; click **Save** to persist the deletion in the application and exported .scraft file.
