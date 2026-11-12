@@ -45,7 +45,7 @@ def test_image_upload_bundled_export(app):
     c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
     pid=c.post("/api/projects",json={"name":"Image demo"}).json["id"]
     data={"revision":"1","screen_id":"home","node_id":"heading",
-          "file":(io.BytesIO(b"\\x89PNG\\r\\n\\x1a\\n"+b"dummy"),"logo.png")}
+          "file":(io.BytesIO(b"\x89PNG\r\n\x1a\n"+b"dummy"),"logo.png")}
     response=c.post("/api/projects/"+pid+"/images",data=data,content_type="multipart/form-data")
     assert response.status_code==201,response.json
     path=response.json["path"]
