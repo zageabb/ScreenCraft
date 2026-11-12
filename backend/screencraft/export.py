@@ -24,6 +24,11 @@ const assetUris=JSON.parse(document.getElementById('sc-assets').textContent);
 const screens=Object.fromEntries(app.screens.map(s=>[s.id,s]));
 const screenList=(app.screen_order||app.screens.map(s=>s.id)).map(id=>screens[id]).filter(Boolean);
 let active=app.start_screen,history=[],modal=null,message='',theme=app.default_theme||'light';
+const containerStates=Object.create(null);
+let navCollapsed=Boolean(app.shared_navigation?.initial_collapsed);
+let mobileOpen=!app.shared_navigation?.mobile_collapsed;
+const navExpanded=new Set();
+const collapsibleTypes=new Set(['container','x-card','x-grid','x-flex','x-toolbar','x-sidebar','x-splitter']);
 let datasets=Object.fromEntries((app.datasets||[]).map(d=>[d.id,structuredClone(d.rows||[])]));
 const inputValues=Object.create(null);
 const SUPPORTED_INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea']);
@@ -90,6 +95,12 @@ function el(tag,text){const x=document.createElement(tag);if(text!==undefined)x.
 function action(a){if(!a||!a.type)return;
  if(a.type==='navigate' && screens[a.target_screen]){history.push(active);active=a.target_screen;modal=null}
  else if(a.type==='back'){active=history.pop()||active;modal=null}
+ else if(['toggle_container','collapse_container','expand_container'].includes(a.type)){
+  const node=(screens[active]?.nodes||[]).find(n=>n.id===a.target_node&&collapsibleTypes.has(n.type));
+  if(!node)return;
+  const current=Object.prototype.hasOwnProperty.call(containerStates,node.id)?containerStates[node.id]:node.props?.expanded!==false;
+  containerStates[node.id]=a.type==='collapse_container'?false:a.type==='expand_container'?true:!current;
+ }
  else if(a.type==='show_modal')modal=a.target_node;
  else if(a.type==='close_modal')modal=null;
  else if(a.type==='message')message=String(a.text||'');
@@ -279,7 +290,13 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  }
  case 'container':case 'x-card':case 'x-grid':case 'x-flex':case 'x-toolbar':case 'x-sidebar':case 'x-splitter':{
   x=el('section');x.className='sc-box'+(n.type==='x-card'?' sc-card':'');
-  x.append(el('strong',p.label||n.type));const content=el('div');content.className='sc-layout-content';
+  const header=el('div');header.className='sc-collapse-header';header.append(el('strong',p.label||n.type));
+  const expanded=Object.prototype.hasOwnProperty.call(containerStates,n.id)?containerStates[n.id]:p.expanded!==false;
+  if(p.collapsible){const button=el('button',expanded?'▾':'▸');button.setAttribute('aria-label','Toggle '+(p.label||n.type));
+   button.setAttribute('aria-expanded',String(expanded));button.onclick=()=>action({type:'toggle_container',target_node:n.id});header.append(button)}
+  x.append(header);
+  if(!expanded){x._hideChildren=true;x.style.height='40px';break}
+  const content=el('div');content.className='sc-layout-content';
   if(n.type==='x-sidebar'){content.style.display='flex';content.style.gap='8px'}
   if(n.type==='x-splitter'){content.style.display='grid';content.style.gridTemplateColumns=Math.max(10,Math.min(90,Number(p.split_percent)||50))+'% 1fr';content.style.gap='8px'}
   x.append(content);x._childContainer=content;break
