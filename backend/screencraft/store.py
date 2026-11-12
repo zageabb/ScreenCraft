@@ -35,9 +35,9 @@ class PrototypeSession(Base):
     rows_json: Mapped[str]=mapped_column(Text,default="[]")
     revision: Mapped[int]=mapped_column(Integer,default=1)
 
-def connect(url: str):
+def connect(url: str, auto_create: bool = False):
     engine = create_engine(url, future=True, pool_pre_ping=True)
-    Base.metadata.create_all(engine) # TODO: replace schema creation with Alembic migration before production
+    if auto_create: Base.metadata.create_all(engine) # for tests or opted-in local development only
     return engine
 
 def create_user(engine, username, hashed_password, is_admin=False):
