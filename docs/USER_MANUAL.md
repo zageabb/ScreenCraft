@@ -76,3 +76,11 @@ In **Preview**, tables support search, column-header sorting, fixed-column filte
 Standalone **Interactive HTML** supports the same controls entirely offline using browser-memory mock data. Reloading the exported page restores packaged seed rows. No production database is updated, and session-persisted or project-shared preview datasets are not editable through the ScreenCraft inline grid until separately approved and implemented.
 
 The **x-grid** object is a layout container for arranging objects; **x-editable-grid** is the spreadsheet-like data control.
+
+## Phase 9B — Charts and KPIs
+
+Add **x-kpi** or **x-chart** from the Data section of the Object Gallery. Select the new object and configure the **Data source** section in the right-hand Properties inspector. Choose a **Metric dataset** and an aggregation: Count, Sum, Average, Minimum or Maximum. For Sum/Average/Min/Max, choose a **Value column** containing numeric records; non-numeric values are ignored. Count measures the number of records regardless of the selected value column.
+
+**x-kpi** can also show a fixed number when no dataset is selected. **x-chart** requires a dataset, a **Category column** and a Chart type of Bar, Line or Pie. Charts group records by category and display up to 30 categories. For pie charts, negative values contribute zero to slice sizes; bar/line support numerical values.
+
+In Preview and the standalone Interactive HTML export, a chart or KPI uses the same mock dataset as tables and buttons. Adding a record to that dataset refreshes values when the prototype re-renders. HTML export runs entirely offline; no production database writes are made.
