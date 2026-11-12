@@ -143,11 +143,13 @@ def make_document(app: dict, assets: dict | None = None, manifest: dict | None =
     return data
 
 def starter_app():
+    """New designs start with an empty editable Home screen, not an unrequested demo action."""
     return {"application_id":"new-app","name":"New Application","start_screen":"home",
         "default_theme":"light","screen_order":["home"],"screens":[{"id":"home","name":"Home",
-        "viewport":{"width":1280,"height":800},"layout":{"mode":"flow","overflow_x":"auto","overflow_y":"auto"},
-        "nodes":[{"id":"heading","type":"text","parent_id":None,"props":{"text":"My Application"},"layout":{"width":"fill"}},
-                 {"id":"start","type":"button","parent_id":None,"props":{"label":"Get started"},
-                  "action":{"type":"message","text":"Preview ready"}}]}],
-        "components":[],"themes":{"light":{"tokens":{"surface.default":"#ffffff","text.primary":"#16243a","action.primary":"#2563eb"}}},
+        "viewport":{"width":1280,"height":800},
+        "layout":{"mode":"freeform","overflow_x":"auto","overflow_y":"auto"},
+        "nodes":[]}],
+        "components":[],"themes":{
+            "light":{"tokens":{"surface.default":"#ffffff","text.primary":"#16243a","action.primary":"#2563eb"}},
+            "dark":{"tokens":{"surface.default":"#1e2737","text.primary":"#f7f7f7","action.primary":"#75aaff"}}},
         "datasets":[],"assets":[]}
