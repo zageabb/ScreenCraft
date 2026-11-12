@@ -40,7 +40,7 @@ def create_app(config=None):
     # LOCAL_UBUNTU_PROXY_COMPAT: forwarded prefix must only be trusted from private Caddy hop.
     if os.environ.get("SCREENCRAFT_TRUST_PROXY")=="1":
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=1,x_proto=1,x_host=1,x_prefix=1)
-    engine=connect(app.config["SQLALCHEMY_URL"])
+    engine=connect(app.config["SQLALCHEMY_URL"],auto_create=bool(app.config.get("TESTING")) or os.environ.get("SCREENCRAFT_AUTO_CREATE_SCHEMA")=="1")
     app.extensions["screencraft_engine"]=engine
 
     @app.before_request
