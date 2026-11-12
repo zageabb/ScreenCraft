@@ -18,7 +18,7 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,doc,rows
  case 'select':child=<select disabled={mode==='design'}>{(p.options||['Option 1','Option 2']).map((v:string,i:number)=><option key={i}>{v}</option>)}</select>;break;
  case 'checkbox':child=<label><input type="checkbox" disabled={mode==='design'}/>{p.label||'Checkbox'}</label>;break;
  case 'table':{const dataset=doc.datasets.find(d=>d.id===p.dataset_id)||doc.datasets[0];const cols=dataset?.columns||[];child=<div className="table-scroll"><table><thead><tr>{cols.map(c=><th key={c.id}>{c.id}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i}>{cols.map(c=><td key={c.id}>{String(r[c.id]??'')}</td>)}</tr>)}</tbody></table></div>;break}
- case 'image':child=p.asset?<img alt={p.alt||'Design image'} src={apiUrl('/api/projects/'+projectId+'/images/'+encodeURIComponent(String(p.asset).replace(/^assets\\//,'')))} style={{maxWidth:'100%',maxHeight:'100%'}}/>:<span className="muted">Choose an image asset</span>;break;
+ case 'image':child=p.asset?<img alt={p.alt||'Design image'} src={apiUrl('/api/projects/'+projectId+'/images/'+encodeURIComponent(String(p.asset).replace('assets/','')))} style={{maxWidth:'100%',maxHeight:'100%'}}/>:<span className="muted">Choose an image asset</span>;break;
  case 'tabs':child=<div className="tabs">Tab 1　 Tab 2</div>;break;
  case 'modal':child=<div className="modal-preview">Modal: {p.label||'Dialog'}</div>;break;
  case 'container':child=<div className="container-outline">Container</div>;break;
