@@ -54,7 +54,7 @@ test('offline HTML export maps six input controls into table columns and keeps c
  ]);
  await expect(control('customer')).toHaveValue('Acme Ltd');
  await expect(control('approved').locator('input')).toBeChecked();
- await expect(control('notes').locator('textarea')).toHaveValue('Delivered by courier');
+ await expect(control('notes')).toHaveValue('Delivered by courier');
  // Values from a second user interaction must override the first.
  await control('customer').locator('input').fill('Second Co');
  await control('approved').locator('input').uncheck();
