@@ -2,7 +2,7 @@
 
 **Local-first visual screen designer and Figma interoperability workspace.**
 
-ScreenCraft is a proposed Flask-backed, browser-based design tool for creating and editing desktop/mobile application screens locally, importing externally designed screens (especially Figma), and exporting reusable designs or application UI code. **Current state: documentation-first repository; no working editor or importer exists yet.**
+ScreenCraft is a proposed Flask-backed, browser-based design tool for creating and editing desktop/mobile application screens locally, importing externally designed screens (especially Figma), and exporting reusable designs or application UI code. **Current state:** initial Phases 1–4 prototype code is under review in a feature branch; production deployment and browser acceptance remain outstanding.
 
 ## Product direction
 
@@ -21,11 +21,11 @@ Start with [AGENTS.md](AGENTS.md), [DEVELOPMENT.md](DEVELOPMENT.md), [DID.md](DI
 
 ## Planned stack
 
-Python Flask backend and JavaScript-based editor (evaluate libraries for canvas and structured editing before selecting). Local storage of project JSON, metadata and assets; migrations or a database only when justified. UI design tokens and optional light/dark modes. Figma must be optional: no Figma account is necessary to create, edit or preview a local screen.
+Python Flask API and React/TypeScript editor. SQLAlchemy with PostgreSQL for multi-user project, asset and preview data; local SQLite for development/tests. .scraft ZIP is the portable application document. UI design tokens and optional light/dark modes. Figma must be optional: no Figma account is necessary to create, edit or preview a local screen.
 
 ## Status and use
 
-Initial documentation and quality controls are being established. **Do not treat the sketches, import claims or export formats as implemented.** When the first prototype exists, this README will gain tested setup/run instructions and a user manual.
+Initial React/Flask editor, .scraft file handling, SQL-backed mock data and HTML preview exports are implemented in the development branch. **GitHub Actions tests do not constitute production acceptance.** See DEVELOPMENT.md for precise verified and pending items, and docs/DEPLOYMENT_UBUNTU.md for proposed server deployment.
 
 The repository is public: no secrets, user/customer data, proprietary design assets, original private Figma files or copyrighted brand/screenshot material without authorisation.
 
@@ -35,3 +35,8 @@ ScreenCraft follows the [Application-Standard v1.0 policy](standards/Application
 
 ## Interactive application prototype proposal
 The [new proposal](docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md) extends the historical concept with an object gallery, drag-and-drop editor, scrollable nested layouts, configurable mock-only actions, PostgreSQL-backed multi-user preview datasets, portable `.scraft` ZIP documents (including image assets), application themes and **single-file interactive offline HTML export**. The first runnable milestone must work both directly and behind Ubuntu/Caddy at `/apps/screencraft/`. These are planned features; no code or production deployment is claimed.
+
+## Prototype source and testing
+The first implementation is reviewed through [ScreenCraft PR #3](https://github.com/zageabb/ScreenCraft/pull/3). Local API: `PYTHONPATH=backend python -m screencraft.api` after installing backend requirements and configuring `SCREENCRAFT_SECRET_KEY`, `DATABASE_URL`, and `SCREENCRAFT_SETUP_KEY`. Editor dev: `cd frontend && npm install && npm run dev`; production frontend: `npm run build`. CI: Python `pytest backend/tests`, TypeScript/Vite build and docs checks. Refer to `docs/DEPLOYMENT_UBUNTU.md` and `docs/USER_MANUAL.md`. No reverse-proxy or deployment steps have been executed by this conversation.
+
+**Portable design format:** the [canonical .scraft specification](https://github.com/zageabb/Application-Standard/blob/main/standards/SCRAFT_FILE_FORMAT_v1.md) is maintained centrally in Application-Standard; this repo's spec path is only a pointer. Designs may be stored within each application repository under `design/screencraft/application.scraft`.
