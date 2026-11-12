@@ -94,3 +94,11 @@ For Tabs or Wizard, select the parent and set **Step labels (comma separated)** 
 An Accordion opens and closes its child content in Preview. **Expanded initially** controls its default state. A Splitter exposes **Split width (%)** in Properties; Sidebar and Splitter act as two-area layout containers for nested objects. These are prototype-safe layout behaviours; no production routing or data access is added.
 
 **Interactive HTML** reproduces the navigation/layout behaviours in a single offline file. Test exported designs with both tabs and nested input controls before publishing.
+
+## Phase 9D — Required fields and validation
+
+Select an input, dropdown, checkbox, date, number or textarea object in Design mode. The right-side **Input validation** section allows **Required**. Text and textarea controls additionally support **Minimum characters** and **Maximum characters**; number/date controls support **Minimum value** and **Maximum value**. Dropdown choices can be edited as one option per line.
+
+These constraints are evaluated when an **add_mock_row** button binds a dataset column to that input in **Input source for [column]**. Clicking the button in Preview or standalone offline Interactive HTML checks the current values first. If required or value constraints fail, no row is added and a visible message explains the problem. Correct the field and click again. Unbound fixed row values still work as before.
+
+This is an interactive design prototype: validation protects mock data demonstrations only and must not be treated as production security or database validation.

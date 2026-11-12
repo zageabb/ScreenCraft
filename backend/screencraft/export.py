@@ -44,6 +44,34 @@ function resolveActionRow(action,screen){
  }
  return row;
 }
+function validateBoundInputs(action,screen){
+ const errors=[];
+ for(const [column,id] of Object.entries(action.field_bindings||{})){
+  if(!id)continue;
+  const source=(screen?.nodes||[]).find(n=>n.id===id&&SUPPORTED_INPUTS.has(n.type));if(!source)continue;
+  const p=source.props||{},label=String(p.label||p.placeholder||column);
+  const fallback=source.type==='checkbox'?false:source.type==='select'?selectValue((p.options||[])[0]??''):p.value??'';
+  const value=Object.prototype.hasOwnProperty.call(inputValues,id)?inputValues[id]:fallback;
+  const text=String(value??'');
+  if(p.required&&(source.type==='checkbox'?value!==true:!text.trim())){errors.push(label+' is required');continue}
+  if(!text.trim()&&source.type!=='checkbox')continue;
+  if(['input','x-textarea'].includes(source.type)){
+   if(p.min_length!==undefined&&Number.isInteger(Number(p.min_length))&&text.length<Number(p.min_length))errors.push(label+' needs at least '+p.min_length+' characters');
+   if(p.max_length!==undefined&&Number.isInteger(Number(p.max_length))&&text.length>Number(p.max_length))errors.push(label+' cannot exceed '+p.max_length+' characters');
+  }
+  if(source.type==='x-number'){
+   const number=Number(text);
+   if(!Number.isFinite(number)){errors.push(label+' must be a number');continue}
+   if(p.min!==undefined&&p.min!==''&&number<Number(p.min))errors.push(label+' must be at least '+p.min);
+   if(p.max!==undefined&&p.max!==''&&number>Number(p.max))errors.push(label+' cannot exceed '+p.max);
+  }
+  if(source.type==='x-date'&&/^\\d{4}-\\d\\d-\\d\\d$/.test(text)){
+   if(p.min&&text<String(p.min))errors.push(label+' cannot be before '+p.min);
+   if(p.max&&text>String(p.max))errors.push(label+' cannot be after '+p.max);
+  }
+ }
+ return errors;
+}
 function captureInput(node,control,kind){
  const id=node.id;
  const read=()=>kind==='checkbox'?control.checked:control.value;
@@ -70,6 +98,9 @@ function action(a){if(!a||!a.type)return;
   if(!Object.prototype.hasOwnProperty.call(datasets,a.dataset_id)){
    message='Choose an existing dataset for this button.';
   }else{
+   const errors=validateBoundInputs(a,screens[active]);
+   if(errors.length){message='Validation: '+errors.join('; ');render();return}
+   message='';
    const row=resolveActionRow(a,screens[active]);
    if(!Object.keys(row).length){message='Configure fixed values or bind input fields for the new row.'}
    else datasets[a.dataset_id].push(structuredClone(row));
@@ -219,9 +250,9 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  switch(n.type){
  case 'text':x=el('div',p.text||'Text');break;
  case 'button':x=el('button',p.label||'Button');x.addEventListener('click',()=>action(n.action));break;
- case 'input':x=el('input');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'input');break;
+ case 'input':x=el('input');x.required=!!p.required;if(p.min_length!==undefined)x.minLength=Number(p.min_length);if(p.max_length!==undefined)x.maxLength=Number(p.max_length);x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'input');break;
  case 'select':x=el('select');(p.options||[]).forEach(v=>{let o=el('option',typeof v==='string'?v:v.label);o.value=selectValue(v);x.append(o)});captureInput(n,x,'select');break;
- case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;captureInput(n,c,'checkbox');x.append(c,el('span',p.label||''));break;
+ case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;c.required=!!p.required;captureInput(n,c,'checkbox');x.append(c,el('span',p.label||''));break;
  case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
  case 'table':case 'x-editable-grid':x=tableView(n);break;
  case 'modal':x=el('div');if(modal!==n.id)return; x.className='sc-modal';x.append(el('h3',p.label||'Dialog'));break;
@@ -253,9 +284,9 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
   if(n.type==='x-splitter'){content.style.display='grid';content.style.gridTemplateColumns=Math.max(10,Math.min(90,Number(p.split_percent)||50))+'% 1fr';content.style.gap='8px'}
   x.append(content);x._childContainer=content;break
  }
- case 'x-date':x=el('input');x.type='date';x.value=p.value||'';captureInput(n,x,'date');break;
- case 'x-number':x=el('input');x.type='number';x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
- case 'x-textarea':x=el('textarea');x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
+ case 'x-date':x=el('input');x.type='date';x.required=!!p.required;if(p.min)x.min=p.min;if(p.max)x.max=p.max;x.value=p.value||'';captureInput(n,x,'date');break;
+ case 'x-number':x=el('input');x.type='number';x.required=!!p.required;if(p.min!==undefined)x.min=String(p.min);if(p.max!==undefined)x.max=String(p.max);x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
+ case 'x-textarea':x=el('textarea');x.required=!!p.required;if(p.min_length!==undefined)x.minLength=Number(p.min_length);if(p.max_length!==undefined)x.maxLength=Number(p.max_length);x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
  case 'x-kpi':case 'x-chart':x=metricView(n);break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
  }

@@ -10,8 +10,8 @@ from screencraft.export import interactive_html
 app=starter_app()
 s=app['screens'][0]
 s['nodes']=[
- {'id':'customer','type':'input','parent_id':None,'props':{'placeholder':'Customer'},'layout':{'x':20,'y':20,'width':170,'height':40}},
- {'id':'amount','type':'x-number','parent_id':None,'props':{'placeholder':'Amount'},'layout':{'x':210,'y':20,'width':150,'height':40}},
+ {'id':'customer','type':'input','parent_id':None,'props':{'placeholder':'Customer','required':True,'min_length':3},'layout':{'x':20,'y':20,'width':170,'height':40}},
+ {'id':'amount','type':'x-number','parent_id':None,'props':{'placeholder':'Amount','min':10,'max':500},'layout':{'x':210,'y':20,'width':150,'height':40}},
  {'id':'when','type':'x-date','parent_id':None,'props':{},'layout':{'x':380,'y':20,'width':170,'height':40}},
  {'id':'status','type':'select','parent_id':None,'props':{'options':['New','Active']},'layout':{'x':20,'y':75,'width':140,'height':40}},
  {'id':'approved','type':'checkbox','parent_id':None,'props':{'label':'Approved'},'layout':{'x':190,'y':75,'width':160,'height':40}},
@@ -72,4 +72,29 @@ test('export stays self-contained and uses no network for bound Add record',asyn
  await page.locator('[data-node-id="add"]').click();
  await expect(page.locator('[data-node-id="table"] tr')).toHaveCount(2);
  expect(requests).toEqual([]);
+});
+
+test('offline Add Row rejects missing, short or out-of-range bound values',async({page})=>{
+ await page.setContent(exportedHtml(),{waitUntil:'load'});
+ const add=page.locator('[data-node-id="add"]');
+ const customer=page.locator('[data-node-id="customer"]');
+ const amount=page.locator('[data-node-id="amount"]');
+ const table=page.locator('[data-node-id="table"]');
+ await add.click();
+ await expect(page.locator('#root')).toContainText('Customer is required');
+ await expect(table.locator('tbody tr')).toHaveCount(0);
+ await customer.fill('Al');
+ await add.click();
+ await expect(page.locator('#root')).toContainText('needs at least 3 characters');
+ await expect(table.locator('tbody tr')).toHaveCount(0);
+ await customer.fill('Acme');
+ await amount.fill('5');
+ await add.click();
+ await expect(page.locator('#root')).toContainText('Amount must be at least 10');
+ await expect(table.locator('tbody tr')).toHaveCount(0);
+ await amount.fill('20');
+ await add.click();
+ await expect(table.locator('tbody tr')).toHaveCount(1);
+ await expect(table.locator('tbody tr').first()).toContainText('Acme');
+ await expect(page.locator('#root')).not.toContainText('Validation:');
 });

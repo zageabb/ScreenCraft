@@ -62,3 +62,8 @@ No runnable ScreenCraft application has been released.
 - Added functional tabs and wizard step switching, configurable captions and per-child step assignment.
 - Enabled accordion expand/collapse, sidebar layout and percentage-based splitter containers.
 - Implemented equivalent behaviour in standalone offline HTML with real browser tests.
+
+## Phase 9D — Form input validation
+- Added required, text-length, number/date ranges and dropdown choice properties for inputs in the right-hand inspector.
+- Add Row buttons validate bound inputs before writing mock records, with a visible user message and no partial insert on failure.
+- Mirrored form validation in standalone HTML export and added Preview and real generated HTML browser tests.
