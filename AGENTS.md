@@ -14,3 +14,6 @@ Read README.md, DEVELOPMENT.md, DID.md, STANDARD_VERSION.md and docs/ARCHITECTUR
 - Optional integrations must distinguish not_configured from valid empty results.
 - Support root / and configured /apps/screencraft/ via controlled proxy. Use LOCAL_UBUNTU_PROXY_COMPAT markers and test forwarded-header trust.
 - Never deploy, expose a service, activate paid integrations or modify credentials without explicit approval.
+
+## Interactive prototype approved direction (2026-11-12)
+Read docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md before implementing editor, data store or deployment. First runnable version must be Ubuntu/Caddy /apps/screencraft/ compatible; single .scraft ZIP packages include images; SQL-backed mock data must have explicitly isolated and shared preview modes; standalone one-file interactive HTML export must work offline and never claim production database behaviour.
