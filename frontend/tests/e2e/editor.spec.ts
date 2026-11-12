@@ -239,3 +239,8 @@ test('existing Get started demo object is removable without deleting a screen',a
  const payload=(await saved).postDataJSON().document;
  expect(payload.screens[0].nodes.some((n:any)=>n.id==='start')).toBe(false);
 });
+
+test('core text retains its content and is not an unsupported placeholder',async({page})=>{
+ await expect(page.locator('.canvas')).toContainText('Home dashboard');
+ await expect(page.locator('.canvas .unsupported-object')).toHaveCount(0);
+});
