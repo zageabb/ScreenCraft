@@ -3,7 +3,7 @@ import type {SharedNavigation as NavModel,SharedNavItem} from './model';
 
 type Props={navigation:NavModel;active:string;onNavigate:(id:string)=>void;validScreens:Set<string>};
 export function visibleItems(navigation:NavModel,active:string,validScreens:Set<string>){
- return navigation.items.filter(item=>item.target_screen&&validScreens.has(item.target_screen)&&!item.hidden_on?.includes(active));
+ return navigation.items.filter(item=>(!item.target_screen||validScreens.has(item.target_screen))&&!item.hidden_on?.includes(active));
 }
 export default function SharedNavigation({navigation,active,onNavigate,validScreens}:Props){
  const [collapsed,setCollapsed]=useState(Boolean(navigation.initial_collapsed));
