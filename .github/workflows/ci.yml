@@ -41,3 +41,18 @@ jobs:
       - name: Type check and bundle
         working-directory: frontend
         run: npm run build
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install editor and Playwright
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Browser smoke tests
+        working-directory: frontend
+        run: npm run test:e2e
