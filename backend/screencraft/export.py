@@ -157,10 +157,13 @@ function tableView(n){
   let remove=el('button','Delete selected');remove.addEventListener('click',()=>{
    const removed=new Set(state.selected);
    datasets[p.dataset_id]=data().filter((_,index)=>!removed.has(index));
-   for(const key of [n.id,p.dataset_id]){
-    const picked=selectedRecords[key];
-    if(typeof picked==='number')selectedRecords[key]=removed.has(picked)?null:picked-[...removed].filter(index=>index<picked).length;
+   for(const item of screens[active]?.nodes||[]){
+    if(!['table','x-editable-grid'].includes(item.type)||item.props?.dataset_id!==p.dataset_id)continue;
+    const picked=selectedRecords[item.id];
+    if(typeof picked==='number')selectedRecords[item.id]=removed.has(picked)?null:picked-[...removed].filter(index=>index<picked).length;
    }
+   const picked=selectedRecords[p.dataset_id];
+   if(typeof picked==='number')selectedRecords[p.dataset_id]=removed.has(picked)?null:picked-[...removed].filter(index=>index<picked).length;
    state.selected.clear();render();
   });
   actions.append(add,remove);box.append(actions);
