@@ -11,7 +11,7 @@ from pathlib import PurePosixPath
 import re
 
 CORE_TYPES = frozenset("text button input select checkbox table image container tabs modal".split())
-EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi".split())
+EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail".split())
 KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram""".split())
 ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message toggle_container collapse_container expand_container".split())
 PERSISTENCE = frozenset(("seed-reset", "session-persisted", "project-shared"))
@@ -221,6 +221,16 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
             p = node.get("props") or {}
             if kind == "table" and p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
                 warnings.append(f"Screen {sid}: table {nid} refers to missing sample dataset {p['dataset_id']}.")
+            if kind == "x-record-detail":
+                source = p.get("source_table_id")
+                if source:
+                    linked = idmap.get(source)
+                    if not linked or linked.get("type") not in ("table", "x-editable-grid"):
+                        warnings.append(f"Screen {sid}: record detail {nid} has missing source table {source}.")
+                    elif linked.get("props", {}).get("dataset_id") != p.get("dataset_id"):
+                        warnings.append(f"Screen {sid}: record detail {nid} source table uses another dataset.")
+                if p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
+                    warnings.append(f"Screen {sid}: record detail {nid} uses missing dataset.")
             if kind == "image" and p.get("asset") and p["asset"] not in assets and p["asset"] not in declared_paths:
                 warnings.append(f"Screen {sid}: image {nid} refers to missing packaged asset.")
             action = node.get("action") or {}
