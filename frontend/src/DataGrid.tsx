@@ -7,7 +7,7 @@ export type DataTableOptions={
 };
 type Props={
  dataset:Dataset; rows:Record<string,unknown>[]; options:DataTableOptions;
- editable:boolean; canMutate:boolean; externalSearch?:string; onRowsChange:(rows:Record<string,unknown>[])=>void;
+ editable:boolean; canMutate:boolean; externalSearch?:string; externalPage?:number; onPageChange?:(page:number)=>void; onRowsChange:(rows:Record<string,unknown>[])=>void;
  activeIndex?:number|null; onSelectRow?:(index:number)=>void; onRowsDeleted?:(indices:number[])=>void;
 };
 
@@ -20,7 +20,7 @@ function compare(a:unknown,b:unknown){
 }
 
 /** Preview-only data grid; source indexes remain stable across search, sort, and paging. */
-export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange,activeIndex,onSelectRow,onRowsDeleted,externalSearch=''}:Props){
+export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange,activeIndex,onSelectRow,onRowsDeleted,externalSearch='',externalPage,onPageChange}:Props){
  const [search,setSearch]=useState('');
  const [sort,setSort]=useState<{key:string;direction:1|-1}|null>(null);
  const [selected,setSelected]=useState<number[]>([]);
@@ -39,7 +39,8 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
   return items;
  },[rows,columns,search,externalSearch,sort,options.filter_column,options.filter_value]);
  const totalPages=pageSize?Math.max(1,Math.ceil(filtered.length/pageSize)):1;
- const currentPage=Math.min(page,totalPages-1);
+ const currentPage=Math.min(externalPage??page,totalPages-1);
+ const changePage=(next:number)=>{onPageChange?.(next);setPage(next)};
  const visible=pageSize?filtered.slice(currentPage*pageSize,(currentPage+1)*pageSize):filtered;
  const selectedIndices=selected.filter(index=>index>=0&&index<rows.length);
  const toggle=(index:number)=>setSelected(current=>current.includes(index)?current.filter(v=>v!==index):[...current,index]);
@@ -61,7 +62,7 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
  };
  return <div className="data-grid" data-grid-kind={editable?'editable':'table'}>
   {options.searchable&&<label className="data-grid-search">Search records
-   <input aria-label="Search records" value={search} onChange={e=>{setSearch(e.target.value);setPage(0)}}/>
+   <input aria-label="Search records" value={search} onChange={e=>{setSearch(e.target.value);changePage(0)}}/>
   </label>}
   {editable&&<div className="data-grid-actions">
    <button type="button" disabled={!canMutate||rows.length>=1000} onClick={add}>+ Row</button>
@@ -71,7 +72,7 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
   <div className="table-scroll"><table>
    <thead><tr>{(options.selectable||editable)&&<th>Choose</th>}
     {columns.map(column=><th key={column.id}>{options.sortable?
-     <button type="button" aria-label={'Sort '+column.id} onClick={()=>{setSort(v=>v?.key===column.id?{key:column.id,direction:v.direction===1?-1:1}:{key:column.id,direction:1});setPage(0)}}>{column.id}{sort?.key===column.id?(sort.direction===1?' ▲':' ▼'):''}</button>
+     <button type="button" aria-label={'Sort '+column.id} onClick={()=>{setSort(v=>v?.key===column.id?{key:column.id,direction:v.direction===1?-1:1}:{key:column.id,direction:1});changePage(0)}}>{column.id}{sort?.key===column.id?(sort.direction===1?' ▲':' ▼'):''}</button>
      :column.id}</th>)}</tr></thead>
    <tbody>{visible.map(({row,index})=><tr key={index} data-row-index={index} className={activeIndex===index||selectedIndices.includes(index)?'selected-row':''} tabIndex={onSelectRow?0:undefined} aria-selected={activeIndex===index} onClick={()=>onSelectRow?.(index)} onKeyDown={event=>{if((event.key==='Enter'||event.key===' ')&&onSelectRow){event.preventDefault();onSelectRow(index)}}}>
     {(options.selectable||editable)&&<td><input type="checkbox" aria-label={'Select row '+(index+1)} checked={selectedIndices.includes(index)} onChange={()=>{toggle(index);onSelectRow?.(index)}}/></td>}
@@ -83,9 +84,9 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
   </table></div>
   {!visible.length&&<p className="muted">No matching records</p>}
   {pageSize>0&&<div className="data-grid-pages">
-   <button type="button" aria-label="Previous page" disabled={currentPage===0} onClick={()=>setPage(v=>Math.max(0,v-1))}>Previous</button>
+   <button type="button" aria-label="Previous page" disabled={currentPage===0} onClick={()=>changePage(Math.max(0,currentPage-1))}>Previous</button>
    <span>Page {currentPage+1} of {totalPages}</span>
-   <button type="button" aria-label="Next page" disabled={currentPage>=totalPages-1} onClick={()=>setPage(v=>v+1)}>Next</button>
+   <button type="button" aria-label="Next page" disabled={currentPage>=totalPages-1} onClick={()=>changePage(currentPage+1)}>Next</button>
   </div>}
   <small className="muted">{filtered.length} of {rows.length} record(s)</small>
  </div>;
