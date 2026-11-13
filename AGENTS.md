@@ -27,3 +27,9 @@ Read docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md before implementing editor, data sto
 - Export must remain a **single self-contained offline HTML file** with no network dependencies or production data mutations. Mock table changes must be in-memory only.
 - Add or update automated tests that **open the actual generated export in a browser** and exercise the changed behaviour, not just check for JavaScript source strings. Compare the result with editor Preview where relevant.
 - A feature is not complete if it works in ScreenCraft Preview but fails after Interactive HTML export. Document any intentionally unsupported feature as a visible limitation and keep the export safe.
+
+## Mandatory .scraft archive download completeness
+
+The **Download .scraft** button must represent the editor's current **saved design**, not an earlier server revision. If the working document has unsaved changes, save them first using optimistic revision checking; only request the stored ZIP after successful save. On save or revision conflict, stop the download and display the error—never silently export stale content. Avoid incrementing project revisions when there is no change.
+
+Regression tests must verify real API ZIP contents and round-trip import of **all current catalogue types**, all screen metadata/order, nested nodes and action bindings, datasets/seed rows, themes, shared navigation, reusable components, arbitrary safe optional fields and declared packaged images. The canonical catalogue snapshot defines the recognized IDs; old inactive-placeholder warning lists must not mislabel supported types. Preview-only runtime values and local file-preview selections are not embedded in the design export; describe these scope limits in the manual.

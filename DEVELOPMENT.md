@@ -334,3 +334,13 @@ The entire Phase 9.3–9.6 development follows Application-Standard's object IDs
 - **Phase 9.6 — Advanced:** PR #24 https://github.com/zageabb/ScreenCraft/pull/24 merged as `844516ae2a247c86bbd7a23d19c00786b5cb0260`; five CI checks green, run https://github.com/zageabb/ScreenCraft/actions/runs/43481357900.
 - **Final catalogue audit:** `frontend/src/model.ts` `isSupported()` matches all **39/39** object IDs in `frontend/src/catalogue.snapshot.json` on main. Actual generated offline HTML has browser regression coverage for all 39 supported types with no unsupported placeholders (except core modal intentionally hidden unless opened). This is prototype-level object support, not a certification of full production-grade behaviour.
 - **Outstanding acceptance:** Latest code is merged on GitHub main; deployment/rebuild on Ubuntu, manual testing with the user's existing saved designs and mobile/accessibility acceptance have **not** been performed in this chat. No database schema migration required. FigmaBridge Phase 7 remains deferred and separate. Production hardening remains Phase 10.
+
+## .scraft export/download integrity audit (2026-11-13)
+
+**Finding:** The header's Download .scraft action previously downloaded `/api/projects/<id>/download` directly. That route correctly returns the stored ZIP, but the button did not save the frontend's pending design changes. The resulting ZIP could be stale despite newer objects/properties on the editor canvas.
+
+**Fix:** Track the last saved serialized document per project. Before downloading, save the current edited document using the existing revision-aware PUT route; on an unsuccessful save, do not download. Already saved and viewer-only designs download without a redundant PUT. The backend continues to bundle the full application JSON and declared packaged image assets. A conformance warning bug was also fixed: known canonical extensions no longer produce false inactive-placeholder warnings.
+
+**Acceptance:** Browser tests assert save-before-download ordering, no redundant save and no export when a revision conflict occurs. Python API tests build a 39-object, two-screen design with nested objects, optional props, action references, sample rows, shared navigation, component templates and a packaged image; download the actual ZIP; check every byte and application field; import the ZIP and check full equality. Existing unknown/future object handling remains preserve-and-warn.
+
+**Scope:** This is an application **design** archive. It intentionally excludes transient Preview values, runtime mock-session changes, user accounts/project permissions, live data and un-packaged local file selections. Real Ubuntu deployment and acceptance require independent verification.
