@@ -138,3 +138,15 @@ To add pagination, first set a **Page size** greater than zero on a table/grid, 
 ## Phase 9.5 — Menu and Breadcrumbs
 
 The **x-menu** component displays an application menu within any screen. Enable **Use shared menu items** to reuse the central menu configured in Phase 9.1; uncheck to maintain menu links local to this object with **Add menu link**, labels and target screens. Preview supports nested group expansion and active-link highlighting. **x-breadcrumbs** displays the current navigation path automatically; users can click earlier screens to navigate back. Both work in Interactive HTML export. These controls do not enforce access rights: production applications must check permissions separately.
+
+## Phase 9.6 — Schema Map, Diagram, Timeline and File Preview
+
+**x-diagram:** Add a Diagram from Advanced. In Properties, use **Add node**, edit each node ID, label and X/Y coordinates, and use **Add connection** to link two nodes. Preview provides an SVG diagram, clickable/focusable node selection and zoom in/out controls. The standalone Interactive HTML export supports the same view and interactions.
+
+**x-schema-map:** Similar to Diagram, but each table node additionally has a **Fields (one per line)** editor. Connect source and target tables to depict relationships. This is a mock schema diagram, not a live PostgreSQL/Databricks schema connection. Use QueryBridge for actual metadata extraction.
+
+**x-timeline:** Select a **Timeline dataset** and date/title columns in Properties. Preview renders events in date order from the mock dataset; clicking a timeline entry selects its source record index.
+
+**x-file-preview:** Preview an image, text, Markdown, JSON, CSV or PDF chosen directly in your browser, or select a packaged image asset in Properties. Local files are not uploaded, embedded into the design or saved to the server; only explicitly packaged assets travel in .scraft. Text reads are capped at 128 KB and previews at 5 MB. Browser PDF support varies. This component remains local-only in exported Interactive HTML, too.
+
+All 39 object names in the central catalogue are now supported by a prototype renderer. Some advanced interactions are intentionally simplified and not production integrations.
