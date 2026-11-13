@@ -17,7 +17,7 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
     title=html.escape(str(app.get("name","ScreenCraft Prototype")),quote=True)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>"""+title+"""</title><style>
 :root{font-family:system-ui,sans-serif;color:#172033;background:#f5f7fa}body{margin:0}header{padding:12px 20px;background:#24344f;color:white;display:flex;gap:12px;align-items:center}main{padding:16px;max-width:100%;overflow:auto;min-height:70vh}button,input,select{font:inherit;padding:8px;margin:4px;max-width:100%}button{cursor:pointer;border:1px solid #aac0d9;border-radius:6px}table{border-collapse:collapse;min-width:100%;background:white}td,th{padding:9px;border:1px solid #dce1e8;white-space:nowrap}section{position:relative;overflow:auto}.sc-node{box-sizing:border-box} .sc-table{max-width:100%;overflow:auto}.sc-table-scroll{overflow:auto;max-width:100%}.sc-data-grid-actions,.sc-data-grid-pages{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sc-data-grid .selected-row{background:#e8f1ff}.sc-data-grid td input{min-width:80px;max-width:180px}.sc-data-grid th button{font-weight:600}.sc-modal{background:white;border:2px solid #789;border-radius:8px;padding:16px;position:fixed;top:25%;left:25%;width:50%;z-index:10;box-shadow:0 0 0 100vmax #0006} .sc-notice{padding:8px;background:#def;border-radius:4px} .sc-menu{display:flex;gap:4px;flex-wrap:wrap}.sc-box{border:1px dashed #859ab0;background:#f6f8fc;padding:6px;min-height:70px}.sc-card{background:white;border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 7px #0001}.sc-kpi{display:flex;flex-direction:column;border:1px solid #ddd;border-radius:7px;padding:8px;background:#edf2fa}.sc-kpi strong{font-size:24px}.sc-chart{display:flex;flex-direction:column;gap:4px;width:100%;height:100%;overflow:auto}.sc-chart svg{width:100%;height:65%;min-height:110px}.sc-chart-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}.sc-chart-legend span{display:inline-flex;align-items:center;gap:3px}.sc-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:2px}.sc-panel-container{border:1px solid #cbd5e1;background:white;min-height:100%;padding:6px}.sc-panel-nav,.sc-wizard-buttons{display:flex;gap:5px;flex-wrap:wrap}.sc-panel-nav button[aria-pressed="true"]{background:#cbdff9}.sc-panel-content{position:relative;min-height:100px}.sc-accordion{background:white;border:1px solid #cbd5e1;min-height:55px}.sc-accordion>button{width:100%;text-align:left}.sc-accordion-content{position:relative;min-height:50px}.sc-layout-content{position:relative;min-height:80%;height:calc(100% - 25px)}.sc-unsupported{border:1px dashed #b77d45;color:#875023;background:#fff6eb;padding:7px}
-.sc-shared-layout{display:flex;min-width:0}.sc-shared-layout.nav-layout-right{flex-direction:row-reverse}.sc-shared-layout.nav-layout-top{flex-direction:column}.sc-screen-content{flex:1;min-width:0}.sc-shared-nav{display:flex;flex-direction:column;flex:0 0 190px;max-width:240px;background:#e9f1fc;border-right:1px solid #c1cfe0;padding:6px;gap:4px}.sc-shared-nav.nav-right{border-right:0;border-left:1px solid #c1cfe0}.sc-shared-nav.nav-top{flex:0 0 auto;max-width:none;flex-direction:row;align-items:center}.sc-shared-nav.nav-top .sc-shared-nav-items{display:flex;gap:4px;flex-wrap:wrap}.sc-shared-nav.is-collapsed:not(.nav-top){flex-basis:46px}.sc-shared-nav-row{display:flex;gap:4px}.sc-shared-nav-row button:first-child{flex:1;min-width:0;text-align:left}.sc-shared-nav-row .is-active{background:#bad7ff;font-weight:700}.sc-shared-nav-children{padding-left:11px;border-left:1px solid #b0bfd1}.sc-shared-nav-controls{display:flex;gap:4px}.sc-mobile-nav-toggle{display:none}.sc-collapse-header{display:flex;justify-content:space-between;align-items:center;min-height:26px}.sc-collapse-header button{padding:2px 8px}.sc-box.is-collapsed{min-height:40px!important;max-height:40px;overflow:hidden}@media(max-width:700px){.sc-shared-layout{flex-direction:column!important}.sc-shared-nav{max-width:none;width:100%;flex:0 0 auto;box-sizing:border-box}.sc-mobile-nav-toggle{display:inline-flex}.sc-shared-nav:not(.mobile-open) .sc-shared-nav-items{display:none}.sc-shared-nav.nav-top{flex-direction:column;align-items:stretch}.sc-shared-nav.nav-top .sc-shared-nav-items{display:block}}</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
+.sc-shared-layout{display:flex;min-width:0}.sc-shared-layout.nav-layout-right{flex-direction:row-reverse}.sc-shared-layout.nav-layout-top{flex-direction:column}.sc-screen-content{flex:1;min-width:0}.sc-shared-nav{display:flex;flex-direction:column;flex:0 0 190px;max-width:240px;background:#e9f1fc;border-right:1px solid #c1cfe0;padding:6px;gap:4px}.sc-shared-nav.nav-right{border-right:0;border-left:1px solid #c1cfe0}.sc-shared-nav.nav-top{flex:0 0 auto;max-width:none;flex-direction:row;align-items:center}.sc-shared-nav.nav-top .sc-shared-nav-items{display:flex;gap:4px;flex-wrap:wrap}.sc-shared-nav.is-collapsed:not(.nav-top){flex-basis:46px}.sc-shared-nav-row{display:flex;gap:4px}.sc-shared-nav-row button:first-child{flex:1;min-width:0;text-align:left}.sc-shared-nav-row .is-active{background:#bad7ff;font-weight:700}.sc-shared-nav-children{padding-left:11px;border-left:1px solid #b0bfd1}.sc-shared-nav-controls{display:flex;gap:4px}.sc-mobile-nav-toggle{display:none}.sc-collapse-header{display:flex;justify-content:space-between;align-items:center;min-height:26px}.sc-collapse-header button{padding:2px 8px}.sc-box.is-collapsed{min-height:40px!important;max-height:40px;overflow:hidden}@media(max-width:700px){.sc-shared-layout{flex-direction:column!important}.sc-shared-nav{max-width:none;width:100%;flex:0 0 auto;box-sizing:border-box}.sc-mobile-nav-toggle{display:inline-flex}.sc-shared-nav:not(.mobile-open) .sc-shared-nav-items{display:none}.sc-shared-nav.nav-top{flex-direction:column;align-items:stretch}.sc-shared-nav.nav-top .sc-shared-nav-items{display:block}}.sc-record-detail{display:flex;flex-direction:column;gap:7px;background:#fff;border:1px solid #ccd7e6;padding:8px;overflow:auto}.sc-record-detail h4{margin:0 0 4px}.sc-record-field{display:flex;flex-direction:column;gap:2px;font-size:12px}.sc-record-field output{padding:6px;background:#f4f7fc;min-height:18px}.sc-record-field input{box-sizing:border-box;width:100%;margin:0}.sc-data-grid tbody tr{cursor:pointer}</style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
 const assetUris=JSON.parse(document.getElementById('sc-assets').textContent);
@@ -121,6 +121,7 @@ function action(a){if(!a||!a.type)return;
  else if(a.type==='set_mock_field' && datasets[a.dataset_id]){let row=datasets[a.dataset_id][Number(a.row_index||0)];if(row&&typeof a.field==='string')row[a.field]=a.value}
  render();}
 const gridState=Object.create(null);
+const selectedRecords=Object.create(null);
 const panelState=Object.create(null);
 function tableView(n){
  const p=n.props||{},id=n.id,editable=n.type==='x-editable-grid';
@@ -154,8 +155,13 @@ function tableView(n){
    data().push(Object.fromEntries(columns.map(col=>[col,''])));refresh();
   });
   let remove=el('button','Delete selected');remove.addEventListener('click',()=>{
-   datasets[p.dataset_id]=data().filter((_,index)=>!state.selected.has(index));
-   state.selected.clear();refresh();
+   const removed=new Set(state.selected);
+   datasets[p.dataset_id]=data().filter((_,index)=>!removed.has(index));
+   for(const key of [n.id,p.dataset_id]){
+    const picked=selectedRecords[key];
+    if(typeof picked==='number')selectedRecords[key]=removed.has(picked)?null:picked-[...removed].filter(index=>index<picked).length;
+   }
+   state.selected.clear();render();
   });
   actions.append(add,remove);box.append(actions);
   state.remove=remove;
@@ -172,10 +178,11 @@ function tableView(n){
   const v=view();tbody.replaceChildren();
   v.shown.forEach(({row,index})=>{
    const tr=el('tr');tr.dataset.rowIndex=index;
-   if(state.selected.has(index))tr.className='selected-row';
+   if(state.selected.has(index)||selectedRecords[n.id]===index)tr.className='selected-row';
+   tr.onclick=event=>{if(event.target.closest('input,button'))return;selectedRecords[n.id]=index;selectedRecords[p.dataset_id]=index;render()};
    if(p.selectable||editable){const td=el('td'),check=el('input');check.type='checkbox';check.setAttribute('aria-label','Select row '+(index+1));check.checked=state.selected.has(index);check.onchange=()=>{
     if(check.checked)state.selected.add(index);else state.selected.delete(index);
-    refresh();
+    selectedRecords[n.id]=index;selectedRecords[p.dataset_id]=index;render();
    };td.append(check);tr.append(td)}
    columns.forEach(col=>{
     const td=el('td');
@@ -194,6 +201,34 @@ function tableView(n){
   count.textContent=v.list.length+' of '+data().length+' record(s)';
  }
  refresh();return box;
+}
+function recordDetailView(n){
+ const p=n.props||{},box=el('section');box.className='sc-record-detail';
+ const title=el('h4',p.label||'Record details');box.append(title);
+ const dataset=(app.datasets||[]).find(d=>d.id===p.dataset_id);
+ if(!dataset){box.append(el('p','Choose a dataset in Properties.'));return box}
+ const rows=datasets[p.dataset_id]||[];
+ const picked=p.source_table_id?selectedRecords[p.source_table_id]:selectedRecords[p.dataset_id];
+ if(typeof picked!=='number'||picked<0||picked>=rows.length){
+  box.append(el('p','Select a row in the linked table or grid.'));return box;
+ }
+ const record=rows[picked],canEdit=Boolean(p.editable)&&(dataset.persistence||'seed-reset')==='seed-reset';
+ for(const col of dataset.columns||[]){
+  const label=el('label');label.className='sc-record-field';
+  label.append(el('span',col.id));
+  if(p.editable){
+   const input=el('input');input.setAttribute('aria-label','Detail '+col.id);
+   input.value=String(record[col.id]??'');input.disabled=!canEdit;
+   input.oninput=()=>{if(canEdit)record[col.id]=input.value};
+   input.onchange=()=>{if(canEdit)render()};
+   label.append(input);
+  }else{
+   const output=el('output',String(record[col.id]??''));output.setAttribute('aria-label','Detail '+col.id);label.append(output);
+  }
+  box.append(label);
+ }
+ box.append(el('small',canEdit?'Changes update the selected mock record.':p.editable?'Editing requires a seed-reset dataset.':'Read-only detail view.'));
+ return box;
 }
 const metricPalette=['#2765be','#24a494','#e2a23c','#9562bc','#dc736c','#537b8c','#83af4c'];
 function aggregateMetric(rows,op,col){
@@ -266,6 +301,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;c.required=!!p.required;captureInput(n,c,'checkbox');x.append(c,el('span',p.label||''));break;
  case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
  case 'table':case 'x-editable-grid':x=tableView(n);break;
+ case 'x-record-detail':x=recordDetailView(n);break;
  case 'modal':x=el('div');if(modal!==n.id)return; x.className='sc-modal';x.append(el('h3',p.label||'Dialog'));break;
  case 'tabs':case 'x-wizard':{
   x=el('section');x.className='sc-panel-container';x.dataset.panelKind=n.type;
