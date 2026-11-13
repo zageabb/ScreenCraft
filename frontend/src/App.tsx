@@ -357,8 +357,8 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  </>}
  {['x-diagram','x-schema-map'].includes(node.type)&&(()=>{
   const key=node.type==='x-schema-map'?'tables':'nodes';
-  const nodes=Array.isArray(node.props[key])?node.props[key]:[];
-  const links=Array.isArray(node.props.links)?node.props.links:[];
+  const nodes=Array.isArray(node.props[key])?node.props[key]:Array.isArray(node.props.diagram_nodes)?node.props.diagram_nodes:[];
+  const links=Array.isArray(node.props.links)?node.props.links:Array.isArray(node.props.connections)?node.props.connections.map((link:any)=>({...link,source:link.source??link.from,target:link.target??link.to})):[];
   return <div className="advanced-structure-editor">
    <h4>{node.type==='x-schema-map'?'Schema tables':'Diagram nodes'}</h4>
    {nodes.map((entry:any,i:number)=><div key={i} className="advanced-entry">
