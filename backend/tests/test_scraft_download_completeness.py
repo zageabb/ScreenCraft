@@ -9,6 +9,7 @@ import pytest
 
 from screencraft.api import create_app
 from screencraft.package import read_document
+from screencraft.conformance import validate_contract
 
 
 @pytest.fixture
@@ -152,6 +153,9 @@ def test_download_zip_contains_entire_saved_application_and_import_preserves_it(
     assert manifest["document_revision"] > 1
     assert restored == doc
     assert assets == {path: raw_image}
+    # Known canonical extensions must not be misreported as unsupported on import.
+    warnings = validate_contract(manifest, restored, assets, verify_assets=True)
+    assert not any("inactive placeholder" in warning for warning in warnings), warnings
     assert len(restored["screens"][0]["nodes"]) == 41
     assert {node["type"] for node in restored["screens"][0]["nodes"] if node["id"].startswith("object-")} == set(types)
 
