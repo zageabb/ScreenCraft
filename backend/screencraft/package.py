@@ -186,6 +186,6 @@ def starter_app():
         "layout":{"mode":"freeform","overflow_x":"auto","overflow_y":"auto"},
         "nodes":[]}],
         "components":[],"themes":{
-            "light":{"tokens":{"surface.default":"#ffffff","text.primary":"#16243a","action.primary":"#2563eb"}},
-            "dark":{"tokens":{"surface.default":"#1e2737","text.primary":"#f7f7f7","action.primary":"#75aaff"}}},
+            "light":{"tokens":{"surface.page":"#F5F7FA","surface.default":"#FFFFFF","surface.nav":"#E9F1FC","surface.input":"#FFFFFF","surface.selected":"#DBEAFE","text.primary":"#172033","text.secondary":"#52647B","text.disabled":"#64748B","border.default":"#CBD5E1","action.primary":"#2563EB","action.on_primary":"#FFFFFF"}},
+            "dark":{"tokens":{"surface.page":"#101827","surface.default":"#1E293B","surface.nav":"#0B1220","surface.input":"#1E293B","surface.selected":"#263F66","text.primary":"#F1F5F9","text.secondary":"#94A3B8","text.disabled":"#94A3B8","border.default":"#334155","action.primary":"#60A5FA","action.on_primary":"#0B1220"}}},
         "datasets":[],"assets":[]}
