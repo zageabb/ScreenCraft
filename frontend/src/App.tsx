@@ -290,7 +290,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
   <p className="muted">Changes apply to the application screens, navigation and interactive HTML export, not the ScreenCraft editor.</p>
   <label>Colour palette<select aria-label="Application palette preset" disabled={!canEdit}
     value={doc.application_palette?.preset||'custom'}
-    onChange={e=>{const preset=e.target.value as PalettePreset;if(preset!=='custom'){edit(applyPalettePreset(doc,preset));setTheme('light')}else{edit({...doc,application_palette:{preset:'custom'}})}}}>
+    onChange={e=>{const preset=e.target.value as PalettePreset;if(preset!=='custom'){edit(applyPalettePreset(doc,preset))}else{edit({...doc,application_palette:{preset:'custom'}})}}}>
     {Object.entries(paletteNames).map(([key,label])=><option key={key} value={key}>{label}</option>)}
   </select></label>
   <div className="palette-swatch-strip" aria-label="Current palette swatches">
