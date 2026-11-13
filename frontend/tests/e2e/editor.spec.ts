@@ -474,3 +474,48 @@ test('Phase 9.1 global menu is edited once, persists separately and follows opt-
  await page.getByRole('button',{name:'▶ Preview'}).click();
  await expect(nav).toHaveCount(0);
 });
+
+test('Phase 9.2 record detail links selected table record and edits seed-reset rows',async({page})=>{
+ await page.route('**/api/projects/p1',async route=>{
+  if(route.request().method()==='GET'){
+   const doc=structuredClone(app);
+   doc.screens[1].nodes.push({
+    id:'detail',type:'x-record-detail',parent_id:null,
+    props:{label:'Customer details',dataset_id:'people',source_table_id:'table',editable:true},
+    layout:{x:430,y:20,width:300,height:270}
+   });
+   await route.fulfill({status:200,contentType:'application/json',
+    body:JSON.stringify({id:'p1',revision:1,role:'owner',document:doc})});
+  }else await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({revision:2})});
+ });
+ await page.reload();
+ await page.getByRole('button',{name:'Open',exact:true}).click();
+ await page.getByRole('button',{name:'Customers',exact:true}).first().click();
+ await page.getByRole('button',{name:'x-record-detail · detail'}).click();
+ await expect(page.getByLabel('Detail dataset')).toHaveValue('people');
+ await expect(page.getByLabel('Detail source table')).toHaveValue('table');
+ await expect(page.getByLabel('Allow detail editing')).toBeChecked();
+ await page.getByRole('button',{name:'▶ Preview'}).click();
+ const detail=page.locator('.canvas .record-detail');
+ await expect(detail).toContainText('Select a row');
+ await page.locator('.canvas .data-grid tbody tr').first().locator('td').first().click();
+ await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveValue('Example Ltd');
+ await detail.getByRole('textbox',{name:'Detail Name'}).fill('Updated customer');
+ await expect(page.locator('.canvas .data-grid tbody')).toContainText('Updated customer');
+ await page.locator('.canvas .prototype-button').filter({hasText:'Add sample'}).click();
+ await page.locator('.canvas .data-grid tbody tr').last().locator('td').first().click();
+ await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveValue('New Person');
+});
+
+test('Phase 9.2 new record detail auto-links to existing table and saves configuration',async({page})=>{
+ await page.getByRole('button',{name:'Customers',exact:true}).first().click();
+ await page.locator('[data-catalogue-type="x-record-detail"]').click();
+ await expect(page.getByLabel('Detail dataset')).toHaveValue('people');
+ await expect(page.getByLabel('Detail source table')).toHaveValue('table');
+ await page.getByLabel('Allow detail editing').check();
+ const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const doc=(await saved).postDataJSON().document;
+ const detail=doc.screens[1].nodes.find((n:any)=>n.type==='x-record-detail');
+ expect(detail.props).toMatchObject({dataset_id:'people',source_table_id:'table',editable:true});
+});

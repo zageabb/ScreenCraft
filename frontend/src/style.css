@@ -103,3 +103,12 @@
  .shared-app-nav:not(.mobile-open) .shared-nav-items{display:none}
  .shared-app-nav.nav-top .shared-nav-items{flex-direction:column}
 }
+
+/* Phase 9.2: selected-record details, with read-only and mock-editing modes. */
+.record-detail{box-sizing:border-box;display:flex;flex-direction:column;gap:7px;padding:8px;background:var(--sc-surface,#fff);border:1px solid #cbd6e2;height:100%;overflow:auto}
+.record-detail h4{margin:0 0 4px;font-size:14px}
+.record-detail-field{display:flex;flex-direction:column;gap:3px;font-size:12px}
+.record-detail-field output{display:block;min-height:18px;padding:6px;background:#f0f4fa;overflow-wrap:anywhere}
+.record-detail-field input{box-sizing:border-box;width:100%;min-width:0}
+.record-detail-configuration{margin-top:12px;padding-top:8px;border-top:1px solid #d5deea}
+.data-grid tbody tr{cursor:pointer}

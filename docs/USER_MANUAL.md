@@ -112,3 +112,13 @@ This is an interactive design prototype: validation protects mock data demonstra
 **Screen opt-out:** On a screen, select **Hide navigation on screen** to remove the shared menu there (for example, on a login or full-screen view). Saved .scraft and standalone HTML preserve the setting. The exported HTML includes Back/Home fallback controls, so a screen without the shared menu need not trap you.
 
 This is mock navigation, not authorization; target applications must enforce their own permissions. For detailed field definitions and acceptance see `docs/PHASE_9_1.md`.
+
+## Phase 9.2 — Record Detail linked to a selected table row
+
+Choose **x-record-detail** under **Data** in the Object Gallery. If the current screen already has a table or editable grid with a dataset, the new detail panel links automatically. Otherwise select the panel and choose **Record detail settings > Linked dataset** and optionally a **Source table / grid**. Leaving the source blank allows selecting a row in any table or grid using that dataset.
+
+Switch to **Preview** and click a table row. The detail panel immediately displays each dataset column from that row; choosing a different row updates it. Rows remain correctly linked when the table is sorted or filtered. Until a record is selected, the panel shows an instructional message instead of invented data.
+
+For mock editing, enable **Allow mock editing** in Properties. The selected fields become editable, and changing them updates the same in-memory record used by tables and grids. Editing is enabled for `seed-reset` datasets only. Session-persisted and project-shared datasets are read-only within record detail. This is a prototype behaviour, not a database write.
+
+**Interactive HTML** export supports the same selection and editing workflow entirely offline and does not contact the application server.

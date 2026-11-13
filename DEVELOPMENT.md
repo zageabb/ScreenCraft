@@ -279,3 +279,15 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - Merged PR #19: https://github.com/zageabb/ScreenCraft/pull/19; squash commit `7d478374ef45f20809fec20c2e6943fc3fd2cc2d`.
 - CI run https://github.com/zageabb/ScreenCraft/actions/runs/43319304058 passed all five jobs (React, Python, Chromium Playwright against real generated HTML, Docker and documentation) on head `f7f2c6e6dfc7242447221fd1386a6502598f9b7e`.
 - No DB schema migration or Caddy/UDA configuration change. Live Ubuntu deployment, keyboard/mobile manual acceptance, and optional formalization of the navigation extension in Application-Standard remain open.
+
+## Phase 9.2 — Record Detail & table selection integration (2026-11-13)
+
+**Implementation:** Activate the existing canonical `x-record-detail` catalogue object as a functional selected-record panel. In the Properties inspector, bind a dataset, optionally a specific table/editable-grid object on the same screen and opt into mock editing. Newly added detail panels auto-link to the first existing table with a configured dataset, when available.
+
+**Prototype behavior:** Clicking a table or editable-grid row selects its original source index (not its sorted/filtered position). The detail displays each declared dataset column. Read-only mode uses output fields; editable mode updates the selected row in the same in-memory mock dataset, reflected in tables and grids. Seed-reset datasets can be edited; shared/session datasets remain read-only. A missing dataset, unselected record or stale selection shows an informative state instead of misleading default data.
+
+**Offline export parity:** The single-file Interactive HTML exports the same selected-row and record-detail binding/editing semantics, with no external network or server writes. Existing table sort/filter and inline grid editing remain supported.
+
+**Validation:** `x-record-detail` is supported and its source/dataset references generate nonblocking compatibility diagnostics when broken. Browser tests exercise the actual Python-generated offline HTML, including sorting before selection, changes reflected in table cells, read-only shared datasets and empty selections. Editor tests exercise inspector configuration and Preview bindings. All five CI checks must pass prior to merge.
+
+**Limitations:** This is prototype in-memory selection/editing, not persistence to PostgreSQL or cross-screen selection. Complex type-specific detail editors, record keys, and shared-record conflict handling remain future work. FigmaBridge continues separately.

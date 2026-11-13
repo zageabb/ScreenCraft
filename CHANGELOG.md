@@ -72,3 +72,8 @@ No runnable ScreenCraft application has been released.
 - Added declarative `toggle_container`, `collapse_container` and `expand_container` button actions, plus optional collapsible headers and saved initial state on nested containers.
 - Added a single shared application navigation definition with global inspector editing, active screen links, nested menu groups, left/right/top placement, mobile collapse and per-screen opt-out.
 - Added SCRAFT reference/cycle validation, screen deletion menu cleanup and matching offline Interactive HTML controls, verified by browser and backend conformance tests.
+
+## Phase 9.2 — Record detail and selected-row binding
+- Activated the canonical `x-record-detail` with row selection from tables and editable grids, source-table configuration and optional seed-reset mock editing.
+- Added empty-state handling, sorted-table index-safe selection and data field display/editing in Preview and offline HTML.
+- Added real HTML Playwright regression tests, editor tests and SCRAFT compatibility diagnostics for record-detail references.
