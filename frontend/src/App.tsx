@@ -2,6 +2,7 @@ import React,{useState,useRef,useEffect} from 'react';
 import{blank,palette,newNode,updateNode,insertNode,cloneDoc,catalogueEntries,catalogueInfo,isContainer,isSupported,removeNodeTree,reparentNode,reorderScreen,removeScreen,cloneSubtree,COLLAPSIBLE_TYPES,defaultSharedNavigation}from './model';import type{Document,Node,Screen,Action}from './model';
 import TableDataEditor from './TableDataEditor';
 import DataGrid from './DataGrid';
+import {DataExtension,DataPagination} from './DataExtensions';
 import RecordDetail from './RecordDetail';
 import SharedNavigation from './SharedNavigation';
 import {DataChart,MetricCard} from './Metrics';
@@ -26,7 +27,7 @@ async function request(path:string,options:RequestInit={}) {
  if(!r.ok)throw new Error('API '+(options.method||'GET')+' '+url+' failed ('+r.status+'): '+(body?.error||'Request failed'));
  return body;
 }
-function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord,onRowsDeleted,externalSearch}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void;onRowsDeleted?:(datasetId:string,indices:number[])=>void;externalSearch?:string}) {
+function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord,onRowsDeleted,externalSearch,tablePage,onPageChange,linkedPages}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void;onRowsDeleted?:(datasetId:string,indices:number[])=>void;externalSearch?:string;tablePage?:number;onPageChange?:(page:number)=>void;linkedPages?:{page:number;total:number;onChange:(page:number)=>void}}) {
  const drag=useRef<{x:number;y:number;startX:number;startY:number}|null>(null);
  const resize=useRef<{x:number;y:number;w:number;h:number}|null>(null);
  const l=node.layout||{},p=node.props||{};const flowChild=!!node.parent_id&&['flow','flex','grid'].includes(parentMode||'');const style:React.CSSProperties={position:flowChild?'relative':'absolute',left:flowChild?undefined:l.x||0,top:flowChild?undefined:l.y||0,width:typeof l.width==='number'?l.width:200,height:mode==='preview'&&COLLAPSIBLE_TYPES.has(node.type)&&containerOpen===false?40:(typeof l.height==='number'?l.height:44),overflowX:l.overflow_x||'visible',overflowY:l.overflow_y||'visible',outline:selected&&mode==='design'?'2px solid #2878e0':'none',boxSizing:'border-box'};
@@ -52,9 +53,17 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
  child=dataset?<DataGrid key={node.id+'-'+dataset.id} dataset={dataset} rows={rows}
   options={{searchable:!!p.searchable,sortable:!!p.sortable,selectable:!!p.selectable,filter_column:p.filter_column,filter_value:p.filter_value,page_size:Number(p.page_size)||0}}
   editable={node.type==='x-editable-grid'} canMutate={mode==='preview'&&(dataset.persistence||'seed-reset')==='seed-reset'}
-  onRowsChange={updated=>onRowsChange(dataset.id,updated)} externalSearch={externalSearch} activeIndex={selectedRecordIndex} onSelectRow={onSelectRecord} onRowsDeleted={indices=>onRowsDeleted?.(dataset.id,indices)}/>
+  onRowsChange={updated=>onRowsChange(dataset.id,updated)} externalSearch={externalSearch} externalPage={tablePage} onPageChange={onPageChange} activeIndex={selectedRecordIndex} onSelectRow={onSelectRecord} onRowsDeleted={indices=>onRowsDeleted?.(dataset.id,indices)}/>
   :<div className="table-empty">No dataset assigned. Select table to create sample data.</div>;
  break}
+ case 'x-tree':case 'x-list':{
+ const dataset=doc.datasets.find(d=>d.id===p.dataset_id);
+ child=<DataExtension type={node.type} dataset={dataset} rows={rows} props={p}
+  selectedIndex={selectedRecordIndex} onSelect={index=>mode==='preview'&&onSelectRecord?.(index)}/>;
+ break}
+ case 'x-pagination':child=linkedPages
+  ?<DataPagination page={linkedPages.page} totalPages={linkedPages.total} onChange={page=>mode==='preview'&&linkedPages.onChange(page)} label={p.label||'Pages'}/>
+  :<div className="table-empty">Link this pagination control to a table with a page size.</div>;break;
  case 'x-record-detail':{
  const dataset=doc.datasets.find(d=>d.id===p.dataset_id);
  child=<RecordDetail dataset={dataset} rows={rows} selectedIndex={selectedRecordIndex??null}
@@ -89,6 +98,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  const [inputValues,setInputValues]=useState<Record<string,unknown>>({});
  const [containerStates,setContainerStates]=useState<Record<string,boolean>>({});
  const [recordSelection,setRecordSelection]=useState<Record<string,number|null>>({});
+ const [tablePages,setTablePages]=useState<Record<string,number>>({});
  useEffect(()=>{if(mode!=='preview')return;doc.datasets.filter(d=>d.persistence==='session-persisted'||d.persistence==='project-shared').forEach(async d=>{try{const result=await request('/api/projects/'+projectId+'/data/'+encodeURIComponent(d.id),{method:'POST',body:JSON.stringify({mode:d.persistence,operation:'list',session_id:previewSession.current})});setRows(v=>({...v,[d.id]:result.rows}));setPreviewRevision(v=>({...v,[d.id]:result.revision}))}catch(e){setMessage(String(e))}})},[mode,projectId]);
  const [history,setHistory]=useState<Document[]>([]),[future,setFuture]=useState<Document[]>([]),[screensBack,setScreensBack]=useState<string[]>([]);
  const screen=doc.screens.find(s=>s.id===screenId)||doc.screens[0];const node=screen.nodes.find(n=>n.id===selected);
@@ -212,6 +222,15 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
        ?screen.nodes.filter(source=>source.type==='x-search'&&source.props.target_table_id===n.id)
         .map(source=>String(inputValues[source.id]??'')).filter(Boolean).join(' ')
        :undefined}
+     tablePage={['table','x-editable-grid'].includes(n.type)?(tablePages[n.id]??0):undefined}
+     onPageChange={page=>setTablePages(v=>({...v,[n.id]:page}))}
+     linkedPages={n.type==='x-pagination'&&n.props.target_table_id?(()=>{
+       const table=screen.nodes.find(item=>item.id===n.props.target_table_id&&['table','x-editable-grid'].includes(item.type));
+       if(!table)return undefined;
+       const pageSize=Math.max(1,Number(table.props.page_size)||0);
+       const total=Math.max(1,Math.ceil(dataRows(table.props.dataset_id||'').length/pageSize));
+       return {page:tablePages[table.id]??0,total,onChange:(page:number)=>setTablePages(v=>({...v,[table.id]:page}))};
+     })():undefined}
      onSelectRecord={index=>setRecordSelection(v=>({...v,[n.id]:index,[n.props.dataset_id||'']:index}))}
      onRowsDeleted={(datasetId,indices)=>{
        const removed=new Set(indices);
@@ -306,7 +325,19 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  <label>Enable collapsible header<input aria-label="Enable collapsible header" type="checkbox" disabled={!canEdit} checked={!!node.props.collapsible} onChange={e=>property('collapsible',e.target.checked)}/></label>
  <label>Initially expanded<input aria-label="Initially expanded" type="checkbox" disabled={!canEdit} checked={node.props.expanded!==false} onChange={e=>property('expanded',e.target.checked)}/></label>
  </section>}
- <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{node?.type==='x-record-detail'&&<section className="record-detail-configuration">
+ <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{['x-tree','x-list','x-pagination'].includes(node.type)&&<section className="data-extension-settings">
+ <h3>Data object settings</h3>
+ {node.type!=='x-pagination'?<>
+  <label>Dataset<select aria-label="Extension dataset" disabled={!canEdit} value={node.props.dataset_id||''} onChange={e=>property('dataset_id',e.target.value)}><option value="">Select dataset</option>{doc.datasets.map(d=><option value={d.id} key={d.id}>{d.id}</option>)}</select></label>
+  <label>Label column<select aria-label="Extension label column" disabled={!canEdit} value={node.props.label_column||''} onChange={e=>property('label_column',e.target.value)}><option value="">First column</option>{doc.datasets.find(d=>d.id===node.props.dataset_id)?.columns.map(column=><option key={column.id}>{column.id}</option>)}</select></label>
+  {node.type==='x-tree'&&<>
+   <label>Node ID column<select aria-label="Tree ID column" disabled={!canEdit} value={node.props.id_column||''} onChange={e=>property('id_column',e.target.value)}><option value="">First column</option>{doc.datasets.find(d=>d.id===node.props.dataset_id)?.columns.map(column=><option key={column.id}>{column.id}</option>)}</select></label>
+   <label>Parent column<select aria-label="Tree parent column" disabled={!canEdit} value={node.props.parent_column||''} onChange={e=>property('parent_column',e.target.value)}><option value="">Select parent column</option>{doc.datasets.find(d=>d.id===node.props.dataset_id)?.columns.map(column=><option key={column.id}>{column.id}</option>)}</select></label>
+  </>}
+ </>:<label>Linked table/grid<select aria-label="Pagination target table" disabled={!canEdit} value={node.props.target_table_id||''} onChange={e=>property('target_table_id',e.target.value)}><option value="">Select table</option>{screen.nodes.filter(n=>['table','x-editable-grid'].includes(n.type)).map(n=><option key={n.id} value={n.id}>{n.props.label||n.type} · {n.id.slice(0,8)}</option>)}</select></label>}
+ <small className="muted">Selections operate on mock dataset rows; pagination uses the target table's page size.</small>
+ </section>}
+ {node?.type==='x-record-detail'&&<section className="record-detail-configuration">
  <h3>Record detail settings</h3>
  <label>Linked dataset<select aria-label="Detail dataset" disabled={!canEdit} value={node.props.dataset_id||''}
  onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,props:{...n.props,dataset_id:e.target.value,source_table_id:''}})))}>
