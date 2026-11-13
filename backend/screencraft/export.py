@@ -208,6 +208,7 @@ function tableView(n){
    pages.append(previous,el('span','Page '+(state.page+1)+' of '+v.total),next)}
   count.textContent=v.list.length+' of '+data().length+' record(s)';
  }
+ state.refresh=refresh;
  refresh();return box;
 }
 function recordDetailView(n){
@@ -361,7 +362,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
   control.onchange=()=>{inputValues[n.id]=control.files?.[0]?.name||'';filename.textContent=String(inputValues[n.id]||'No file selected')};
   x.append(control,filename,el('small','Prototype: filename only; file contents are never stored or uploaded.'));break}
  case 'x-search':x=el('input');x.type='search';x.setAttribute('aria-label',p.label||'Search');x.placeholder=p.placeholder||'Search records';x.value=p.value||'';
-  captureInput(n,x,'search');x.addEventListener('input',()=>{if(p.target_table_id){const table=document.querySelector('[data-node-id="'+CSS.escape(p.target_table_id)+'"]');if(table)render()}});break;
+  captureInput(n,x,'search');x.addEventListener('input',()=>{if(p.target_table_id&&gridState[p.target_table_id]?.refresh)gridState[p.target_table_id].refresh()});break;
  case 'x-kpi':case 'x-chart':x=metricView(n);break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
  }
