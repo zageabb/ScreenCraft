@@ -204,7 +204,7 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
         for node in nodes:
             nid = node["id"]
             kind = _ident(node.get("type"), f"node {nid} type")
-            if kind not in CORE_TYPES | EDITOR_EXTENSIONS:
+            if kind not in CORE_TYPES | KNOWN_CATALOGUE:
                 warnings.append(f"Screen {sid}: {kind} is preserved as an inactive placeholder (node {nid}).")
             for key in ("props", "layout", "style", "bindings", "accessibility"):
                 if key in node:
