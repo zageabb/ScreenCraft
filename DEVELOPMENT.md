@@ -355,3 +355,11 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Central standard clarification proposed in `Application-Standard`; no v1 format migration or new mandatory field.
 - Verification: manual deployment and browser/screenshot regression remain pending. GitHub CI must be reviewed when billing permits. Do not claim production acceptance solely from source changes.
 
+
+## 2026-11-13: Application palette presets — companion to dark-theme fix
+
+- Added two built-in presets: ScreenCraft blue/grey, and a sample corporate black/grey/white/red. These are editable light/dark token dictionaries, stored inside the application `themes`; `application_palette.preset` is optional descriptive metadata.
+- Added application-level inspector palette selector, theme swatches and per-token colour editor, with explicit default export theme control.
+- Kept project palette distinct from editor chrome; applied semantic tokens to canvas and shared navigation. Interactive standalone export allows light/dark theme switching and resolves `action.on_primary`.
+- `.scraft` v1 extension described in central `Application-Standard` draft. Old documents without palette metadata keep their imported theme colours.
+- Added ZIP round-trip and interactive export regression assertions. Still require live UI/visual acceptance, full frontend build/tests and CI status before merge.
