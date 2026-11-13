@@ -5,6 +5,7 @@ export type Dataset={id:string;columns:{id:string;type:string}[];rows:Record<str
 export type SharedNavItem={id:string;label:string;target_screen?:string;parent_id?:string|null;icon?:string;hidden_on?:string[]};
 export type SharedNavigation={enabled:boolean;position:'left'|'right'|'top';collapsible:boolean;initial_collapsed?:boolean;mobile_collapsed?:boolean;items:SharedNavItem[]};
 export type Document={application_palette?:{preset:'screencraft'|'corporate'|'custom'};shared_navigation?:SharedNavigation;application_id:string;name:string;start_screen:string;default_theme:string;screen_order:string[];screens:Screen[];components:any[];themes:Record<string,{tokens:Record<string,string>}>;datasets:Dataset[];assets:any[]}
+import {palettePresets} from './palettePresets';
 import catalogue from './catalogue.snapshot.json';
 export const palette=catalogue.objects.map(o=>o.id);
 export const catalogueEntries=catalogue.objects;
@@ -39,4 +40,4 @@ export function newNode(type:string,x=24,y=24):Node{
 export function updateNode(doc:Document,screenId:string,nodeId:string,update:(n:Node)=>Node):Document{return {...doc,screens:doc.screens.map(s=>s.id!==screenId?s:{...s,nodes:s.nodes.map(n=>n.id!==nodeId?n:update(n))})}}
 export function insertNode(doc:Document,screenId:string,node:Node):Document{return {...doc,screens:doc.screens.map(s=>s.id!==screenId?s:{...s,nodes:[...s.nodes,node]})}}
 export function cloneDoc<T>(doc:T):T{return JSON.parse(JSON.stringify(doc))}
-export const blank:Document={application_palette:{preset:'screencraft'},application_id:'local',name:'Untitled Application',start_screen:'home',default_theme:'light',screen_order:['home'],screens:[{id:'home',name:'Home',viewport:{width:1280,height:800},layout:{mode:'freeform',overflow_x:'auto',overflow_y:'auto'},nodes:[]}],components:[],themes:{light:{tokens:{'surface.default':'#ffffff','text.primary':'#172033','action.primary':'#2563eb'}},dark:{tokens:{'surface.default':'#1e2737','text.primary':'#f7f7f7','action.primary':'#75aaff'}}},datasets:[],assets:[]};
+export const blank:Document={application_palette:{preset:'screencraft'},application_id:'local',name:'Untitled Application',start_screen:'home',default_theme:'light',screen_order:['home'],screens:[{id:'home',name:'Home',viewport:{width:1280,height:800},layout:{mode:'freeform',overflow_x:'auto',overflow_y:'auto'},nodes:[]}],components:[],themes:{light:{tokens:{...palettePresets.screencraft.light}},dark:{tokens:{...palettePresets.screencraft.dark}}},datasets:[],assets:[]};
