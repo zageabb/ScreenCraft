@@ -271,7 +271,7 @@ function dataExtensionView(n){
     toggle.onclick=()=>{if(expanded.has(id))expanded.delete(id);else expanded.add(id);render()};
     line.append(toggle);
    }else line.append(el('span','·'));
-   const item=el('button',String(row[labelKey]??id||'Unnamed node'));
+   const item=el('button',String((row[labelKey]??id)||'Unnamed node'));
    item.setAttribute('aria-pressed',String(selectedRecords[p.dataset_id]===index));item.onclick=()=>pick(index);line.append(item);
    li.append(line);if(expanded.has(id)&&descendants.length){const nested=el('ul');append(id,nested,new Set([...seen,index]),depth+1);li.append(nested)}
    holder.append(li);
