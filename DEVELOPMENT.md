@@ -371,3 +371,18 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Added a synthetic browser regression based on the user's TAIJU fixed navy navigation background and theme-linked text, without committing the private project file.
 - Scope limitations: non-text objects, alpha compositing, images, native controls and visual overlaps still require manual review. Editor/export parity from PR #27 remains in force.
 - Verification pending CI; manual comparison to the seven-screen example and live Ubuntu deployment have not been accepted.
+
+## Future innovation development register — proposed 2026-11-13
+
+**Status: PLANNED / DOCUMENTATION ONLY.** This roadmap is independent of active Phase 10 work and the deferred Phase 7 FigmaBridge stream. No implementation, deployment, or acceptance is implied. See [Future Innovation Roadmap](docs/FUTURE_INNOVATION_ROADMAP.md) for the scoped features, technical boundaries, dependencies and acceptance criteria.
+
+- **First discovery priority:** SC-F08, read-only existing-application reverse engineering (React/Vite and Flask/Jinja to editable .scraft; no source modification).
+- **Proposed Phase 11:** SC-F01, AI Design Reviewer with offline checks and approval-based suggestions.
+- **Proposed Phase 12:** SC-F02, visual .scraft design diff/history and safe rollback.
+- **Proposed Phase 13:** SC-F03, visual workflow designer and interactive HTML export parity.
+- **Proposed Phase 14:** SC-F04, data/API binding studio with strict mock/live segregation.
+- **Proposed Phase 15:** SC-F05/SC-F06, business rules and permission simulation.
+- **Proposed Phase 16:** SC-F07, PR-based controlled application generator.
+- **Further backlog:** SC-F09–SC-F19 screenshot import, requirements-to-design, test generation, journeys, database modelling/drift, documentation, recording import, component packs, localisation and plugin SDK.
+
+**Design policy:** screens remain mandatory; all other application specification areas are optional. AI may propose missing functionality but needs approval for changes. Keep .scraft schema changes centralised in Application-Standard, preserve unknown imported fields, and keep existing development/CI gates in effect. Future phase numbering is provisional until prioritised at the Phase 10 exit gate.
