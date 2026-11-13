@@ -2,7 +2,7 @@ import type {Action,Node} from './model';
 
 const INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea','x-time','x-radio','x-toggle','x-file-upload','x-search']);
 function defaultValue(node:Node):unknown{
- if(node.type==='checkbox')return false;
+ if(['checkbox','x-toggle'].includes(node.type))return false;
  if(node.type==='select'){
   const option=node.props.options?.[0];
   return typeof option==='string'?option:option?.value??option?.label??'';
@@ -24,7 +24,7 @@ export function validateBoundInputs(action:Action,nodes:Node[],inputValues:Recor
   if(props.required&&(['checkbox','x-toggle'].includes(source.type)?value!==true:!string.trim())){
    errors.push(label+' is required');continue;
   }
-  if(!string.trim()&&source.type!=='checkbox')continue;
+  if(!string.trim()&&!['checkbox','x-toggle'].includes(source.type))continue;
   if((source.type==='input'||source.type==='x-textarea')&&
      Number.isInteger(Number(props.min_length))&&props.min_length!==undefined&&
      string.length<Number(props.min_length))errors.push(label+' needs at least '+props.min_length+' characters');
