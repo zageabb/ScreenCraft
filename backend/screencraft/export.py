@@ -398,9 +398,11 @@ function localNavigationView(n){
 const advancedStates=Object.create(null);
 function advancedDiagramView(n){
  const p=n.props||{},box=el('div');box.className='sc-advanced-diagram';box.dataset.advancedKind=n.type;
- const nodes=(n.type==='x-schema-map'?p.tables:p.nodes)||[];
+ const nodes=(n.type==='x-schema-map'?(p.tables??p.diagram_nodes):(p.nodes??p.diagram_nodes))||[];
  const sample=[{id:'source',label:'Source',x:25,y:45,fields:['ID','Name']},{id:'target',label:'Target',x:270,y:45,fields:['ID','Source ID']}];
- const data=Array.isArray(nodes)&&nodes.length?nodes:sample,links=Array.isArray(p.links)?p.links:[{source:'source',target:'target'}];
+ const data=Array.isArray(nodes)&&nodes.length?nodes:sample;
+ const rawLinks=p.links??p.connections;
+ const links=Array.isArray(rawLinks)?rawLinks.map(link=>({...link,source:link.source??link.from,target:link.target??link.to})):[{source:'source',target:'target'}];
  const state=advancedStates[n.id]||(advancedStates[n.id]={zoom:1,selected:null});
  const heading=el('div');heading.className='sc-diagram-tools';heading.append(el('strong',p.label||(n.type==='x-schema-map'?'Schema map':'Diagram')));
  const minus=el('button','−');minus.setAttribute('aria-label','Zoom out');minus.disabled=state.zoom<=.5;
@@ -410,7 +412,9 @@ function advancedDiagramView(n){
  plus.onclick=()=>{state.zoom=Math.min(2,state.zoom+.25);render()};
  heading.append(minus,zoom,plus);box.append(heading);
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
- svg.setAttribute('viewBox','0 0 560 290');svg.setAttribute('role','img');
+ const width=Math.max(560,...data.map((item,index)=>(Number.isFinite(Number(item.x))?Number(item.x):25+index*220)+170));
+ const height=Math.max(290,...data.map(item=>(Number.isFinite(Number(item.y))?Number(item.y):45)+65+Math.min(Array.isArray(item.fields)?item.fields.length:0,6)*16));
+ svg.setAttribute('viewBox','0 0 '+width+' '+height);svg.setAttribute('role','img');
  svg.setAttribute('aria-label',n.type==='x-schema-map'?'Schema relationship map':'Node link diagram');
  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale('+state.zoom+')');svg.append(g);
  const elSvg=(tag,attrs,parent=g)=>{const elem=document.createElementNS(ns,tag);for(const [key,val] of Object.entries(attrs))elem.setAttribute(key,String(val));parent.append(elem);return elem};
