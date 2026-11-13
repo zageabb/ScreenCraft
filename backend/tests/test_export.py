@@ -44,3 +44,14 @@ def test_dark_theme_export_resolves_tokens_and_styles():
     assert "root.classList.add('sc-theme')" in result
     assert "background_color_token" in result
     assert "#101827" in result and "#F1F5F9" in result
+
+def test_interactive_html_supports_light_dark_palette_switch():
+    app=starter_app()
+    app["default_theme"]="dark"
+    app["application_palette"]={"preset":"corporate"}
+    app["themes"]["dark"]["tokens"]["action.primary"]="#E23B55"
+    result=interactive_html(app)
+    assert "Application theme" in result
+    assert "picker.onchange=()=>{theme=picker.value;render()}" in result
+    assert "action.on_primary" in result
+    assert "#E23B55" in result
