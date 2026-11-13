@@ -134,3 +134,7 @@ Preview and the exported Interactive HTML support the same user interactions and
 Add `x-tree` or `x-list` from the Data object catalogue. Choose a **Dataset** and **Label column** in the right-hand Properties. For Tree, also choose the ID and parent columns. Parent fields should match another row's ID, with empty parent values identifying roots. Preview and Interactive HTML support expanding/collapsing branches and clicking rows to select them. Tree traversal has a safe depth limit for malformed circular mock data.
 
 To add pagination, first set a **Page size** greater than zero on a table/grid, then add `x-pagination` and configure **Linked table/grid**. Preview and standalone HTML can move between pages using Previous/Next. These are mock UI interactions and do not use remote database paging.
+
+## Phase 9.5 — Menu and Breadcrumbs
+
+The **x-menu** component displays an application menu within any screen. Enable **Use shared menu items** to reuse the central menu configured in Phase 9.1; uncheck to maintain menu links local to this object with **Add menu link**, labels and target screens. Preview supports nested group expansion and active-link highlighting. **x-breadcrumbs** displays the current navigation path automatically; users can click earlier screens to navigate back. Both work in Interactive HTML export. These controls do not enforce access rights: production applications must check permissions separately.
