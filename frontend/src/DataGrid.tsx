@@ -72,7 +72,7 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
     {columns.map(column=><th key={column.id}>{options.sortable?
      <button type="button" aria-label={'Sort '+column.id} onClick={()=>{setSort(v=>v?.key===column.id?{key:column.id,direction:v.direction===1?-1:1}:{key:column.id,direction:1});setPage(0)}}>{column.id}{sort?.key===column.id?(sort.direction===1?' ▲':' ▼'):''}</button>
      :column.id}</th>)}</tr></thead>
-   <tbody>{visible.map(({row,index})=><tr key={index} data-row-index={index} className={activeIndex===index||selectedIndices.includes(index)?'selected-row':''} onClick={()=>onSelectRow?.(index)}>
+   <tbody>{visible.map(({row,index})=><tr key={index} data-row-index={index} className={activeIndex===index||selectedIndices.includes(index)?'selected-row':''} tabIndex={onSelectRow?0:undefined} aria-selected={activeIndex===index} onClick={()=>onSelectRow?.(index)} onKeyDown={event=>{if((event.key==='Enter'||event.key===' ')&&onSelectRow){event.preventDefault();onSelectRow(index)}}}>
     {(options.selectable||editable)&&<td><input type="checkbox" aria-label={'Select row '+(index+1)} checked={selectedIndices.includes(index)} onChange={()=>{toggle(index);onSelectRow?.(index)}}/></td>}
     {columns.map(column=><td key={column.id}>{editable?
       <input aria-label={'Edit row '+(index+1)+' '+column.id} value={display(row[column.id])}
