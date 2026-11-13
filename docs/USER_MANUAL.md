@@ -175,3 +175,9 @@ Open **Application palette** in the right-hand inspector. Choose **ScreenCraft �
 Use the **Theme** selector to preview light/dark. Expand **Application palette**, choose the variant and change any colour with the colour input or a complete `#RRGGBB` hex value. Editing a token marks the palette as **Custom / imported**. Use **Use light/dark as exported default** to choose which variant opens when the prototype HTML is launched. The standalone HTML has its own theme selector whenever multiple theme variants are present.
 
 Applying a named preset changes the semantic theme token values in the document; it preserves unknown extension tokens. Existing literal object colour overrides remain fixed. To retain an imported document unchanged, leave the selection at **Custom / imported**. Save the project or export `.scraft` to persist palette changes.
+
+## Phase 10.1 — Visual quality and contrast checks
+
+Expand **Visual quality · contrast audit** in the editor inspector. The finding count reflects the current light/dark theme. The audit checks ordinary text against the current page background and any explicit background on its parent containers. Each finding displays the screen, object ID, estimated contrast ratio and colour sample. A ratio below 4.5:1 is flagged for review.
+
+To correct a finding, inspect the object's colour or its parent container background and prefer compatible semantic light/dark theme tokens. Explicit colours intentionally remain unchanged until you edit them. Switch the theme to check both variants. This audit is conservative: it does not certify contrast for controls, images, translucent surfaces, gradients or complex compositing. Browser and accessibility acceptance remain required.

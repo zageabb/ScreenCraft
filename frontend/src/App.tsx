@@ -1,5 +1,6 @@
 import React,{useState,useRef,useEffect} from 'react';
 import './prototype-theme.css';
+import {inspectTextContrast} from './contrastAudit';
 import {paletteNames,palettePresets,tokenLabels,applyPalettePreset,setThemeToken} from './palettePresets';
 import type {PalettePreset} from './palettePresets';
 import{blank,palette,newNode,updateNode,insertNode,cloneDoc,catalogueEntries,catalogueInfo,isContainer,isSupported,removeNodeTree,reparentNode,reorderScreen,removeScreen,cloneSubtree,COLLAPSIBLE_TYPES,defaultSharedNavigation}from './model';import type{Document,Node,Screen,Action}from './model';
@@ -265,6 +266,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  function goBack(){setScreensBack(h=>{const copy=[...h];setScreenId(copy.pop()||doc.start_screen);return copy})}
  function goHome(){setScreenId(doc.start_screen);setScreensBack([]);setModal(null);setSelected(null)}
  function layerDepth(n:Node){let depth=0,parent=n.parent_id,seen=new Set([n.id]);while(parent&&!seen.has(parent)){seen.add(parent);depth++;parent=screen.nodes.find(x=>x.id===parent)?.parent_id||null}return Math.min(depth,8)}
+ const contrastFindings=inspectTextContrast(doc,theme);
  const tokens=doc.themes[theme]?.tokens||{};const dark=theme.toLowerCase().includes('dark');const vars:Record<string,string>={
  '--sc-page':tokens['surface.page']||tokens['surface.default']||(dark?'#101827':'#fff'),
  '--sc-surface':tokens['surface.default']||(dark?'#1E293B':'#fff'),
@@ -286,7 +288,16 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  {mode==='preview'&&doc.shared_navigation?.enabled&&!screen.shared_navigation_hidden&&
   <SharedNavigation navigation={doc.shared_navigation} active={screen.id} validScreens={new Set(doc.screens.map(s=>s.id))} onNavigate={navigateShared}/>}
  <div className="workscroll"><div className="canvas sc-theme" style={canvasStyle} onDragOver={e=>e.preventDefault()} onDrop={e=>placeFromDrop(e)} onClick={()=>setSelected(null)}>{screen.nodes.filter(n=>!n.parent_id).map(n=>renderTree(n))}</div></div></div>{message&&<div className="notice" onClick={()=>setMessage('')}>{message} ×</div>}</div>
- <aside className="inspector"><details className="application-palette-editor" open={false}><summary>Application palette</summary>
+ <aside className="inspector"><details className="contrast-audit"><summary>Visual quality · contrast audit ({contrastFindings.length})</summary>
+  <p className="muted">Checks text against resolved page and explicit ancestor backgrounds for the selected theme. Manual browser checks are still required for controls, gradients and overlays.</p>
+  {contrastFindings.length===0?<p>No low-contrast text combinations found in this audit.</p>:
+   <ul>{contrastFindings.slice(0,40).map(f=><li key={f.screen+':'+f.nodeId}>
+     <strong>{f.screen}</strong> · {f.nodeId.slice(0,14)} — {f.ratio.toFixed(2)}:1
+     <span className="contrast-swatch" style={{background:f.background,color:f.foreground}}>Aa</span>
+     <small>{f.message}</small>
+   </li>)}</ul>}
+  {contrastFindings.length>40&&<p>{contrastFindings.length-40} further findings not displayed.</p>}
+ </details><details className="application-palette-editor" open={false}><summary>Application palette</summary>
   <p className="muted">Changes apply to the application screens, navigation and interactive HTML export, not the ScreenCraft editor.</p>
   <label>Colour palette<select aria-label="Application palette preset" disabled={!canEdit}
     value={doc.application_palette?.preset||'custom'}
