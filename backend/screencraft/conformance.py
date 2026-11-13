@@ -11,7 +11,7 @@ from pathlib import PurePosixPath
 import re
 
 CORE_TYPES = frozenset("text button input select checkbox table image container tabs modal".split())
-EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail x-time x-radio x-toggle x-file-upload x-search".split())
+EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail x-time x-radio x-toggle x-file-upload x-search x-menu x-breadcrumbs x-tree x-list x-pagination".split())
 KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram""".split())
 ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message toggle_container collapse_container expand_container".split())
 PERSISTENCE = frozenset(("seed-reset", "session-persisted", "project-shared"))
@@ -221,6 +221,17 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
             p = node.get("props") or {}
             if kind == "table" and p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
                 warnings.append(f"Screen {sid}: table {nid} refers to missing sample dataset {p['dataset_id']}.")
+            if kind == "x-menu":
+                items = p.get("items", [])
+                _require(isinstance(items, list) and len(items) <= 100 and all(isinstance(x, dict) for x in items),
+                         f"Invalid menu items on {nid}")
+                menu_ids = [_ident(x.get("id"), "menu item.id") for x in items]
+                _unique(menu_ids, f"menu item IDs on {nid}")
+                for item in items:
+                    if item.get("target_screen") and item["target_screen"] not in screen_ids:
+                        warnings.append(f"Screen {sid}: menu {nid} has a missing navigation target.")
+                    if item.get("parent_id") and item["parent_id"] not in menu_ids:
+                        warnings.append(f"Screen {sid}: menu {nid} has an invalid nesting parent.")
             if kind == "x-search" and p.get("target_table_id"):
                 target = idmap.get(p["target_table_id"])
                 if not target or target["type"] not in ("table", "x-editable-grid"):
