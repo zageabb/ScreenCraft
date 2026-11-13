@@ -6,8 +6,8 @@ export function resolveActionRow(action:Action, nodes:Node[], inputValues:Record
  for(const [column,id] of Object.entries(action.field_bindings||{})){
    if(!id)continue;
    const source=nodes.find(node=>node.id===id);
-   if(!source||!['input','select','checkbox','x-date','x-number','x-textarea'].includes(source.type))continue;
-   values[column]=inputValues[id]??(source.type==='checkbox'?false:source.type==='select'?(source.props?.options?.[0]??''):source.props?.value??'');
+   if(!source||!['input','select','checkbox','x-date','x-number','x-textarea','x-time','x-radio','x-toggle','x-file-upload','x-search'].includes(source.type))continue;
+   values[column]=inputValues[id]??(['checkbox','x-toggle'].includes(source.type)?false:source.type==='select'?(source.props?.options?.[0]??''):source.props?.value??'');
  }
  return values;
 }
