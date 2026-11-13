@@ -61,3 +61,16 @@ test('offline record-detail without a selection is an informative empty state',a
  await expect(detail.getByLabel('Detail Name')).toContainText('Zulu');
  await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveCount(0);
 });
+
+test('deleting an earlier grid row preserves detail selection of the remaining record',async({page})=>{
+ await page.setContent(html(),{waitUntil:'load'});
+ const table=page.locator('[data-node-id="customers-table"]');
+ const grid=page.locator('[data-node-id="customer-grid"]');
+ const detail=page.locator('[data-node-id="detail"]');
+ await table.locator('tbody tr').last().locator('td').nth(1).click();
+ await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveValue('Alpha');
+ await grid.getByRole('checkbox',{name:'Select row 1'}).check();
+ await grid.getByRole('button',{name:'Delete selected'}).click();
+ await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveValue('Alpha');
+ await expect(table.locator('tbody tr')).toHaveCount(1);
+});
