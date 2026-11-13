@@ -1,5 +1,7 @@
 import React,{useState,useRef,useEffect} from 'react';
 import './prototype-theme.css';
+import {paletteNames,palettePresets,tokenLabels,applyPalettePreset,setThemeToken} from './palettePresets';
+import type {PalettePreset} from './palettePresets';
 import{blank,palette,newNode,updateNode,insertNode,cloneDoc,catalogueEntries,catalogueInfo,isContainer,isSupported,removeNodeTree,reparentNode,reorderScreen,removeScreen,cloneSubtree,COLLAPSIBLE_TYPES,defaultSharedNavigation}from './model';import type{Document,Node,Screen,Action}from './model';
 import TableDataEditor from './TableDataEditor';
 import DataGrid from './DataGrid';
@@ -271,7 +273,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  '--sc-muted':tokens['text.secondary']||(dark?'#94A3B8':'#52647b'),
  '--sc-border':tokens['border.default']||(dark?'#334155':'#cbd5e1'),
  '--sc-accent':tokens['action.primary']||'#2563eb',
- '--sc-accent-text':dark?'#0B1220':'#fff',
+ '--sc-accent-text':tokens['action.on_primary']||(dark?'#0B1220':'#fff'),
  '--sc-field':tokens['surface.input']||tokens['surface.default']||(dark?'#1E293B':'#fff'),
  '--sc-field-text':tokens['text.primary']||(dark?'#F1F5F9':'#172033'),
  '--sc-selected':tokens['surface.selected']||(dark?'#263F66':'#dbeafe'),
@@ -284,7 +286,38 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  {mode==='preview'&&doc.shared_navigation?.enabled&&!screen.shared_navigation_hidden&&
   <SharedNavigation navigation={doc.shared_navigation} active={screen.id} validScreens={new Set(doc.screens.map(s=>s.id))} onNavigate={navigateShared}/>}
  <div className="workscroll"><div className="canvas sc-theme" style={canvasStyle} onDragOver={e=>e.preventDefault()} onDrop={e=>placeFromDrop(e)} onClick={()=>setSelected(null)}>{screen.nodes.filter(n=>!n.parent_id).map(n=>renderTree(n))}</div></div></div>{message&&<div className="notice" onClick={()=>setMessage('')}>{message} ×</div>}</div>
- <aside className="inspector"><details className="shared-nav-editor"><summary>Shared application navigation</summary>
+ <aside className="inspector"><details className="application-palette-editor" open={false}><summary>Application palette</summary>
+  <p className="muted">Changes apply to the application screens, navigation and interactive HTML export, not the ScreenCraft editor.</p>
+  <label>Colour palette<select aria-label="Application palette preset" disabled={!canEdit}
+    value={doc.application_palette?.preset||'custom'}
+    onChange={e=>{const preset=e.target.value as PalettePreset;if(preset!=='custom'){edit(applyPalettePreset(doc,preset));setTheme('light')}else{edit({...doc,application_palette:{preset:'custom'}})}}}>
+    {Object.entries(paletteNames).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+  </select></label>
+  <div className="palette-swatch-strip" aria-label="Current palette swatches">
+    {['surface.page','surface.nav','surface.default','text.primary','border.default','action.primary'].map(key=>
+      <span key={key} title={key+': '+(doc.themes[theme]?.tokens[key]||'unset')}
+        style={{background:doc.themes[theme]?.tokens[key]||'#ffffff'}}/>)}
+  </div>
+  <label>Edit colour variant<select aria-label="Palette variant" value={theme}
+    onChange={e=>setTheme(e.target.value)}>
+    {Object.keys(doc.themes).map(key=><option key={key} value={key}>{key}</option>)}
+  </select></label>
+  {Object.entries(tokenLabels).map(([key,label])=>{
+    const raw=doc.themes[theme]?.tokens[key]||((palettePresets.screencraft as Record<string,Record<string,string>>)[theme]?.[key])||'#FFFFFF';
+    const hex=/^#[0-9a-fA-F]{6}$/.test(raw)?raw:'#FFFFFF';
+    return <div className="palette-token-row" key={key}>
+      <label htmlFor={'token-'+key}>{label}</label>
+      <input id={'token-'+key} type="color" aria-label={label+' colour'}
+        value={hex} disabled={!canEdit}
+        onChange={e=>edit(setThemeToken(doc,theme,key,e.target.value))}/>
+      <input aria-label={label+' hex'} value={raw} disabled={!canEdit} maxLength={7}
+        onChange={e=>{if(/^#[0-9a-fA-F]{6}$/.test(e.target.value))edit(setThemeToken(doc,theme,key,e.target.value))}}/>
+    </div>;
+  })}
+  <button type="button" disabled={!canEdit||doc.default_theme===theme}
+    onClick={()=>edit({...doc,default_theme:theme})}>Use {theme} as exported default</button>
+  <p className="muted">Choosing a preset replaces standard theme colours but retains extension tokens and any intentional fixed object colours. Editing a colour switches this project to Custom.</p>
+ </details><details className="shared-nav-editor"><summary>Shared application navigation</summary>
   <p className="muted">One menu stored at application level, not copied into screen nodes.</p>
   <label>Enabled<input aria-label="Enable shared navigation" type="checkbox" disabled={!canEdit}
    checked={!!doc.shared_navigation?.enabled} onChange={e=>updateSharedNavigation({enabled:e.target.checked})}/></label>
