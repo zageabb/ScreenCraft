@@ -11,9 +11,14 @@ const sampleNodes:DiagramNode[]=[
 ];
 
 export function DiagramView({kind,props}:DiagramProps){
- const raw=kind==='x-schema-map'?props.tables:props.nodes;
+ const raw=kind==='x-schema-map'?(props.tables??props.diagram_nodes):(props.nodes??props.diagram_nodes);
  const nodes:DiagramNode[]=Array.isArray(raw)&&raw.length?raw:sampleNodes;
- const links:DiagramLink[]=Array.isArray(props.links)?props.links:[{source:'source',target:'target'}];
+ const rawLinks=props.links??props.connections;
+ const links:DiagramLink[]=Array.isArray(rawLinks)?rawLinks.map((item:any)=>({
+  ...item,source:item.source??item.from,target:item.target??item.to
+ })):[{source:'source',target:'target'}];
+ const diagramWidth=Math.max(560,...nodes.map((node,i)=>(Number.isFinite(Number(node.x))?Number(node.x):25+i*220)+170));
+ const diagramHeight=Math.max(290,...nodes.map(node=>(Number.isFinite(Number(node.y))?Number(node.y):45)+65+Math.min(node.fields?.length||0,6)*16));
  const [scale,setScale]=useState(1);
  const [selected,setSelected]=useState<string|null>(null);
  const lookup=new Map(nodes.map(node=>[node.id,node]));
@@ -26,7 +31,7 @@ export function DiagramView({kind,props}:DiagramProps){
    <button type="button" aria-label="Zoom in" disabled={scale>=2} onClick={()=>setScale(s=>Math.min(2,s+.25))}>+</button>
   </div>
   <div className="sc-diagram-scroller">
-   <svg viewBox="0 0 560 290" role="img" aria-label={kind==='x-schema-map'?'Schema relationship map':'Node link diagram'}>
+   <svg viewBox={`0 0 ${diagramWidth} ${diagramHeight}`} role="img" aria-label={kind==='x-schema-map'?'Schema relationship map':'Node link diagram'}>
     <g transform={`scale(${scale})`}>
      {links.map((link,i)=>{
       const from=lookup.get(link.source),to=lookup.get(link.target);
