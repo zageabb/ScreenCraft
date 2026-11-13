@@ -207,10 +207,10 @@ test('Phase 5 preview always has a route home after navigation',async({page})=>{
  await expect(page.locator('.prototype-button')).toContainText(['Open customers']);
  await expect(page.getByRole('button',{name:'Preview back'})).toBeDisabled();
 });
-test('Phase 5 unsupported extension stays editable and visibly warned',async({page})=>{
+test('Phase 9.6 formerly unsupported diagram is rendered and preserved',async({page})=>{
  await page.locator('.palette details').filter({has:page.locator('[data-catalogue-type="x-diagram"]')}).locator('summary').click();
  await page.locator('[data-catalogue-type="x-diagram"]').click();
- await expect(page.locator('.canvas .unsupported-object').first()).toContainText('Unsupported object: x-diagram');
+ await expect(page.locator('.canvas .sc-advanced-diagram').first()).toBeVisible();
  const saved=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
  await page.getByRole('button',{name:'Save',exact:true}).click();
  const savedDoc=(await saved).postDataJSON().document;
