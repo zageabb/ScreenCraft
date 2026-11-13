@@ -24,7 +24,7 @@ def sample():
         {"id":"intro","type":"text","parent_id":None,"props":{"text":"Hello"},"layout":{"width":300}},
         {"id":"next","type":"button","parent_id":None,"props":{"label":"Open"},
          "action":{"type":"navigate","target_screen":"details"}},
-        {"id":"future","type":"x-diagram","parent_id":None,
+        {"id":"future","type":"x-future-widget","parent_id":None,
          "props":{"future":{"key":"value"}}}
     ]
     doc["datasets"]=[{"id":"seed","columns":[{"id":"Name","type":"text"}],
@@ -56,7 +56,7 @@ def test_two_screen_fixture_preserves_future_fields_and_warns():
     assert restored==doc
     assert files==assets
     warnings=validate_contract(manifest,restored,files,verify_assets=True)
-    assert any("x-diagram" in w and "inactive placeholder" in w for w in warnings)
+    assert any("x-future-widget" in w and "inactive placeholder" in w for w in warnings)
 
 
 @pytest.mark.parametrize("change", [
