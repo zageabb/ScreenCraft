@@ -82,3 +82,7 @@ No runnable ScreenCraft application has been released.
 - Activated x-time, x-radio, x-toggle, x-file-upload (prototype filename only) and x-search with configurable Properties.
 - Extended mock-row bindings and required/time validation; search can filter a linked table/grid in Preview and Interactive HTML export.
 - Added generated offline HTML browser tests and conformance checks without production file uploads or database writes.
+
+## Phase 9.4 — Data objects
+- Activated x-tree, x-list and x-pagination using in-memory datasets, row selection, expandable hierarchy and linked table paging.
+- Added right-side object settings and matching standalone offline HTML behaviour with generated-file browser tests.

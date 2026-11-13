@@ -112,3 +112,13 @@
 .record-detail-field input{box-sizing:border-box;width:100%;min-width:0}
 .record-detail-configuration{margin-top:12px;padding-top:8px;border-top:1px solid #d5deea}
 .data-grid tbody tr{cursor:pointer}
+
+/* Phase 9.4 tree, list and pagination */
+.sc-data-extension{box-sizing:border-box;height:100%;overflow:auto;padding:7px;background:#fff;border:1px solid #cbd5e1}
+.sc-data-extension>strong{font-size:13px}
+.sc-record-list,.sc-tree-root,.sc-tree-root ul{list-style:none;margin:6px 0;padding-left:14px}
+.sc-data-extension li{margin:3px 0}
+.sc-tree-row{display:flex;gap:5px;align-items:center}
+.sc-data-extension button[aria-pressed="true"]{background:#d9eafb;font-weight:700}
+.sc-pagination{display:flex;justify-content:center;align-items:center;gap:8px;height:100%;flex-wrap:wrap}
+.data-extension-settings{margin-top:10px;border-top:1px solid #dbe4f0;padding-top:8px}

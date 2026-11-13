@@ -128,3 +128,9 @@ For mock editing, enable **Allow mock editing** in Properties. The selected fiel
 From the **Inputs** Object Gallery, add `x-time` for a browser-native HH:MM time selector, `x-radio` for mutually exclusive options, `x-toggle` for a Boolean on/off switch, `x-file-upload` for a filename-only file selector, or `x-search` for a search box. Use Properties to edit their labels, required settings, time minimum/maximum, radio choices (one per line) and accepted file extensions. For a search box, select **Filter table/grid** to link it to an existing table or editable grid on the same screen.
 
 Preview and the exported Interactive HTML support the same user interactions and the current values can be bound into an Add Row button. The file selector is intentionally **not a file uploader**: only the selected filename is used as sample data, and the browser's file content is not uploaded or saved in the `.scraft` file. Both modes operate safely without external network dependencies.
+
+## Phase 9.4 — Tree, List and Pagination
+
+Add `x-tree` or `x-list` from the Data object catalogue. Choose a **Dataset** and **Label column** in the right-hand Properties. For Tree, also choose the ID and parent columns. Parent fields should match another row's ID, with empty parent values identifying roots. Preview and Interactive HTML support expanding/collapsing branches and clicking rows to select them. Tree traversal has a safe depth limit for malformed circular mock data.
+
+To add pagination, first set a **Page size** greater than zero on a table/grid, then add `x-pagination` and configure **Linked table/grid**. Preview and standalone HTML can move between pages using Previous/Next. These are mock UI interactions and do not use remote database paging.
