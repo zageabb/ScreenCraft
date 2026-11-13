@@ -33,7 +33,7 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
 .canvas.sc-theme input::placeholder,.canvas.sc-theme textarea::placeholder,.sc-theme input::placeholder,.sc-theme textarea::placeholder{color:var(--sc-muted);opacity:1}
 .canvas.sc-theme input[type=checkbox],.canvas.sc-theme input[type=radio],.sc-theme input[type=checkbox],.sc-theme input[type=radio]{accent-color:var(--sc-accent)}
 .canvas.sc-theme button:not(.prototype-button),.sc-theme button{background:var(--sc-surface);color:var(--sc-text);border:1px solid var(--sc-border)}
-.canvas.sc-theme .prototype-button,.sc-theme .sc-node > button{background:var(--sc-accent);color:#fff}
+.canvas.sc-theme .prototype-button,.sc-theme .sc-node > button{background:var(--sc-accent);color:var(--sc-accent-text,#fff)}
 .canvas.sc-theme button:disabled,.sc-theme button:disabled{opacity:1;color:var(--sc-disabled);background:var(--sc-surface);cursor:not-allowed}
 .canvas.sc-theme button:focus-visible,.canvas.sc-theme input:focus-visible,.canvas.sc-theme select:focus-visible,.sc-theme button:focus-visible,.sc-theme input:focus-visible,.sc-theme select:focus-visible{outline:2px solid var(--sc-accent);outline-offset:2px}
 .canvas.sc-theme .selected-row,.sc-theme .selected-row,.sc-theme .sc-data-grid .selected-row{background:var(--sc-selected)}
@@ -41,6 +41,11 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
 .sc-theme .sc-shared-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
 .sc-theme .sc-shared-nav-row .is-active{background:var(--sc-selected);color:var(--sc-text)}
 .sc-theme .sc-record-field output{background:var(--sc-field);color:var(--sc-field-text)}
+
+/* Shared navigation lives outside the canvas but inherits the same project theme. */
+.shared-preview-layout.sc-theme .shared-app-nav{background:var(--sc-nav);color:var(--sc-text);border-color:var(--sc-border)}
+.shared-preview-layout.sc-theme .shared-app-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
+.shared-preview-layout.sc-theme .shared-app-nav button.is-active{background:var(--sc-selected);color:var(--sc-text)}
 </style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
@@ -58,6 +63,7 @@ function applyTheme(){
  '--sc-muted':t['text.secondary']||(dark?'#94A3B8':'#52647b'),
  '--sc-border':t['border.default']||(dark?'#334155':'#cbd5e1'),
  '--sc-accent':t['action.primary']||'#2563eb',
+ '--sc-accent-text':dark?'#0B1220':'#fff',
  '--sc-field':t['surface.input']||t['surface.default']||(dark?'#1E293B':'#fff'),
  '--sc-field-text':t['text.primary']||(dark?'#F1F5F9':'#172033'),
  '--sc-selected':t['surface.selected']||(dark?'#263F66':'#dbeafe'),
