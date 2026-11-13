@@ -180,7 +180,7 @@ def make_document(app: dict, assets: dict | None = None, manifest: dict | None =
 
 def starter_app():
     """New designs start with an empty editable Home screen, not an unrequested demo action."""
-    return {"application_id":"new-app","name":"New Application","start_screen":"home",
+    return {"application_id":"new-app","application_palette":{"preset":"screencraft"},"name":"New Application","start_screen":"home",
         "default_theme":"light","screen_order":["home"],"screens":[{"id":"home","name":"Home",
         "viewport":{"width":1280,"height":800},
         "layout":{"mode":"freeform","overflow_x":"auto","overflow_y":"auto"},
