@@ -519,3 +519,49 @@ test('Phase 9.2 new record detail auto-links to existing table and saves configu
  const detail=doc.screens[1].nodes.find((n:any)=>n.type==='x-record-detail');
  expect(detail.props).toMatchObject({dataset_id:'people',source_table_id:'table',editable:true});
 });
+
+test('Download .scraft saves unsaved editor changes before exporting the ZIP, without duplicate saves',async({page})=>{
+ const order:string[]=[];
+ await page.route('**/api/projects/p1',async route=>{
+  if(route.request().method()==='PUT'){
+   order.push('save');
+   const payload=route.request().postDataJSON();
+   expect(payload.document.screens[0].nodes.some((n:any)=>n.type==='x-time')).toBe(true);
+   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({revision:2})});
+  }else await route.continue();
+ });
+ await page.route('**/api/projects/p1/download',async route=>{
+  order.push('download');
+  await route.fulfill({status:200,headers:{
+   'Content-Type':'application/zip','Content-Disposition':'attachment; filename="application.scraft"'
+  },body:Buffer.from('ZIP test fixture')});
+ });
+ await page.locator('[data-catalogue-type="x-time"]').click();
+ const first=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Download .scraft'}).click();
+ expect((await first).suggestedFilename()).toBe('application.scraft');
+ expect(order).toEqual(['save','download']);
+ const second=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Download .scraft'}).click();
+ await second;
+ expect(order).toEqual(['save','download','download']);
+});
+
+test('Download .scraft never exports a stale revision when save fails',async({page})=>{
+ let downloads=0;
+ await page.route('**/api/projects/p1',async route=>{
+  if(route.request().method()==='PUT')
+   await route.fulfill({status:409,contentType:'application/json',
+    body:JSON.stringify({error:'Revision conflict'})});
+  else await route.continue();
+ });
+ await page.route('**/api/projects/p1/download',async route=>{
+  downloads++;
+  await route.fulfill({status:200,body:'should not download'});
+ });
+ await page.locator('[data-catalogue-type="x-time"]').click();
+ await page.getByRole('button',{name:'Download .scraft'}).click();
+ await expect(page.locator('.status')).toContainText('Download .scraft failed');
+ await expect(page.locator('.status')).toContainText('Revision conflict');
+ expect(downloads).toBe(0);
+});
