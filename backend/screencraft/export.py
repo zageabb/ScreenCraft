@@ -70,7 +70,7 @@ function validateBoundInputs(action,screen){
    if(p.min!==undefined&&p.min!==''&&number<Number(p.min))errors.push(label+' must be at least '+p.min);
    if(p.max!==undefined&&p.max!==''&&number>Number(p.max))errors.push(label+' cannot exceed '+p.max);
   }
-  if(['x-date','x-time'].includes(source.type)&&/^\\d{4}-\\d\\d-\\d\\d$/.test(text)){
+  if((source.type==='x-date'&&/^\\d{4}-\\d\\d-\\d\\d$/.test(text))||(source.type==='x-time'&&/^\\d\\d:\\d\\d$/.test(text))){
    if(p.min&&text<String(p.min))errors.push(label+' cannot be before '+p.min);
    if(p.max&&text>String(p.max))errors.push(label+' cannot be after '+p.max);
   }
