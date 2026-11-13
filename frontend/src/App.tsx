@@ -26,7 +26,7 @@ async function request(path:string,options:RequestInit={}) {
  if(!r.ok)throw new Error('API '+(options.method||'GET')+' '+url+' failed ('+r.status+'): '+(body?.error||'Request failed'));
  return body;
 }
-function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void}) {
+function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord,onRowsDeleted}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void;onRowsDeleted?:(datasetId:string,indices:number[])=>void}) {
  const drag=useRef<{x:number;y:number;startX:number;startY:number}|null>(null);
  const resize=useRef<{x:number;y:number;w:number;h:number}|null>(null);
  const l=node.layout||{},p=node.props||{};const flowChild=!!node.parent_id&&['flow','flex','grid'].includes(parentMode||'');const style:React.CSSProperties={position:flowChild?'relative':'absolute',left:flowChild?undefined:l.x||0,top:flowChild?undefined:l.y||0,width:typeof l.width==='number'?l.width:200,height:mode==='preview'&&COLLAPSIBLE_TYPES.has(node.type)&&containerOpen===false?40:(typeof l.height==='number'?l.height:44),overflowX:l.overflow_x||'visible',overflowY:l.overflow_y||'visible',outline:selected&&mode==='design'?'2px solid #2878e0':'none',boxSizing:'border-box'};
@@ -52,7 +52,7 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
  child=dataset?<DataGrid key={node.id+'-'+dataset.id} dataset={dataset} rows={rows}
   options={{searchable:!!p.searchable,sortable:!!p.sortable,selectable:!!p.selectable,filter_column:p.filter_column,filter_value:p.filter_value,page_size:Number(p.page_size)||0}}
   editable={node.type==='x-editable-grid'} canMutate={mode==='preview'&&(dataset.persistence||'seed-reset')==='seed-reset'}
-  onRowsChange={updated=>onRowsChange(dataset.id,updated)} activeIndex={selectedRecordIndex} onSelectRow={onSelectRecord}/>
+  onRowsChange={updated=>onRowsChange(dataset.id,updated)} activeIndex={selectedRecordIndex} onSelectRow={onSelectRecord} onRowsDeleted={indices=>onRowsDeleted?.(dataset.id,indices)}/>
   :<div className="table-empty">No dataset assigned. Select table to create sample data.</div>;
  break}
  case 'x-record-detail':{
@@ -204,6 +204,15 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
        ?(n.props.source_table_id?recordSelection[n.props.source_table_id]??null:recordSelection[n.props.dataset_id||'']??null)
        :(recordSelection[n.id]??null)}
      onSelectRecord={index=>setRecordSelection(v=>({...v,[n.id]:index,[n.props.dataset_id||'']:index}))}
+     onRowsDeleted={(datasetId,indices)=>{
+       const removed=new Set(indices);
+       const linked=screen.nodes.filter(x=>['table','x-editable-grid'].includes(x.type)&&x.props.dataset_id===datasetId).map(x=>x.id);
+       const keys=new Set([datasetId,...linked]);
+       setRecordSelection(state=>Object.fromEntries(Object.entries(state).map(([key,value])=>{
+         if(!keys.has(key)||value==null)return [key,value];
+         return [key,removed.has(value)?null:value-indices.filter(index=>index<value).length];
+       })));
+     }}
      sectionIndices={screen.nodes.filter(child=>child.parent_id===n.id).map(child=>Number(child.props.tab_index)||0)}>
        {screen.nodes.filter(child=>child.parent_id===n.id).map(child=>renderTree(child,path))}
      </CanvasNode>
