@@ -63,7 +63,7 @@ function applyTheme(){
  '--sc-muted':t['text.secondary']||(dark?'#94A3B8':'#52647b'),
  '--sc-border':t['border.default']||(dark?'#334155':'#cbd5e1'),
  '--sc-accent':t['action.primary']||'#2563eb',
- '--sc-accent-text':dark?'#0B1220':'#fff',
+ '--sc-accent-text':t['action.on_primary']||(dark?'#0B1220':'#fff'),
  '--sc-field':t['surface.input']||t['surface.default']||(dark?'#1E293B':'#fff'),
  '--sc-field-text':t['text.primary']||(dark?'#F1F5F9':'#172033'),
  '--sc-selected':t['surface.selected']||(dark?'#263F66':'#dbeafe'),
