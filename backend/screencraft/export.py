@@ -639,6 +639,11 @@ function renderSharedNav(){
  return panel;
 }
 function render(){root.replaceChildren();menu.replaceChildren();applyTheme();
+ if(Object.keys(app.themes||{}).length>1){
+  const label=el('label','Theme '),picker=el('select');picker.setAttribute('aria-label','Application theme');
+  for(const name of Object.keys(app.themes||{})){const option=el('option',name);option.value=name;option.selected=name===theme;picker.append(option)}
+  picker.onchange=()=>{theme=picker.value;render()};label.append(picker);menu.append(label);
+ }
  const shared=app.shared_navigation?.enabled;
  if(!shared)screenList.forEach(s=>{let b=el('button',s.name);b.disabled=s.id===active;b.onclick=()=>action({type:'navigate',target_screen:s.id});menu.append(b)});
  else {
