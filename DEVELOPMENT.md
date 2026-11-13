@@ -291,3 +291,8 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 **Validation:** `x-record-detail` is supported and its source/dataset references generate nonblocking compatibility diagnostics when broken. Browser tests exercise the actual Python-generated offline HTML, including sorting before selection, changes reflected in table cells, read-only shared datasets and empty selections. Editor tests exercise inspector configuration and Preview bindings. All five CI checks must pass prior to merge.
 
 **Limitations:** This is prototype in-memory selection/editing, not persistence to PostgreSQL or cross-screen selection. Complex type-specific detail editors, record keys, and shared-record conflict handling remain future work. FigmaBridge continues separately.
+
+### Phase 9.2 merge and acceptance (2026-11-13)
+- **Merged:** PR #20 https://github.com/zageabb/ScreenCraft/pull/20; squash commit `3ba951589e2e71e04df5e3dac0af2e04f9be556f`.
+- **All five CI jobs green:** Python, React, browser (including actual offline HTML), Docker and docs on head `e0717aaebfaafb3f59fe059bce7f0ef333ca380c` in https://github.com/zageabb/ScreenCraft/actions/runs/43412322820.
+- **Manual acceptance:** Pull/rebuild `main` on Ubuntu, open the existing x-record-detail in your design, select a linked dataset and source table/grid in Properties, then Preview a selected row and try editable mode. Verify Interactive HTML behaves the same. No database migration or UDA/Caddy changes.
