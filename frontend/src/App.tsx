@@ -310,8 +310,8 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
       <input id={'token-'+key} type="color" aria-label={label+' colour'}
         value={hex} disabled={!canEdit}
         onChange={e=>edit(setThemeToken(doc,theme,key,e.target.value))}/>
-      <input aria-label={label+' hex'} value={raw} disabled={!canEdit} maxLength={7}
-        onChange={e=>{if(/^#[0-9a-fA-F]{6}$/.test(e.target.value))edit(setThemeToken(doc,theme,key,e.target.value))}}/>
+      <input aria-label={label+' hex'} key={theme+key+raw} defaultValue={raw} disabled={!canEdit} maxLength={7}
+        onBlur={e=>{if(/^#[0-9a-fA-F]{6}$/.test(e.target.value))edit(setThemeToken(doc,theme,key,e.target.value));else e.target.value=raw}}/>
     </div>;
   })}
   <button type="button" disabled={!canEdit||doc.default_theme===theme}
