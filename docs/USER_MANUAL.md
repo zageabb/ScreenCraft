@@ -158,3 +158,7 @@ Click **Download .scraft** in the application header to download a portable ZIP 
 **Pending edits:** The button now saves unsaved editor changes first, then downloads the saved ZIP. If saving fails (for example, another user saved a newer revision), no older archive is downloaded and the error appears on screen. If nothing changed, the download does not increment the project revision. Users with viewer access can download the already-saved design.
 
 **Not included:** transient Preview session rows or input values, project access rights/users, live database contents, and the contents of local files chosen in x-file-upload/x-file-preview. Those controls deliberately avoid persisting local files. Only image assets explicitly packaged in the application are stored inside .scraft. Use Import .scraft and its validation preflight to restore a design.
+
+### Imported schema maps from older design converters
+
+`x-schema-map` and `x-diagram` accept the current `tables`/`nodes` + `links`/`source`/`target` properties, and older `diagram_nodes` + `connections`/`from`/`to` properties. The Properties panel displays the imported nodes and relationships and preserves the legacy source fields on export; editing can add canonical fields alongside the originals. The relationship map displays all original coordinates and fields after updating ScreenCraft. An **Unsupported object** placeholder on your live server indicates the frontend running there is older than the implementation on GitHub main; redeploy and hard-refresh the browser first.
