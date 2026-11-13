@@ -363,3 +363,11 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Kept project palette distinct from editor chrome; applied semantic tokens to canvas and shared navigation. Interactive standalone export allows light/dark theme switching and resolves `action.on_primary`.
 - `.scraft` v1 extension described in central `Application-Standard` draft. Old documents without palette metadata keep their imported theme colours.
 - Added ZIP round-trip and interactive export regression assertions. Still require live UI/visual acceptance, full frontend build/tests and CI status before merge.
+
+## Phase 10.1 — Visual quality and imported-theme audit (2026-11-13)
+
+- Added a non-destructive contrast audit in the editor inspector for text nodes against page and explicit ancestor backgrounds.
+- Calculates WCAG relative luminance and flags combinations under 4.5:1 per active theme. Preserves all .scraft node styles and unknown tokens; no format change.
+- Added a synthetic browser regression based on the user's TAIJU fixed navy navigation background and theme-linked text, without committing the private project file.
+- Scope limitations: non-text objects, alpha compositing, images, native controls and visual overlaps still require manual review. Editor/export parity from PR #27 remains in force.
+- Verification pending CI; manual comparison to the seven-screen example and live Ubuntu deployment have not been accepted.
