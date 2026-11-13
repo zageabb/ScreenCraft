@@ -5,6 +5,7 @@ import DataGrid from './DataGrid';
 import {DataExtension,DataPagination} from './DataExtensions';
 import RecordDetail from './RecordDetail';
 import SharedNavigation from './SharedNavigation';
+import {MenuObject,BreadcrumbsObject} from './NavigationObjects';
 import {DataChart,MetricCard} from './Metrics';
 import ActionRowEditor from './ActionRowEditor';
 import {resolveActionRow} from './actionBindings';
@@ -27,7 +28,7 @@ async function request(path:string,options:RequestInit={}) {
  if(!r.ok)throw new Error('API '+(options.method||'GET')+' '+url+' failed ('+r.status+'): '+(body?.error||'Request failed'));
  return body;
 }
-function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord,onRowsDeleted,externalSearch,tablePage,onPageChange,linkedPages}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void;onRowsDeleted?:(datasetId:string,indices:number[])=>void;externalSearch?:string;tablePage?:number;onPageChange?:(page:number)=>void;linkedPages?:{page:number;total:number;onChange:(page:number)=>void}}) {
+function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputChange,inputValues,onRowsChange,doc,rows,projectId,children,onDropChild,activeModal,parentMode,sectionIndices,containerOpen,onContainerToggle,selectedRecordIndex,onSelectRecord,onRowsDeleted,externalSearch,tablePage,onPageChange,linkedPages,currentScreenId,screenHistory}: {node:Node;mode:string;selected:boolean;onPick:()=>void;onMove:(x:number,y:number)=>void;onResize:(w:number,h:number)=>void;onAction:(a:Action|undefined)=>void;onInputChange:(id:string,value:unknown)=>void;inputValues:Record<string,unknown>;onRowsChange:(datasetId:string,rows:Record<string,unknown>[])=>void;doc:Document;rows:Record<string,any>[];projectId:string;children?:React.ReactNode;onDropChild?:(e:React.DragEvent)=>void;activeModal?:string|null;parentMode?:string;sectionIndices?:number[];containerOpen?:boolean;onContainerToggle?:()=>void;selectedRecordIndex?:number|null;onSelectRecord?:(index:number)=>void;onRowsDeleted?:(datasetId:string,indices:number[])=>void;externalSearch?:string;tablePage?:number;onPageChange?:(page:number)=>void;linkedPages?:{page:number;total:number;onChange:(page:number)=>void};currentScreenId?:string;screenHistory?:string[]}) {
  const drag=useRef<{x:number;y:number;startX:number;startY:number}|null>(null);
  const resize=useRef<{x:number;y:number;w:number;h:number}|null>(null);
  const l=node.layout||{},p=node.props||{};const flowChild=!!node.parent_id&&['flow','flex','grid'].includes(parentMode||'');const style:React.CSSProperties={position:flowChild?'relative':'absolute',left:flowChild?undefined:l.x||0,top:flowChild?undefined:l.y||0,width:typeof l.width==='number'?l.width:200,height:mode==='preview'&&COLLAPSIBLE_TYPES.has(node.type)&&containerOpen===false?40:(typeof l.height==='number'?l.height:44),overflowX:l.overflow_x||'visible',overflowY:l.overflow_y||'visible',outline:selected&&mode==='design'?'2px solid #2878e0':'none',boxSizing:'border-box'};
@@ -64,6 +65,10 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
  case 'x-pagination':child=linkedPages
   ?<DataPagination page={linkedPages.page} totalPages={linkedPages.total} onChange={page=>mode==='preview'&&linkedPages.onChange(page)} label={p.label||'Pages'}/>
   :<div className="table-empty">Link this pagination control to a table with a page size.</div>;break;
+ case 'x-menu':child=<MenuObject doc={doc} props={p} mode={mode} currentScreenId={currentScreenId||doc.start_screen}
+  history={screenHistory||[]} onNavigate={id=>onAction({type:'navigate',target_screen:id})}>{children}</MenuObject>;break;
+ case 'x-breadcrumbs':child=<BreadcrumbsObject doc={doc} props={p} mode={mode} currentScreenId={currentScreenId||doc.start_screen}
+  history={screenHistory||[]} onNavigate={id=>onAction({type:'navigate',target_screen:id})}>{children}</BreadcrumbsObject>;break;
  case 'x-record-detail':{
  const dataset=doc.datasets.find(d=>d.id===p.dataset_id);
  child=<RecordDetail dataset={dataset} rows={rows} selectedIndex={selectedRecordIndex??null}
@@ -212,6 +217,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
      onMove={(x,y)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,x,y}}))) }}
      onResize={(width,height)=>{if(canEdit)setDoc(updateNode(doc,screen.id,n.id,v=>({...v,layout:{...v.layout,width,height}}))) }}
      onAction={act} onInputChange={(id,value)=>setInputValues(v=>({...v,[id]:value}))} inputValues={inputValues} onRowsChange={(id,updated)=>setRows(v=>({...v,[id]:updated}))} projectId={projectId} doc={doc} rows={dataRows(n.props.dataset_id||'')} activeModal={modal} parentMode={screen.nodes.find(v=>v.id===n.parent_id)?.layout.mode}
+     currentScreenId={screen.id} screenHistory={screensBack}
      onDropChild={e=>placeFromDrop(e,n.id)}
      containerOpen={containerStates[n.id]??(n.props.expanded!==false)}
      onContainerToggle={()=>toggleContainer(n.id)}
@@ -325,7 +331,26 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  <label>Enable collapsible header<input aria-label="Enable collapsible header" type="checkbox" disabled={!canEdit} checked={!!node.props.collapsible} onChange={e=>property('collapsible',e.target.checked)}/></label>
  <label>Initially expanded<input aria-label="Initially expanded" type="checkbox" disabled={!canEdit} checked={node.props.expanded!==false} onChange={e=>property('expanded',e.target.checked)}/></label>
  </section>}
- <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{node&&['x-tree','x-list','x-pagination'].includes(node.type)&&<section className="data-extension-settings">
+ <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{node&&['x-menu','x-breadcrumbs'].includes(node.type)&&<section className="navigation-object-settings">
+ <h3>Navigation settings</h3>
+ {node.type==='x-menu'&&<>
+  <label>Use shared menu items<input aria-label="Use shared menu items" type="checkbox" disabled={!canEdit} checked={node.props.use_shared!==false}
+    onChange={e=>property('use_shared',e.target.checked)}/></label>
+  {node.props.use_shared===false&&<>
+   {(node.props.items||[]).map((item:any,i:number)=><div className="menu-item-property" key={item.id||i}>
+    <label>Menu label {i+1}<input aria-label={'Menu item label '+i} disabled={!canEdit} value={item.label||''} onChange={e=>property('items',(node.props.items||[]).map((v:any,j:number)=>j===i?{...v,label:e.target.value}:v))}/></label>
+    <label>Target screen {i+1}<select aria-label={'Menu item target '+i} disabled={!canEdit} value={item.target_screen||''}
+     onChange={e=>property('items',(node.props.items||[]).map((v:any,j:number)=>j===i?{...v,target_screen:e.target.value}:v))}>
+     <option value="">Group heading</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+    </select></label>
+    <button disabled={!canEdit} onClick={()=>property('items',(node.props.items||[]).filter((_:any,j:number)=>j!==i))}>Remove item</button>
+   </div>)}
+   <button disabled={!canEdit} onClick={()=>property('items',[...(node.props.items||[]),{id:'item-'+crypto.randomUUID().slice(0,8),label:'New link',target_screen:screen.id}])}>Add menu link</button>
+  </>}
+ </>}
+ <p className="muted">Menu uses stable screen IDs. Breadcrumbs reflect Preview navigation history.</p>
+ </section>}
+{node&&['x-tree','x-list','x-pagination'].includes(node.type)&&<section className="data-extension-settings">
  <h3>Data object settings</h3>
  {node.type!=='x-pagination'?<>
   <label>Dataset<select aria-label="Extension dataset" disabled={!canEdit} value={node.props.dataset_id||''} onChange={e=>property('dataset_id',e.target.value)}><option value="">Select dataset</option>{doc.datasets.map(d=><option value={d.id} key={d.id}>{d.id}</option>)}</select></label>
