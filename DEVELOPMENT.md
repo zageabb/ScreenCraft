@@ -312,3 +312,17 @@ Implemented `x-tree`, `x-list` and `x-pagination`. Tree supports dataset-backed 
 ## Phase 9.5 — Navigation catalogue objects (2026-11-13)
 
 Implemented `x-menu` and `x-breadcrumbs` on the canonical catalogue. A local menu can inherit the app-level shared menu from Phase 9.1, or define its own ordered items with screen IDs and optional nested groups; it highlights the active screen and navigates in Preview. Breadcrumbs render screen history and support returning to previous screens. Properties support inheriting the shared definition or editing local menu labels/targets. Both are supported in standalone Interactive HTML with real browser tests and no online dependencies. SCRAFT validator checks menu item IDs and warns about broken links. These are prototype navigation elements, not permission checks.
+
+## Phase 9.6 — Advanced objects and full catalogue coverage (2026-11-13)
+
+Activated the four remaining canonical objects: `x-schema-map`, `x-timeline`, `x-file-preview` and `x-diagram`. As of this phase, all **39/39 objects** from the pinned Application-Standard 1.0 catalogue are recognised and rendered rather than defaulting to unsupported placeholders. This is supported **prototype functionality**, not a claim of production-ready capabilities in every object.
+
+**Diagram and schema map:** SVG-based interactive node/table boxes with orthogonal connectors, node selection by mouse or keyboard, zoom controls and right-side Properties editing for node IDs, labels, X/Y positions, table fields and source/target links. Schema-map tables and relationships are stored as ordinary optional .scraft object props, not a duplicate schema standard.
+
+**Timeline:** Select a sample dataset, date column and title column; rows sort chronologically by ISO-compatible date string. Click entries for in-memory dataset row selection. No production calendar integration.
+
+**File preview:** Choose local image, PDF or plain-text files (including Markdown/JSON/CSV) in Preview or exported offline HTML; browser rendering remains local. Text is limited to 128 KB; files over 5 MB are not previewed. A packaged image asset can also be selected. No arbitrary network fetch, upload, persistence of local selected-file bytes, or remote URL loading is introduced. Browser PDF rendering may vary across platforms.
+
+**Parity/acceptance:** React Preview and the standalone one-file Interactive HTML exporter implement matching node/link structures, zoom, timeline sorting and local previews. Automated Playwright checks open genuine Python-generated export HTML; SCRAFT validator limits diagram node/link counts and warns on missing links, timeline datasets or packaged image references. The previous regression test expecting x-diagram to be unsupported has been replaced with a supported-render assertion.
+
+The entire Phase 9.3–9.6 development follows Application-Standard's object IDs and ScreenCraft AGENTS.md export-parity rule. Remaining tasks for Phase 10 include production hardening, mobile/accessibility acceptance, and richer advanced-object controls; these do not reduce canonical catalogue coverage.
