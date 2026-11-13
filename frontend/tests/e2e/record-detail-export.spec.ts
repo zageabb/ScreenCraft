@@ -74,3 +74,11 @@ test('deleting an earlier grid row preserves detail selection of the remaining r
  await expect(detail.getByRole('textbox',{name:'Detail Name'})).toHaveValue('Alpha');
  await expect(table.locator('tbody tr')).toHaveCount(1);
 });
+
+test('keyboard selection with Enter populates the linked record detail',async({page})=>{
+ await page.setContent(html(false),{waitUntil:'load'});
+ const table=page.locator('[data-node-id="customers-table"]');
+ await table.locator('tbody tr').last().focus();
+ await page.keyboard.press('Enter');
+ await expect(page.locator('[data-node-id="detail"]').getByLabel('Detail Name')).toContainText('Alpha');
+});
