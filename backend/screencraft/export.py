@@ -182,7 +182,10 @@ function tableView(n){
   v.shown.forEach(({row,index})=>{
    const tr=el('tr');tr.dataset.rowIndex=index;
    if(state.selected.has(index)||selectedRecords[n.id]===index)tr.className='selected-row';
-   tr.onclick=event=>{if(event.target.closest('input,button'))return;selectedRecords[n.id]=index;selectedRecords[p.dataset_id]=index;render()};
+   const pick=()=>{selectedRecords[n.id]=index;selectedRecords[p.dataset_id]=index;render()};
+   tr.tabIndex=0;tr.setAttribute('aria-selected',String(selectedRecords[n.id]===index));
+   tr.onclick=event=>{if(event.target.closest('input,button'))return;pick()};
+   tr.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();pick()}};
    if(p.selectable||editable){const td=el('td'),check=el('input');check.type='checkbox';check.setAttribute('aria-label','Select row '+(index+1));check.checked=state.selected.has(index);check.onchange=()=>{
     if(check.checked)state.selected.add(index);else state.selected.delete(index);
     selectedRecords[n.id]=index;selectedRecords[p.dataset_id]=index;render();
