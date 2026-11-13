@@ -95,3 +95,8 @@ No runnable ScreenCraft application has been released.
 - Activated x-schema-map, x-timeline, x-file-preview and x-diagram with editable Properties, prototype-safe SVG/data/file interactions and standalone HTML export parity.
 - Added conformance checks, actual generated HTML browser tests and a supported-diagram regression assertion.
 - All 39 canonical catalogue objects are now recognised and have an implemented renderer; production-grade integrations and advanced interactions remain future work.
+
+## .scraft download completeness audit (2026-11-13)
+- Fixed Download .scraft exporting the previous saved ZIP when unsaved design edits existed: the editor now saves changed content first, blocks stale downloads on conflicts, and skips redundant saves.
+- Synchronized supported-object validation with the canonical catalogue so known objects are not falsely labelled inactive during import.
+- Added browser tests for save-before-download and failure handling, plus a full API archive/restore regression covering 39 objects, nested properties, screens/order, navigation, datasets, components and packaged image bytes.
