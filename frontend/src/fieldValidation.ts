@@ -37,7 +37,7 @@ export function validateBoundInputs(action:Action,nodes:Node[],inputValues:Recor
    if(props.min!==undefined&&props.min!==''&&number<Number(props.min))errors.push(label+' must be at least '+props.min);
    if(props.max!==undefined&&props.max!==''&&number>Number(props.max))errors.push(label+' cannot exceed '+props.max);
   }
-  if(['x-date','x-time'].includes(source.type)&&/^\d{4}-\d\d-\d\d$/.test(string)){
+  if((source.type==='x-date'&&/^\d{4}-\d\d-\d\d$/.test(string))||(source.type==='x-time'&&/^\d\d:\d\d$/.test(string))){
    if(props.min&&string<String(props.min))errors.push(label+' cannot be before '+props.min);
    if(props.max&&string>String(props.max))errors.push(label+' cannot be after '+props.max);
   }
