@@ -11,7 +11,7 @@ from pathlib import PurePosixPath
 import re
 
 CORE_TYPES = frozenset("text button input select checkbox table image container tabs modal".split())
-EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail".split())
+EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail x-time x-radio x-toggle x-file-upload x-search".split())
 KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram""".split())
 ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message toggle_container collapse_container expand_container".split())
 PERSISTENCE = frozenset(("seed-reset", "session-persisted", "project-shared"))
@@ -221,6 +221,18 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
             p = node.get("props") or {}
             if kind == "table" and p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
                 warnings.append(f"Screen {sid}: table {nid} refers to missing sample dataset {p['dataset_id']}.")
+            if kind == "x-search" and p.get("target_table_id"):
+                target = idmap.get(p["target_table_id"])
+                if not target or target["type"] not in ("table", "x-editable-grid"):
+                    warnings.append(f"Screen {sid}: search {nid} targets missing table/grid.")
+            if kind in ("x-radio", "select"):
+                options = p.get("options", [])
+                _require(isinstance(options, list) and len(options) <= 100,
+                         f"Invalid options on {nid}")
+            if kind == "x-file-upload" and p.get("accept"):
+                accept = p["accept"]
+                _require(isinstance(accept, str) and len(accept) <= 300,
+                         f"Invalid accept filter on {nid}")
             if kind == "x-record-detail":
                 source = p.get("source_table_id")
                 if source:
