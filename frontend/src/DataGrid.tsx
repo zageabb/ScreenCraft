@@ -8,6 +8,7 @@ export type DataTableOptions={
 type Props={
  dataset:Dataset; rows:Record<string,unknown>[]; options:DataTableOptions;
  editable:boolean; canMutate:boolean; onRowsChange:(rows:Record<string,unknown>[])=>void;
+ activeIndex?:number|null; onSelectRow?:(index:number)=>void;
 };
 
 function display(value:unknown){return value===null||value===undefined?'':String(value)}
@@ -19,7 +20,7 @@ function compare(a:unknown,b:unknown){
 }
 
 /** Preview-only data grid; source indexes remain stable across search, sort, and paging. */
-export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange}:Props){
+export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange,activeIndex,onSelectRow}:Props){
  const [search,setSearch]=useState('');
  const [sort,setSort]=useState<{key:string;direction:1|-1}|null>(null);
  const [selected,setSelected]=useState<number[]>([]);
@@ -54,6 +55,7 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
   if(!canMutate||!selectedIndices.length)return;
   const ids=new Set(selectedIndices);
   onRowsChange(rows.filter((_,i)=>!ids.has(i)));
+  if(activeIndex!=null&&ids.has(activeIndex))onSelectRow?.(-1);
   setSelected([]);
  };
  return <div className="data-grid" data-grid-kind={editable?'editable':'table'}>
@@ -70,8 +72,8 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
     {columns.map(column=><th key={column.id}>{options.sortable?
      <button type="button" aria-label={'Sort '+column.id} onClick={()=>{setSort(v=>v?.key===column.id?{key:column.id,direction:v.direction===1?-1:1}:{key:column.id,direction:1});setPage(0)}}>{column.id}{sort?.key===column.id?(sort.direction===1?' ▲':' ▼'):''}</button>
      :column.id}</th>)}</tr></thead>
-   <tbody>{visible.map(({row,index})=><tr key={index} data-row-index={index} className={selectedIndices.includes(index)?'selected-row':''}>
-    {(options.selectable||editable)&&<td><input type="checkbox" aria-label={'Select row '+(index+1)} checked={selectedIndices.includes(index)} onChange={()=>toggle(index)}/></td>}
+   <tbody>{visible.map(({row,index})=><tr key={index} data-row-index={index} className={activeIndex===index||selectedIndices.includes(index)?'selected-row':''} onClick={()=>onSelectRow?.(index)}>
+    {(options.selectable||editable)&&<td><input type="checkbox" aria-label={'Select row '+(index+1)} checked={selectedIndices.includes(index)} onChange={()=>{toggle(index);onSelectRow?.(index)}}/></td>}
     {columns.map(column=><td key={column.id}>{editable?
       <input aria-label={'Edit row '+(index+1)+' '+column.id} value={display(row[column.id])}
        disabled={!canMutate} onChange={e=>update(index,column.id,e.target.value)}/>
