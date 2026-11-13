@@ -150,3 +150,11 @@ The **x-menu** component displays an application menu within any screen. Enable 
 **x-file-preview:** Preview an image, text, Markdown, JSON, CSV or PDF chosen directly in your browser, or select a packaged image asset in Properties. Local files are not uploaded, embedded into the design or saved to the server; only explicitly packaged assets travel in .scraft. Text reads are capped at 128 KB and previews at 5 MB. Browser PDF support varies. This component remains local-only in exported Interactive HTML, too.
 
 All 39 object names in the central catalogue are now supported by a prototype renderer. Some advanced interactions are intentionally simplified and not production integrations.
+
+## Download .scraft — complete design backup
+
+Click **Download .scraft** in the application header to download a portable ZIP containing `manifest.json`, `application.json` and packaged image assets. The complete saved design includes screens and screen order, object definitions and settings, nested relationships, actions, mock dataset seeds, shared navigation, themes, reusable components and compatible optional .scraft properties.
+
+**Pending edits:** The button now saves unsaved editor changes first, then downloads the saved ZIP. If saving fails (for example, another user saved a newer revision), no older archive is downloaded and the error appears on screen. If nothing changed, the download does not increment the project revision. Users with viewer access can download the already-saved design.
+
+**Not included:** transient Preview session rows or input values, project access rights/users, live database contents, and the contents of local files chosen in x-file-upload/x-file-preview. Those controls deliberately avoid persisting local files. Only image assets explicitly packaged in the application are stored inside .scraft. Use Import .scraft and its validation preflight to restore a design.
