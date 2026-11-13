@@ -167,3 +167,11 @@ Nodes can use semantic `style.color_token`, `style.background_color_token` and `
 
 The document format and existing files remain unchanged. Review light and dark views and verify interactive HTML output after editing styles or adding components. Design-mode input fields are disabled by design; Preview is for testing interactions.
 
+
+## Application palettes (light and dark)
+
+Open **Application palette** in the right-hand inspector. Choose **ScreenCraft — Blue / Grey** or **Corporate — Black / Grey / Red**. The selected preset updates the application's light and dark semantic colours, including navigation, cards, tables, inputs and primary buttons, without changing the ScreenCraft editor chrome or rearranging objects.
+
+Use the **Theme** selector to preview light/dark. Expand **Application palette**, choose the variant and change any colour with the colour input or a complete `#RRGGBB` hex value. Editing a token marks the palette as **Custom / imported**. Use **Use light/dark as exported default** to choose which variant opens when the prototype HTML is launched. The standalone HTML has its own theme selector whenever multiple theme variants are present.
+
+Applying a named preset changes the semantic theme token values in the document; it preserves unknown extension tokens. Existing literal object colour overrides remain fixed. To retain an imported document unchanged, leave the selection at **Custom / imported**. Save the project or export `.scraft` to persist palette changes.
