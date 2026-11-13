@@ -223,8 +223,8 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
                 warnings.append(f"Screen {sid}: table {nid} refers to missing sample dataset {p['dataset_id']}.")
             if kind in ("x-diagram", "x-schema-map"):
                 key = "tables" if kind == "x-schema-map" else "nodes"
-                entries = p.get(key, [])
-                links = p.get("links", [])
+                entries = p.get(key, p.get("diagram_nodes", []))
+                links = p.get("links", p.get("connections", []))
                 _require(isinstance(entries, list) and len(entries) <= 100 and
                          all(isinstance(x, dict) for x in entries),
                          f"Invalid diagram node collection on {nid}")
@@ -234,7 +234,7 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
                 ids = [_ident(x.get("id"), f"diagram {nid} node") for x in entries]
                 _unique(ids, f"diagram IDs on {nid}")
                 for link in links:
-                    if link.get("source") not in ids or link.get("target") not in ids:
+                    if link.get("source", link.get("from")) not in ids or link.get("target", link.get("to")) not in ids:
                         warnings.append(f"Screen {sid}: diagram {nid} references an unknown node.")
             if kind == "x-timeline" and p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
                 warnings.append(f"Screen {sid}: timeline {nid} has no matching dataset.")
