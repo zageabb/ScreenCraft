@@ -6,6 +6,7 @@ import {DataExtension,DataPagination} from './DataExtensions';
 import RecordDetail from './RecordDetail';
 import SharedNavigation from './SharedNavigation';
 import {MenuObject,BreadcrumbsObject} from './NavigationObjects';
+import {DiagramView,TimelineView,FilePreviewView} from './AdvancedObjects';
 import {DataChart,MetricCard} from './Metrics';
 import ActionRowEditor from './ActionRowEditor';
 import {resolveActionRow} from './actionBindings';
@@ -69,6 +70,11 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
   history={screenHistory||[]} onNavigate={id=>onAction({type:'navigate',target_screen:id})}>{children}</MenuObject>;break;
  case 'x-breadcrumbs':child=<BreadcrumbsObject doc={doc} props={p} mode={mode} currentScreenId={currentScreenId||doc.start_screen}
   history={screenHistory||[]} onNavigate={id=>onAction({type:'navigate',target_screen:id})}>{children}</BreadcrumbsObject>;break;
+ case 'x-schema-map':case 'x-diagram':child=<DiagramView kind={node.type as 'x-schema-map'|'x-diagram'} props={p}/>;break;
+ case 'x-timeline':child=<TimelineView dataset={doc.datasets.find(d=>d.id===p.dataset_id)} rows={rows} props={p}
+  onSelect={index=>mode==='preview'&&onSelectRecord?.(index)}/>;break;
+ case 'x-file-preview':child=<FilePreviewView props={p}
+  assetUrl={p.asset?apiUrl('/api/projects/'+projectId+'/images/'+encodeURIComponent(String(p.asset).replace('assets/',''))):undefined}/>;break;
  case 'x-record-detail':{
  const dataset=doc.datasets.find(d=>d.id===p.dataset_id);
  child=<RecordDetail dataset={dataset} rows={rows} selectedIndex={selectedRecordIndex??null}
@@ -331,7 +337,49 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  <label>Enable collapsible header<input aria-label="Enable collapsible header" type="checkbox" disabled={!canEdit} checked={!!node.props.collapsible} onChange={e=>property('collapsible',e.target.checked)}/></label>
  <label>Initially expanded<input aria-label="Initially expanded" type="checkbox" disabled={!canEdit} checked={node.props.expanded!==false} onChange={e=>property('expanded',e.target.checked)}/></label>
  </section>}
- <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{node&&['x-menu','x-breadcrumbs'].includes(node.type)&&<section className="navigation-object-settings">
+ <label>Target modal<select aria-label="Target modal" disabled={!canEdit} value={node.action?.target_node||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:"show_modal",target_node:e.target.value}})))}><option value="">Choose modal</option>{screen.nodes.filter(n=>n.type==="modal").map(n=><option key={n.id} value={n.id}>{n.props.label||n.id}</option>)}</select></label><label>Target screen<select value={node.action?.target_screen||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,action:{...n.action,type:'navigate',target_screen:e.target.value}})))}><option value="">Select</option>{doc.screens.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label></>:<p>Select an object in design mode.</p>}{node?.type==='image'&&<label>Image file (PNG/JPEG/WebP/GIF)<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{let file=e.target.files?.[0];if(file)onImageUpload(file,screen.id,node.id)}}/></label>}{node&&['x-diagram','x-schema-map','x-timeline','x-file-preview'].includes(node.type)&&<section className="advanced-object-settings">
+ <h3>Advanced object settings</h3>
+ {node.type==='x-timeline'&&<>
+  <label>Timeline dataset<select aria-label="Timeline dataset" disabled={!canEdit} value={node.props.dataset_id||''} onChange={e=>property('dataset_id',e.target.value)}>
+   <option value="">Select dataset</option>{doc.datasets.map(d=><option key={d.id} value={d.id}>{d.id}</option>)}
+  </select></label>
+  {(['date_column','title_column'] as const).map(key=><label key={key}>{key.replace('_',' ')}
+   <select aria-label={key} disabled={!canEdit} value={node.props[key]||''} onChange={e=>property(key,e.target.value)}>
+    <option value="">Select field</option>{doc.datasets.find(d=>d.id===node.props.dataset_id)?.columns.map(field=><option key={field.id} value={field.id}>{field.id}</option>)}
+   </select></label>)}
+ </>}
+ {node.type==='x-file-preview'&&<>
+  <label>Accepted file types<input aria-label="Preview accepted file types" disabled={!canEdit} value={node.props.accept||''} onChange={e=>property('accept',e.target.value)}/></label>
+  <label>Packaged image<select aria-label="Preview packaged image" disabled={!canEdit} value={node.props.asset||''} onChange={e=>property('asset',e.target.value)}>
+   <option value="">Choose local file in Preview</option>{doc.assets.filter((a:any)=>a.path?.match(/\.(png|jpg|jpeg|webp|gif)$/i)).map((a:any)=><option key={a.path} value={a.path}>{a.path}</option>)}
+  </select></label>
+  <p className="muted">The browser previews selected local files without uploading them. For portability, select an already packaged image.</p>
+ </>}
+ {['x-diagram','x-schema-map'].includes(node.type)&&(()=>{
+  const key=node.type==='x-schema-map'?'tables':'nodes';
+  const nodes=Array.isArray(node.props[key])?node.props[key]:[];
+  const links=Array.isArray(node.props.links)?node.props.links:[];
+  return <div className="advanced-structure-editor">
+   <h4>{node.type==='x-schema-map'?'Schema tables':'Diagram nodes'}</h4>
+   {nodes.map((entry:any,i:number)=><div key={i} className="advanced-entry">
+    <label>ID<input aria-label={'Advanced node ID '+i} disabled={!canEdit} value={entry.id||''} onChange={e=>property(key,nodes.map((v:any,j:number)=>j===i?{...v,id:e.target.value}:v))}/></label>
+    <label>Label<input aria-label={'Advanced node label '+i} disabled={!canEdit} value={entry.label||''} onChange={e=>property(key,nodes.map((v:any,j:number)=>j===i?{...v,label:e.target.value}:v))}/></label>
+    <label>X<input aria-label={'Advanced node X '+i} type="number" disabled={!canEdit} value={entry.x??0} onChange={e=>property(key,nodes.map((v:any,j:number)=>j===i?{...v,x:Number(e.target.value)}:v))}/></label>
+    <label>Y<input aria-label={'Advanced node Y '+i} type="number" disabled={!canEdit} value={entry.y??0} onChange={e=>property(key,nodes.map((v:any,j:number)=>j===i?{...v,y:Number(e.target.value)}:v))}/></label>
+    {key==='tables'&&<label>Fields (one per line)<textarea aria-label={'Advanced fields '+i} disabled={!canEdit} value={(entry.fields||[]).join('\n')} onChange={e=>property(key,nodes.map((v:any,j:number)=>j===i?{...v,fields:e.target.value.split('\n').filter(Boolean)}:v))}/></label>}
+    <button type="button" disabled={!canEdit} onClick={()=>property(key,nodes.filter((_:any,j:number)=>j!==i))}>Remove node</button>
+   </div>)}
+   <button type="button" disabled={!canEdit} onClick={()=>property(key,[...nodes,{id:'node-'+crypto.randomUUID().slice(0,5),label:key==='tables'?'Table':'Node',x:25+(nodes.length%3)*175,y:45+Math.floor(nodes.length/3)*110,fields:key==='tables'?['ID']:undefined}])}>Add node</button>
+   <h4>Connections</h4>
+   {links.map((link:any,i:number)=><div key={i} className="advanced-entry">
+    {(['source','target'] as const).map(field=><label key={field}>{field}<select aria-label={'Connection '+field+' '+i} disabled={!canEdit} value={link[field]||''} onChange={e=>property('links',links.map((v:any,j:number)=>j===i?{...v,[field]:e.target.value}:v))}><option value="">Choose node</option>{nodes.map((n:any)=><option key={n.id} value={n.id}>{n.label||n.id}</option>)}</select></label>)}
+    <button type="button" disabled={!canEdit} onClick={()=>property('links',links.filter((_:any,j:number)=>j!==i))}>Remove link</button>
+   </div>)}
+   <button type="button" disabled={!canEdit||nodes.length<2} onClick={()=>property('links',[...links,{source:nodes[0].id,target:nodes[1].id}])}>Add connection</button>
+  </div>;
+ })()}
+ </section>}
+{node&&['x-menu','x-breadcrumbs'].includes(node.type)&&<section className="navigation-object-settings">
  <h3>Navigation settings</h3>
  {node.type==='x-menu'&&<>
   <label>Use shared menu items<input aria-label="Use shared menu items" type="checkbox" disabled={!canEdit} checked={node.props.use_shared!==false}
