@@ -90,3 +90,8 @@ No runnable ScreenCraft application has been released.
 ## Phase 9.5 — Navigation objects
 - Activated x-menu and x-breadcrumbs with application-level menu reuse, screen-local links, history-based navigation and offline HTML parity.
 - Added controls and generated-file browser tests; the original shared navigation design remains the authoritative global menu.
+
+## Phase 9.6 — Advanced objects and catalogue completion
+- Activated x-schema-map, x-timeline, x-file-preview and x-diagram with editable Properties, prototype-safe SVG/data/file interactions and standalone HTML export parity.
+- Added conformance checks, actual generated HTML browser tests and a supported-diagram regression assertion.
+- All 39 canonical catalogue objects are now recognised and have an implemented renderer; production-grade integrations and advanced interactions remain future work.
