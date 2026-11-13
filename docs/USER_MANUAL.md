@@ -122,3 +122,9 @@ Switch to **Preview** and click a table row. The detail panel immediately displa
 For mock editing, enable **Allow mock editing** in Properties. The selected fields become editable, and changing them updates the same in-memory record used by tables and grids. Editing is enabled for `seed-reset` datasets only. Session-persisted and project-shared datasets are read-only within record detail. This is a prototype behaviour, not a database write.
 
 **Interactive HTML** export supports the same selection and editing workflow entirely offline and does not contact the application server.
+
+## Phase 9.3 — Time, radio, toggle, file selection and search
+
+From the **Inputs** Object Gallery, add `x-time` for a browser-native HH:MM time selector, `x-radio` for mutually exclusive options, `x-toggle` for a Boolean on/off switch, `x-file-upload` for a filename-only file selector, or `x-search` for a search box. Use Properties to edit their labels, required settings, time minimum/maximum, radio choices (one per line) and accepted file extensions. For a search box, select **Filter table/grid** to link it to an existing table or editable grid on the same screen.
+
+Preview and the exported Interactive HTML support the same user interactions and the current values can be bound into an Add Row button. The file selector is intentionally **not a file uploader**: only the selected filename is used as sample data, and the browser's file content is not uploaded or saved in the `.scraft` file. Both modes operate safely without external network dependencies.

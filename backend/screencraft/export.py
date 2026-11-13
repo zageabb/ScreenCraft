@@ -31,7 +31,7 @@ const navExpanded=new Set();
 const collapsibleTypes=new Set(['container','x-card','x-grid','x-flex','x-toolbar','x-sidebar','x-splitter']);
 let datasets=Object.fromEntries((app.datasets||[]).map(d=>[d.id,structuredClone(d.rows||[])]));
 const inputValues=Object.create(null);
-const SUPPORTED_INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea']);
+const SUPPORTED_INPUTS=new Set(['input','select','checkbox','x-date','x-number','x-textarea','x-time','x-radio','x-toggle','x-file-upload','x-search']);
 function selectValue(option){return typeof option==='string'?option:(option&&typeof option==='object'?(option.value??option.label??''):'')}
 function resolveActionRow(action,screen){
  const row={...(action.values||{})};
@@ -43,7 +43,7 @@ function resolveActionRow(action,screen){
   const options=source.props?.options||[];
   row[column]=Object.prototype.hasOwnProperty.call(inputValues,id)
    ?inputValues[id]
-   :source.type==='checkbox'?false:
+   :['checkbox','x-toggle'].includes(source.type)?false:
     source.type==='select'?selectValue(options[0]??''):
     (source.props?.value??'');
  }
@@ -55,11 +55,11 @@ function validateBoundInputs(action,screen){
   if(!id)continue;
   const source=(screen?.nodes||[]).find(n=>n.id===id&&SUPPORTED_INPUTS.has(n.type));if(!source)continue;
   const p=source.props||{},label=String(p.label||p.placeholder||column);
-  const fallback=source.type==='checkbox'?false:source.type==='select'?selectValue((p.options||[])[0]??''):p.value??'';
+  const fallback=['checkbox','x-toggle'].includes(source.type)?false:source.type==='select'?selectValue((p.options||[])[0]??''):p.value??'';
   const value=Object.prototype.hasOwnProperty.call(inputValues,id)?inputValues[id]:fallback;
   const text=String(value??'');
-  if(p.required&&(source.type==='checkbox'?value!==true:!text.trim())){errors.push(label+' is required');continue}
-  if(!text.trim()&&source.type!=='checkbox')continue;
+  if(p.required&&(['checkbox','x-toggle'].includes(source.type)?value!==true:!text.trim())){errors.push(label+' is required');continue}
+  if(!text.trim()&&!['checkbox','x-toggle'].includes(source.type))continue;
   if(['input','x-textarea'].includes(source.type)){
    if(p.min_length!==undefined&&Number.isInteger(Number(p.min_length))&&text.length<Number(p.min_length))errors.push(label+' needs at least '+p.min_length+' characters');
    if(p.max_length!==undefined&&Number.isInteger(Number(p.max_length))&&text.length>Number(p.max_length))errors.push(label+' cannot exceed '+p.max_length+' characters');
@@ -70,7 +70,7 @@ function validateBoundInputs(action,screen){
    if(p.min!==undefined&&p.min!==''&&number<Number(p.min))errors.push(label+' must be at least '+p.min);
    if(p.max!==undefined&&p.max!==''&&number>Number(p.max))errors.push(label+' cannot exceed '+p.max);
   }
-  if(source.type==='x-date'&&/^\\d{4}-\\d\\d-\\d\\d$/.test(text)){
+  if((source.type==='x-date'&&/^\\d{4}-\\d\\d-\\d\\d$/.test(text))||(source.type==='x-time'&&/^\\d\\d:\\d\\d$/.test(text))){
    if(p.min&&text<String(p.min))errors.push(label+' cannot be before '+p.min);
    if(p.max&&text>String(p.max))errors.push(label+' cannot be after '+p.max);
   }
@@ -135,6 +135,8 @@ function tableView(n){
  function view(){
   let list=data().map((row,index)=>({row,index}));
   if(p.filter_column&&p.filter_value)list=list.filter(({row})=>String(row[p.filter_column]??'').toLowerCase().includes(String(p.filter_value).toLowerCase()));
+  const linkedTerms=(screens[active]?.nodes||[]).filter(source=>source.type==='x-search'&&source.props?.target_table_id===n.id).map(source=>String(inputValues[source.id]||'').toLowerCase()).filter(Boolean);
+  if(linkedTerms.length)list=list.filter(({row})=>linkedTerms.every(term=>columns.some(col=>String(row[col]??'').toLowerCase().includes(term))));
   if(state.search.trim())list=list.filter(({row})=>columns.some(col=>String(row[col]??'').toLowerCase().includes(state.search.trim().toLowerCase())));
   if(state.sort)list.sort((a,b)=>{
    const av=String(a.row[state.sort]??''),bv=String(b.row[state.sort]??'');
@@ -206,6 +208,7 @@ function tableView(n){
    pages.append(previous,el('span','Page '+(state.page+1)+' of '+v.total),next)}
   count.textContent=v.list.length+' of '+data().length+' record(s)';
  }
+ state.refresh=refresh;
  refresh();return box;
 }
 function recordDetailView(n){
@@ -346,6 +349,20 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'x-date':x=el('input');x.type='date';x.required=!!p.required;if(p.min)x.min=p.min;if(p.max)x.max=p.max;x.value=p.value||'';captureInput(n,x,'date');break;
  case 'x-number':x=el('input');x.type='number';x.required=!!p.required;if(p.min!==undefined)x.min=String(p.min);if(p.max!==undefined)x.max=String(p.max);x.placeholder=p.placeholder||'0';x.value=p.value??'';captureInput(n,x,'number');break;
  case 'x-textarea':x=el('textarea');x.required=!!p.required;if(p.min_length!==undefined)x.minLength=Number(p.min_length);if(p.max_length!==undefined)x.maxLength=Number(p.max_length);x.placeholder=p.placeholder||'';x.value=p.value||'';captureInput(n,x,'textarea');break;
+ case 'x-time':x=el('input');x.type='time';x.setAttribute('aria-label',p.label||'Time');x.required=!!p.required;if(p.min)x.min=p.min;if(p.max)x.max=p.max;x.value=p.value||'';captureInput(n,x,'time');break;
+ case 'x-radio':{x=el('fieldset');x.className='sc-radio';x.append(el('legend',p.label||'Choose'));
+  const options=p.options||[];const selected=Object.prototype.hasOwnProperty.call(inputValues,n.id)?inputValues[n.id]:p.value??'';
+  options.forEach((opt,i)=>{const value=selectValue(opt),label=el('label'),radio=el('input');radio.type='radio';radio.name='radio-'+n.id;radio.value=value;radio.checked=selected===value;radio.disabled=false;
+   radio.onchange=()=>{inputValues[n.id]=value};label.append(radio,el('span',typeof opt==='string'?opt:opt.label||String(value)));x.append(label)});
+  break}
+ case 'x-toggle':{x=el('label');x.className='sc-toggle';const control=el('input');control.type='checkbox';control.setAttribute('role','switch');control.setAttribute('aria-label',p.label||'Toggle');control.checked=!!p.checked;captureInput(n,control,'checkbox');x.append(control,el('span',p.label||'Toggle'));break}
+ case 'x-file-upload':{x=el('label');x.className='sc-file-input';x.append(el('span',p.label||'Choose file'));
+  const control=el('input');control.type='file';control.setAttribute('aria-label',p.label||'Choose file');if(p.accept)control.accept=p.accept;
+  const filename=el('small',String(inputValues[n.id]||'No file selected'));
+  control.onchange=()=>{inputValues[n.id]=control.files?.[0]?.name||'';filename.textContent=String(inputValues[n.id]||'No file selected')};
+  x.append(control,filename,el('small','Prototype: filename only; file contents are never stored or uploaded.'));break}
+ case 'x-search':x=el('input');x.type='search';x.setAttribute('aria-label',p.label||'Search');x.placeholder=p.placeholder||'Search records';x.value=p.value||'';
+  captureInput(n,x,'search');x.addEventListener('input',()=>{if(p.target_table_id&&gridState[p.target_table_id]?.refresh)gridState[p.target_table_id].refresh()});break;
  case 'x-kpi':case 'x-chart':x=metricView(n);break;
  default:x=el('section','Unsupported object: '+n.type+' (preserved in .scraft)');x.className='sc-unsupported';break;
  }

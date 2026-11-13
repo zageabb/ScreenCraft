@@ -7,7 +7,7 @@ export type DataTableOptions={
 };
 type Props={
  dataset:Dataset; rows:Record<string,unknown>[]; options:DataTableOptions;
- editable:boolean; canMutate:boolean; onRowsChange:(rows:Record<string,unknown>[])=>void;
+ editable:boolean; canMutate:boolean; externalSearch?:string; onRowsChange:(rows:Record<string,unknown>[])=>void;
  activeIndex?:number|null; onSelectRow?:(index:number)=>void; onRowsDeleted?:(indices:number[])=>void;
 };
 
@@ -20,7 +20,7 @@ function compare(a:unknown,b:unknown){
 }
 
 /** Preview-only data grid; source indexes remain stable across search, sort, and paging. */
-export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange,activeIndex,onSelectRow,onRowsDeleted}:Props){
+export default function DataGrid({dataset,rows,options,editable,canMutate,onRowsChange,activeIndex,onSelectRow,onRowsDeleted,externalSearch=''}:Props){
  const [search,setSearch]=useState('');
  const [sort,setSort]=useState<{key:string;direction:1|-1}|null>(null);
  const [selected,setSelected]=useState<number[]>([]);
@@ -33,10 +33,11 @@ export default function DataGrid({dataset,rows,options,editable,canMutate,onRows
    const term=String(options.filter_value).toLocaleLowerCase();
    items=items.filter(({row})=>display(row[options.filter_column!]).toLocaleLowerCase().includes(term));
   }
-  if(search.trim())items=items.filter(({row})=>columns.some(c=>display(row[c.id]).toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())));
+  const effectiveSearch=[search.trim(),externalSearch.trim()].filter(Boolean).join(' ').trim();
+  if(effectiveSearch)items=items.filter(({row})=>columns.some(c=>display(row[c.id]).toLocaleLowerCase().includes(effectiveSearch.toLocaleLowerCase())));
   if(sort)items.sort((a,b)=>compare(a.row[sort.key],b.row[sort.key])*sort.direction||a.index-b.index);
   return items;
- },[rows,columns,search,sort,options.filter_column,options.filter_value]);
+ },[rows,columns,search,externalSearch,sort,options.filter_column,options.filter_value]);
  const totalPages=pageSize?Math.max(1,Math.ceil(filtered.length/pageSize)):1;
  const currentPage=Math.min(page,totalPages-1);
  const visible=pageSize?filtered.slice(currentPage*pageSize,(currentPage+1)*pageSize):filtered;

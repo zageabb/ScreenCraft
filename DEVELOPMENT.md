@@ -296,3 +296,11 @@ Fix: explicitly `db.flush()` after adding the project and before adding its owne
 - **Merged:** PR #20 https://github.com/zageabb/ScreenCraft/pull/20; squash commit `3ba951589e2e71e04df5e3dac0af2e04f9be556f`.
 - **All five CI jobs green:** Python, React, browser (including actual offline HTML), Docker and docs on head `e0717aaebfaafb3f59fe059bce7f0ef333ca380c` in https://github.com/zageabb/ScreenCraft/actions/runs/43412322820.
 - **Manual acceptance:** Pull/rebuild `main` on Ubuntu, open the existing x-record-detail in your design, select a linked dataset and source table/grid in Properties, then Preview a selected row and try editable mode. Verify Interactive HTML behaves the same. No database migration or UDA/Caddy changes.
+
+## Phase 9.3 — Remaining input catalogue objects (2026-11-13)
+
+Activate `x-time`, `x-radio`, `x-toggle`, `x-file-upload` and `x-search` from the canonical Application-Standard object catalogue. ScreenCraft now supports browser-native time selection and range validation; configurable radio choices; a Boolean toggle switch; a prototype-only file chooser that stores **filename only**, not binary content; and a search control that filters a chosen table/grid's displayed rows. The right-hand Properties inspector includes required, min/max time, radio choices, file accept filter, and a target table link.
+
+All five controls work in both React Preview and the standalone one-file Interactive HTML export. Values (except binary file data) can be mapped into `add_mock_row.field_bindings`, with validation before insertion. Offline search refreshes the linked table without a network request. File selection has no upload, no content retention and no production side effects: it is a safe UI prototype.
+
+Test acceptance: editor Preview, generated offline HTML browser tests, input validation and search filtering, compatibility validator checks, and green React/Python/Docker/browser/docs CI. No database migration; Ubuntu manual deployment pending. Remaining objects are scoped to phases 9.4 (Data), 9.5 (Navigation) and 9.6 (Advanced).

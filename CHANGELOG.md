@@ -77,3 +77,8 @@ No runnable ScreenCraft application has been released.
 - Activated the canonical `x-record-detail` with row selection from tables and editable grids, source-table configuration and optional seed-reset mock editing.
 - Added empty-state handling, sorted-table index-safe selection and data field display/editing in Preview and offline HTML.
 - Added real HTML Playwright regression tests, editor tests and SCRAFT compatibility diagnostics for record-detail references.
+
+## Phase 9.3 — Five input extensions
+- Activated x-time, x-radio, x-toggle, x-file-upload (prototype filename only) and x-search with configurable Properties.
+- Extended mock-row bindings and required/time validation; search can filter a linked table/grid in Preview and Interactive HTML export.
+- Added generated offline HTML browser tests and conformance checks without production file uploads or database writes.
