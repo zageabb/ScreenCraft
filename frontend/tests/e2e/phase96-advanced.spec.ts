@@ -51,7 +51,7 @@ test('offline file preview displays local text without a server upload',async({p
  await page.setContent(html(),{waitUntil:'load'});
  const preview=page.locator('[data-node-id="preview"]');
  await expect(preview).toContainText('Nothing is uploaded');
- await preview.getByRole('textbox',{name:'Choose preview file'}).setInputFiles({
+ await preview.getByLabel('Choose preview file').setInputFiles({
   name:'sample.txt',mimeType:'text/plain',buffer:Buffer.from('Sample local preview')});
  await expect(preview.locator('pre')).toContainText('Sample local preview');
  expect(requests).toEqual([]);
