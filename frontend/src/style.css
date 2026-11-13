@@ -122,3 +122,14 @@
 .sc-data-extension button[aria-pressed="true"]{background:#d9eafb;font-weight:700}
 .sc-pagination{display:flex;justify-content:center;align-items:center;gap:8px;height:100%;flex-wrap:wrap}
 .data-extension-settings{margin-top:10px;border-top:1px solid #dbe4f0;padding-top:8px}
+
+/* Phase 9.5 screen-local menus and history breadcrumbs */
+.sc-local-menu,.sc-breadcrumbs{box-sizing:border-box;width:100%;height:100%;padding:6px;background:#fff;border:1px solid #ced9e8;overflow:auto}
+.sc-local-menu ul{list-style:none;margin:5px 0;padding-left:13px}
+.sc-local-menu li{margin:3px 0}
+.sc-menu-row{display:flex;align-items:center;gap:4px}
+.sc-menu-row button:first-child{flex:1;text-align:left}
+.sc-local-menu [aria-current="page"],.sc-breadcrumbs [aria-current="page"]{background:#d9eafb;font-weight:700}
+.sc-breadcrumbs{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.navigation-object-settings{padding-top:8px;border-top:1px solid #d7e0e9}
+.menu-item-property{padding:6px;border:1px solid #d7e0e9;margin:5px 0}

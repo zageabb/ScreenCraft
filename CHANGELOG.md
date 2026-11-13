@@ -86,3 +86,7 @@ No runnable ScreenCraft application has been released.
 ## Phase 9.4 — Data objects
 - Activated x-tree, x-list and x-pagination using in-memory datasets, row selection, expandable hierarchy and linked table paging.
 - Added right-side object settings and matching standalone offline HTML behaviour with generated-file browser tests.
+
+## Phase 9.5 — Navigation objects
+- Activated x-menu and x-breadcrumbs with application-level menu reuse, screen-local links, history-based navigation and offline HTML parity.
+- Added controls and generated-file browser tests; the original shared navigation design remains the authoritative global menu.
