@@ -72,3 +72,13 @@ def test_nested_catalogue_extensions_preserve_unknown_metadata_and_screen_order(
     assert actual==app
     assert actual["screen_order"]==["details","home"]
     assert actual["screens"][0]["nodes"][2]["props"]["vendor_specific"]=="retained"
+
+def test_application_palette_roundtrip_is_optional_and_keeps_custom_theme_tokens():
+    app=starter_app()
+    assert app["application_palette"]["preset"]=="screencraft"
+    assert app["themes"]["light"]["tokens"]["action.on_primary"]=="#FFFFFF"
+    app["application_palette"]={"preset":"corporate"}
+    app["themes"]["dark"]["tokens"]["action.primary"]="#E23B55"
+    assert read_document(make_document(app))[1]==app
+    del app["application_palette"]
+    assert read_document(make_document(app))[1]==app

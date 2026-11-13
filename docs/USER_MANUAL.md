@@ -158,3 +158,20 @@ Click **Download .scraft** in the application header to download a portable ZIP 
 **Pending edits:** The button now saves unsaved editor changes first, then downloads the saved ZIP. If saving fails (for example, another user saved a newer revision), no older archive is downloaded and the error appears on screen. If nothing changed, the download does not increment the project revision. Users with viewer access can download the already-saved design.
 
 **Not included:** transient Preview session rows or input values, project access rights/users, live database contents, and the contents of local files chosen in x-file-upload/x-file-preview. Those controls deliberately avoid persisting local files. Only image assets explicitly packaged in the application are stored inside .scraft. Use Import .scraft and its validation preflight to restore a design.
+
+## Prototype dark theme and imported .scraft colours
+
+Choose **Theme → dark** in the screen toolbar to preview the currently selected screen using its theme tokens. The dark theme should colour the screen/page, shared navigation, navigation controls, KPI cards, grids, headings, input fields and disabled states. Standalone **Interactive HTML** export starts with the document's saved `default_theme`; switching the editor's preview theme does not change that saved default.
+
+Nodes can use semantic `style.color_token`, `style.background_color_token` and `style.border_color_token`; ScreenCraft resolves them from the selected theme. A fixed `style.color` or `style.background_color` is a deliberate override if a corresponding token is absent; fixed colours do not automatically change on theme switch. To fix a legacy unreadable object, prefer a semantic token rather than manually choosing colours in every theme.
+
+The document format and existing files remain unchanged. Review light and dark views and verify interactive HTML output after editing styles or adding components. Design-mode input fields are disabled by design; Preview is for testing interactions.
+
+
+## Application palettes (light and dark)
+
+Open **Application palette** in the right-hand inspector. Choose **ScreenCraft — Blue / Grey** or **Corporate — Black / Grey / Red**. The selected preset updates the application's light and dark semantic colours, including navigation, cards, tables, inputs and primary buttons, without changing the ScreenCraft editor chrome or rearranging objects.
+
+Use the **Theme** selector to preview light/dark. Expand **Application palette**, choose the variant and change any colour with the colour input or a complete `#RRGGBB` hex value. Editing a token marks the palette as **Custom / imported**. Use **Use light/dark as exported default** to choose which variant opens when the prototype HTML is launched. The standalone HTML has its own theme selector whenever multiple theme variants are present.
+
+Applying a named preset changes the semantic theme token values in the document; it preserves unknown extension tokens. Existing literal object colour overrides remain fixed. To retain an imported document unchanged, leave the selection at **Custom / imported**. Save the project or export `.scraft` to persist palette changes.

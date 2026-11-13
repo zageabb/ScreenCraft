@@ -344,3 +344,22 @@ The entire Phase 9.3–9.6 development follows Application-Standard's object IDs
 **Acceptance:** Browser tests assert save-before-download ordering, no redundant save and no export when a revision conflict occurs. Python API tests build a 39-object, two-screen design with nested objects, optional props, action references, sample rows, shared navigation, component templates and a packaged image; download the actual ZIP; check every byte and application field; import the ZIP and check full equality. Existing unknown/future object handling remains preserve-and-warn.
 
 **Scope:** This is an application **design** archive. It intentionally excludes transient Preview values, runtime mock-session changes, user accounts/project permissions, live data and un-packaged local file selections. Real Ubuntu deployment and acceptance require independent verification.
+
+## 2026-11-13: Dark theme token parity correction (Issue #26; implementation review)
+
+Branch `fix/dark-theme-token-parity-20261113`:
+- Introduced shared semantic prototype theme CSS, applied to the Canvas and navigation layout (not editor chrome).
+- Editor node styles now resolve `color_token`, `background_color_token` and `border_color_token`; matching standalone HTML export runtime resolves the same references.
+- Removed hard-coded light-only backgrounds for themed KPI, table, inputs, disabled buttons, shared navigation, selected rows and advanced content via scoped CSS overrides.
+- Interactive exporter mirrors the same stylesheet and dynamic token variables; a regression test covers the exported token resolver and key selector presence.
+- Central standard clarification proposed in `Application-Standard`; no v1 format migration or new mandatory field.
+- Verification: manual deployment and browser/screenshot regression remain pending. GitHub CI must be reviewed when billing permits. Do not claim production acceptance solely from source changes.
+
+
+## 2026-11-13: Application palette presets — companion to dark-theme fix
+
+- Added two built-in presets: ScreenCraft blue/grey, and a sample corporate black/grey/white/red. These are editable light/dark token dictionaries, stored inside the application `themes`; `application_palette.preset` is optional descriptive metadata.
+- Added application-level inspector palette selector, theme swatches and per-token colour editor, with explicit default export theme control.
+- Kept project palette distinct from editor chrome; applied semantic tokens to canvas and shared navigation. Interactive standalone export allows light/dark theme switching and resolves `action.on_primary`.
+- `.scraft` v1 extension described in central `Application-Standard` draft. Old documents without palette metadata keep their imported theme colours.
+- Added ZIP round-trip and interactive export regression assertions. Still require live UI/visual acceptance, full frontend build/tests and CI status before merge.

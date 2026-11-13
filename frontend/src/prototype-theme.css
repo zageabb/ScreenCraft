@@ -1,0 +1,29 @@
+
+/* ScreenCraft semantic canvas palette: applied only to prototype surfaces, not the editor chrome. */
+.canvas.sc-theme,.sc-theme{--sc-page:#fff;--sc-surface:#fff;--sc-nav:#e9f1fc;--sc-text:#172033;--sc-muted:#52647b;--sc-border:#cbd5e1;--sc-accent:#2563eb;--sc-field:#fff;--sc-field-text:#172033;--sc-selected:#dbeafe;--sc-disabled:#64748b;color:var(--sc-text);color-scheme:var(--sc-color-scheme,light)}
+.canvas.sc-theme .canvas-node,.sc-theme .sc-node{color:inherit}
+.canvas.sc-theme .kpi-tile,.sc-theme .sc-kpi{background:var(--sc-surface);border-color:var(--sc-border);color:var(--sc-text)}
+.canvas.sc-theme .kpi-tile small,.sc-theme .sc-kpi small{color:var(--sc-muted)}
+.canvas.sc-theme .container-outline,.canvas.sc-theme .sc-card,.canvas.sc-theme .sc-panel-container,.canvas.sc-theme .sc-accordion,.canvas.sc-theme .sc-record-detail,.canvas.sc-theme .sc-data-extension,.canvas.sc-theme .sc-local-menu,.canvas.sc-theme .sc-breadcrumbs,.canvas.sc-theme .sc-advanced-diagram,.canvas.sc-theme .sc-advanced-timeline,.canvas.sc-theme .sc-advanced-file-preview,
+.sc-theme .sc-box,.sc-theme .sc-card,.sc-theme .sc-panel-container,.sc-theme .sc-accordion,.sc-theme .sc-record-detail,.sc-theme .sc-data-extension,.sc-theme .sc-local-menu,.sc-theme .sc-breadcrumbs,.sc-theme .sc-advanced-diagram,.sc-theme .sc-advanced-timeline,.sc-theme .sc-advanced-file-preview{background:var(--sc-surface);color:var(--sc-text);border-color:var(--sc-border)}
+.canvas.sc-theme table,.sc-theme table{background:var(--sc-surface);color:var(--sc-text)}
+.canvas.sc-theme th,.canvas.sc-theme td,.sc-theme th,.sc-theme td{border-color:var(--sc-border);color:var(--sc-text)}
+.canvas.sc-theme th,.sc-theme th{background:var(--sc-surface);font-weight:600}
+.canvas.sc-theme input:not([type=checkbox]):not([type=radio]):not([type=file]),.canvas.sc-theme select,.canvas.sc-theme textarea,
+.sc-theme input:not([type=checkbox]):not([type=radio]):not([type=file]),.sc-theme select,.sc-theme textarea{background:var(--sc-field);color:var(--sc-field-text);border:1px solid var(--sc-border);border-radius:5px}
+.canvas.sc-theme input::placeholder,.canvas.sc-theme textarea::placeholder,.sc-theme input::placeholder,.sc-theme textarea::placeholder{color:var(--sc-muted);opacity:1}
+.canvas.sc-theme input[type=checkbox],.canvas.sc-theme input[type=radio],.sc-theme input[type=checkbox],.sc-theme input[type=radio]{accent-color:var(--sc-accent)}
+.canvas.sc-theme button:not(.prototype-button),.sc-theme button{background:var(--sc-surface);color:var(--sc-text);border:1px solid var(--sc-border)}
+.canvas.sc-theme .prototype-button,.sc-theme .sc-node > button{background:var(--sc-accent);color:var(--sc-accent-text,#fff)}
+.canvas.sc-theme button:disabled,.sc-theme button:disabled{opacity:1;color:var(--sc-disabled);background:var(--sc-surface);cursor:not-allowed}
+.canvas.sc-theme button:focus-visible,.canvas.sc-theme input:focus-visible,.canvas.sc-theme select:focus-visible,.sc-theme button:focus-visible,.sc-theme input:focus-visible,.sc-theme select:focus-visible{outline:2px solid var(--sc-accent);outline-offset:2px}
+.canvas.sc-theme .selected-row,.sc-theme .selected-row,.sc-theme .sc-data-grid .selected-row{background:var(--sc-selected)}
+.sc-theme .sc-shared-nav{background:var(--sc-nav);color:var(--sc-text);border-color:var(--sc-border)}
+.sc-theme .sc-shared-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
+.sc-theme .sc-shared-nav-row .is-active{background:var(--sc-selected);color:var(--sc-text)}
+.sc-theme .sc-record-field output{background:var(--sc-field);color:var(--sc-field-text)}
+
+/* Shared navigation lives outside the canvas but inherits the same project theme. */
+.shared-preview-layout.sc-theme .shared-app-nav{background:var(--sc-nav);color:var(--sc-text);border-color:var(--sc-border)}
+.shared-preview-layout.sc-theme .shared-app-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
+.shared-preview-layout.sc-theme .shared-app-nav button.is-active{background:var(--sc-selected);color:var(--sc-text)}
