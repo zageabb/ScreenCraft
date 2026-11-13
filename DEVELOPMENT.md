@@ -344,3 +344,9 @@ The entire Phase 9.3–9.6 development follows Application-Standard's object IDs
 **Acceptance:** Browser tests assert save-before-download ordering, no redundant save and no export when a revision conflict occurs. Python API tests build a 39-object, two-screen design with nested objects, optional props, action references, sample rows, shared navigation, component templates and a packaged image; download the actual ZIP; check every byte and application field; import the ZIP and check full equality. Existing unknown/future object handling remains preserve-and-warn.
 
 **Scope:** This is an application **design** archive. It intentionally excludes transient Preview values, runtime mock-session changes, user accounts/project permissions, live data and un-packaged local file selections. Real Ubuntu deployment and acceptance require independent verification.
+
+### Imported legacy schema-map compatibility (2026-11-13)
+
+An actual imported TAIJU/DPPP design used `x-schema-map.props.diagram_nodes` and `props.connections` with `from/to` relationship endpoints. Earlier Phase 9.6 prototype code only recognised `tables` and `links` with `source/target`, causing a generic sample schema map to render after upgrading even though the stored design had not been damaged. The live screenshot showed the earlier unsupported placeholder, indicating a separate deployment/version mismatch.
+
+The editor, right Properties inspector, standalone Interactive HTML and semantic validator now accept both property dialects **without deleting or rewriting the original imported keys**. Actual diagram coordinates are used to size the SVG viewBox, so remote tables are not clipped. Regressions test legacy nodes, links and exported HTML. The full imported design is preserved as-is; users need to deploy updated main to replace the unsupported UI.
