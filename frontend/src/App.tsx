@@ -201,7 +201,7 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
      containerOpen={containerStates[n.id]??(n.props.expanded!==false)}
      onContainerToggle={()=>toggleContainer(n.id)}
      selectedRecordIndex={n.type==='x-record-detail'
-       ?(recordSelection[n.props.source_table_id||'']??recordSelection[n.props.dataset_id||'']??null)
+       ?(n.props.source_table_id?recordSelection[n.props.source_table_id]??null:recordSelection[n.props.dataset_id||'']??null)
        :(recordSelection[n.id]??null)}
      onSelectRecord={index=>setRecordSelection(v=>({...v,[n.id]:index,[n.props.dataset_id||'']:index}))}
      sectionIndices={screen.nodes.filter(child=>child.parent_id===n.id).map(child=>Number(child.props.tab_index)||0)}>
