@@ -100,3 +100,8 @@ No runnable ScreenCraft application has been released.
 - Fixed Download .scraft exporting the previous saved ZIP when unsaved design edits existed: the editor now saves changed content first, blocks stale downloads on conflicts, and skips redundant saves.
 - Synchronized supported-object validation with the canonical catalogue so known objects are not falsely labelled inactive during import.
 - Added browser tests for save-before-download and failure handling, plus a full API archive/restore regression covering 39 objects, nested properties, screens/order, navigation, datasets, components and packaged image bytes.
+
+## Legacy .scraft schema map import compatibility (2026-11-13)
+- Fixed x-schema-map and x-diagram renderers and offline HTML exporter to honour imported `diagram_nodes` and `connections` using `from/to` references, rather than drawing sample nodes.
+- Existing node/table data and custom properties remain intact; editor Properties and conformance validation recognise legacy sources. Automatically fit wide schema coordinates within the diagram SVG viewBox.
+- Added regression coverage for imported legacy relationship maps.
