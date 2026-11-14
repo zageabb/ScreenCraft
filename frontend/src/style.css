@@ -171,3 +171,33 @@
 .contrast-audit li{margin:8px 0;font-size:12px;overflow-wrap:anywhere}
 .contrast-audit li small{display:block;color:#52647b}
 .contrast-swatch{display:inline-block;border:1px solid #92a0b0;border-radius:3px;margin:2px 5px;padding:3px 7px;font-size:12px}
+
+
+/* Editor-only collapsible side panels. Hidden panels retain mounted state and scroll. */
+.workspace > aside[hidden]{display:none!important}
+.editor-panel-toggle{font-size:12px;white-space:nowrap}
+.editor-panel-toggle:focus-visible,.object-colour-swatch:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+@media(min-width:901px){
+ .workspace.left-panel-collapsed{grid-template-columns:minmax(0,1fr) 220px}
+ .workspace.right-panel-collapsed{grid-template-columns:210px minmax(0,1fr)}
+ .workspace.left-panel-collapsed.right-panel-collapsed{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:900px){
+ .workspace{display:flex;flex-direction:column}
+ .workspace .sidebar,.workspace .inspector{flex:none;max-height:32vh;overflow:auto;grid-column:auto}
+ .workspace .mainarea{min-height:280px}
+ .workspace .workscroll{max-height:60vh}
+}
+/* Per-object palette selector; settings never inherit application theme colours. */
+.object-colour-editor{border:1px solid #dce3ea;border-radius:7px;padding:9px;margin:10px 0;background:#f8fafc}
+.object-colour-editor h3{margin:2px 0 8px}
+.object-colour-current{display:flex;align-items:center;gap:8px;font-size:12px;overflow-wrap:anywhere}
+.object-colour-chip{display:inline-block;width:24px;height:24px;flex:none;border:1px solid #95a3b6;border-radius:4px}
+.object-colour-swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(32px,1fr));gap:6px;margin:9px 0}
+.object-colour-swatch{height:32px;min-width:0;padding:2px;border:2px solid #9baac0;position:relative}
+.object-colour-swatch[aria-pressed=true]{outline:3px solid #2563eb;outline-offset:1px}
+.object-colour-selected{display:inline-flex;background:#111;color:#fff;border-radius:100%;width:18px;height:18px;align-items:center;justify-content:center;font-size:12px}
+.object-colour-actions{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.object-colour-actions label{display:flex;flex-direction:row;gap:8px;align-items:center;margin:4px 0}
+.object-colour-actions input[type=color]{width:40px;height:32px;padding:2px}
+.object-colour-editor .muted{margin:6px 0}
