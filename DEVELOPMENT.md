@@ -371,3 +371,12 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Added a synthetic browser regression based on the user's TAIJU fixed navy navigation background and theme-linked text, without committing the private project file.
 - Scope limitations: non-text objects, alpha compositing, images, native controls and visual overlaps still require manual review. Editor/export parity from PR #27 remains in force.
 - Verification pending CI; manual comparison to the seven-screen example and live Ubuntu deployment have not been accepted.
+
+
+## Object appearance and editor layout — 2026-11-14 (Issues #30 and #31)
+
+- **Issue #30:** Per-object Appearance inspector now selects individual background, foreground and border colours from existing application theme tokens. A chosen swatch records `node.style.<property>_token` (theme-aware), while a fixed HEX override records `node.style.<property>` (theme-independent); Use default removes both. This reuses the established .scraft style representation; no new schema field or Application-Standard fork.
+- Existing project palette presets and custom theme-token values are reused, with native visual swatches and accessible name/pressed state. The current theme affects the sample swatches; object changes update the design preview and the one-file interactive HTML export.
+- **Issue #31:** Independently collapsible Screens/Object Gallery/Layers (left) and Inspector/Properties (right) editor panels. Both can be hidden simultaneously to give the canvas more room; state persists per browser in localStorage, not in shared .scraft files. Responsive layout uses a stacked arrangement on narrow viewports.
+- Automated regression added for panel toggle/persistence, palette-linked light/dark appearance, fixed overrides, save payloads and the real standalone HTML export. **Validation remains pending** a green frontend build, browser suite and manual responsive/accessibility acceptance; do not call the feature production-ready solely because the code is committed.
+- The prototype's *application navigation* and collapsible document containers are distinct from these editor-only side panels; no change to their saved structure is intended.

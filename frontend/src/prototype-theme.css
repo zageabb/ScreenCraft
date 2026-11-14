@@ -27,3 +27,18 @@
 .shared-preview-layout.sc-theme .shared-app-nav{background:var(--sc-nav);color:var(--sc-text);border-color:var(--sc-border)}
 .shared-preview-layout.sc-theme .shared-app-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
 .shared-preview-layout.sc-theme .shared-app-nav button.is-active{background:var(--sc-selected);color:var(--sc-text)}
+
+/* Ensure an authored object colour reaches native controls with their own backgrounds.
+   These are scoped to the current node's direct content to avoid recolouring descendants. */
+.canvas.sc-theme .canvas-node[data-sc-bg] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-bg] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-bg] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{background-color:var(--sc-object-bg)!important}
+.canvas.sc-theme .canvas-node[data-sc-fg] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-fg] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-fg] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{color:var(--sc-object-fg)!important}
+.canvas.sc-theme .canvas-node[data-sc-border] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-border] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-border] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{border:1px solid var(--sc-object-border)!important}
