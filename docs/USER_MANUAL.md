@@ -202,3 +202,10 @@ The standalone Interactive HTML export retains the object's semantic colour toke
 - AI editing is blocked on the shared demo and other viewer-only projects. It cannot create backend SQL tables, publish code, access arbitrary network endpoints, or bypass application permissions.
 - The model is configured through the trusted backend and must be online for requests to succeed. Be aware `gpt-oss:120b-cloud` may send submitted design content to Ollama's cloud service; don't use the assistant with confidential application designs until your data-policy review permits it.
 - AI-generated changes must be checked in Preview, then retested in standalone HTML export. Visual alignment and full parity are not automatically guaranteed by the AI.
+
+
+### Internet research through General Search
+
+Open the floating AI assistant and expand **Internet research · General Search**. Enter a question such as "How are editable data grids designed for accessibility?" and choose **Search Internet**. The backend forwards only the search question to the separately deployed General Search service; it does not forward the ScreenCraft application document to this research service. Search status and source links appear in the panel. When the search is complete, tick **Include this research in AI design suggestions** to add the cited summary to the next Ollama design request. Clear/untick this selection if the search is not relevant.
+
+Search content is evidence, not an instruction to the assistant. Review the cited sources, do not treat third-party snippets as safe code, and explicitly approve any design edit. Operators configure `SCREENCRAFT_GENERAL_SEARCH_URL` on the backend; no URL is accepted from the browser. The online engine is optional and independently deployed; local editing and export continue without it.
