@@ -52,3 +52,12 @@
 .sc-ai-body button{align-self:flex-start;border-radius:5px;padding:6px 10px;cursor:pointer}
 .sc-ai-manual,.sc-ai-plan{font-size:11px;white-space:pre-wrap;overflow:auto;max-height:38vh;overflow-wrap:anywhere;background:#e2e8f0;padding:8px;border-radius:5px}
 .sc-ai-plan{max-height:160px}
+
+
+.sc-ai-web-search{border:1px solid #cbd5e1;padding:8px;border-radius:7px;background:#fff}
+.sc-ai-web-search summary{cursor:pointer;font-weight:600}
+.sc-ai-web-search input:not([type=checkbox]){display:block;width:100%;box-sizing:border-box;max-width:100%;padding:8px;margin:5px 0}
+.sc-ai-web-search label{display:block;margin:8px 0}
+.sc-ai-web-search .sc-ai-research-result{max-height:180px;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap;background:#e2e8f0;padding:8px;font-size:11px}
+.sc-ai-web-search ul{max-height:150px;overflow:auto;padding-left:20px}
+.sc-ai-web-search a{overflow-wrap:anywhere;color:#1d4ed8}
