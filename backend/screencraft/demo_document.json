@@ -1,0 +1,1128 @@
+{
+  "application_id": "screencraft-gallery-demo",
+  "name": "ScreenCraft Object Gallery Demo",
+  "start_screen": "demo-0",
+  "screen_order": [
+    "demo-0",
+    "demo-1",
+    "demo-2",
+    "demo-3",
+    "demo-4",
+    "demo-5",
+    "demo-6"
+  ],
+  "default_theme": "light",
+  "screens": [
+    {
+      "id": "demo-0",
+      "name": "Gallery 1",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-0",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — text, button, input, select, checkbox, table"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-text",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "label": "text example",
+            "text": "text — Static or dynamic textual content",
+            "placeholder": "Example text"
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-button",
+          "type": "button",
+          "parent_id": null,
+          "props": {
+            "label": "button example",
+            "text": "button — Trigger an action or navigation",
+            "placeholder": "Example button"
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-input",
+          "type": "input",
+          "parent_id": null,
+          "props": {
+            "label": "input example",
+            "text": "input — Text or numeric entry",
+            "placeholder": "Example input"
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-select",
+          "type": "select",
+          "parent_id": null,
+          "props": {
+            "label": "select example",
+            "text": "select — Choose a value from defined options",
+            "placeholder": "Example select",
+            "options": [
+              "Open",
+              "In progress",
+              "Closed"
+            ]
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-checkbox",
+          "type": "checkbox",
+          "parent_id": null,
+          "props": {
+            "label": "checkbox example",
+            "text": "checkbox — Boolean selection",
+            "placeholder": "Example checkbox"
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-table",
+          "type": "table",
+          "parent_id": null,
+          "props": {
+            "label": "table example",
+            "text": "table — Tabular data and optional mock interactions",
+            "placeholder": "Example table",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-1",
+      "name": "Gallery 2",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-1",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — image, container, tabs, modal, x-card, x-grid"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-image",
+          "type": "image",
+          "parent_id": null,
+          "props": {
+            "label": "image example",
+            "text": "image — Packaged media",
+            "placeholder": "Example image"
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-container",
+          "type": "container",
+          "parent_id": null,
+          "props": {
+            "label": "container example",
+            "text": "container — Generic container with nested components",
+            "placeholder": "Example container"
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-tabs",
+          "type": "tabs",
+          "parent_id": null,
+          "props": {
+            "label": "tabs example",
+            "text": "tabs — Switch between labelled panels",
+            "placeholder": "Example tabs",
+            "tab_labels": [
+              "First",
+              "Second"
+            ]
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-modal",
+          "type": "modal",
+          "parent_id": null,
+          "props": {
+            "label": "modal example",
+            "text": "modal — Dialog with nested content",
+            "placeholder": "Example modal"
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-card",
+          "type": "x-card",
+          "parent_id": null,
+          "props": {
+            "label": "x-card example",
+            "text": "x-card — x-card extension object",
+            "placeholder": "Example x-card"
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-grid",
+          "type": "x-grid",
+          "parent_id": null,
+          "props": {
+            "label": "x-grid example",
+            "text": "x-grid — x-grid extension object",
+            "placeholder": "Example x-grid"
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-2",
+      "name": "Gallery 3",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-2",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — x-flex, x-splitter, x-sidebar, x-accordion, x-number, x-date"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-x-flex",
+          "type": "x-flex",
+          "parent_id": null,
+          "props": {
+            "label": "x-flex example",
+            "text": "x-flex — x-flex extension object",
+            "placeholder": "Example x-flex"
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-splitter",
+          "type": "x-splitter",
+          "parent_id": null,
+          "props": {
+            "label": "x-splitter example",
+            "text": "x-splitter — x-splitter extension object",
+            "placeholder": "Example x-splitter"
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-sidebar",
+          "type": "x-sidebar",
+          "parent_id": null,
+          "props": {
+            "label": "x-sidebar example",
+            "text": "x-sidebar — x-sidebar extension object",
+            "placeholder": "Example x-sidebar"
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-accordion",
+          "type": "x-accordion",
+          "parent_id": null,
+          "props": {
+            "label": "x-accordion example",
+            "text": "x-accordion — x-accordion extension object",
+            "placeholder": "Example x-accordion"
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-number",
+          "type": "x-number",
+          "parent_id": null,
+          "props": {
+            "label": "x-number example",
+            "text": "x-number — x-number extension object",
+            "placeholder": "Example x-number"
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-date",
+          "type": "x-date",
+          "parent_id": null,
+          "props": {
+            "label": "x-date example",
+            "text": "x-date — x-date extension object",
+            "placeholder": "Example x-date"
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-3",
+      "name": "Gallery 4",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-3",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — x-time, x-radio, x-toggle, x-file-upload, x-search, x-textarea"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-x-time",
+          "type": "x-time",
+          "parent_id": null,
+          "props": {
+            "label": "x-time example",
+            "text": "x-time — x-time extension object",
+            "placeholder": "Example x-time"
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-radio",
+          "type": "x-radio",
+          "parent_id": null,
+          "props": {
+            "label": "x-radio example",
+            "text": "x-radio — x-radio extension object",
+            "placeholder": "Example x-radio",
+            "options": [
+              "Open",
+              "In progress",
+              "Closed"
+            ]
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-toggle",
+          "type": "x-toggle",
+          "parent_id": null,
+          "props": {
+            "label": "x-toggle example",
+            "text": "x-toggle — x-toggle extension object",
+            "placeholder": "Example x-toggle"
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-file-upload",
+          "type": "x-file-upload",
+          "parent_id": null,
+          "props": {
+            "label": "x-file-upload example",
+            "text": "x-file-upload — x-file-upload extension object",
+            "placeholder": "Example x-file-upload"
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-search",
+          "type": "x-search",
+          "parent_id": null,
+          "props": {
+            "label": "x-search example",
+            "text": "x-search — x-search extension object",
+            "placeholder": "Example x-search"
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-textarea",
+          "type": "x-textarea",
+          "parent_id": null,
+          "props": {
+            "label": "x-textarea example",
+            "text": "x-textarea — x-textarea extension object",
+            "placeholder": "Example x-textarea"
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-4",
+      "name": "Gallery 5",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-4",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — x-editable-grid, x-tree, x-list, x-record-detail, x-kpi, x-chart"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-x-editable-grid",
+          "type": "x-editable-grid",
+          "parent_id": null,
+          "props": {
+            "label": "x-editable-grid example",
+            "text": "x-editable-grid — x-editable-grid extension object",
+            "placeholder": "Example x-editable-grid",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-tree",
+          "type": "x-tree",
+          "parent_id": null,
+          "props": {
+            "label": "x-tree example",
+            "text": "x-tree — x-tree extension object",
+            "placeholder": "Example x-tree",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-list",
+          "type": "x-list",
+          "parent_id": null,
+          "props": {
+            "label": "x-list example",
+            "text": "x-list — x-list extension object",
+            "placeholder": "Example x-list",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-record-detail",
+          "type": "x-record-detail",
+          "parent_id": null,
+          "props": {
+            "label": "x-record-detail example",
+            "text": "x-record-detail — x-record-detail extension object",
+            "placeholder": "Example x-record-detail",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-kpi",
+          "type": "x-kpi",
+          "parent_id": null,
+          "props": {
+            "label": "Sample records",
+            "text": "x-kpi — x-kpi extension object",
+            "placeholder": "Example x-kpi",
+            "value": "3"
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-chart",
+          "type": "x-chart",
+          "parent_id": null,
+          "props": {
+            "label": "x-chart example",
+            "text": "x-chart — x-chart extension object",
+            "placeholder": "Example x-chart",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-5",
+      "name": "Gallery 6",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-5",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — x-pagination, x-menu, x-breadcrumbs, x-toolbar, x-wizard, x-schema-map"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-x-pagination",
+          "type": "x-pagination",
+          "parent_id": null,
+          "props": {
+            "label": "x-pagination example",
+            "text": "x-pagination — x-pagination extension object",
+            "placeholder": "Example x-pagination"
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-menu",
+          "type": "x-menu",
+          "parent_id": null,
+          "props": {
+            "label": "x-menu example",
+            "text": "x-menu — x-menu extension object",
+            "placeholder": "Example x-menu"
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-breadcrumbs",
+          "type": "x-breadcrumbs",
+          "parent_id": null,
+          "props": {
+            "label": "x-breadcrumbs example",
+            "text": "x-breadcrumbs — x-breadcrumbs extension object",
+            "placeholder": "Example x-breadcrumbs"
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-toolbar",
+          "type": "x-toolbar",
+          "parent_id": null,
+          "props": {
+            "label": "x-toolbar example",
+            "text": "x-toolbar — x-toolbar extension object",
+            "placeholder": "Example x-toolbar"
+          },
+          "layout": {
+            "x": 600,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-wizard",
+          "type": "x-wizard",
+          "parent_id": null,
+          "props": {
+            "label": "x-wizard example",
+            "text": "x-wizard — x-wizard extension object",
+            "placeholder": "Example x-wizard",
+            "tab_labels": [
+              "First",
+              "Second"
+            ]
+          },
+          "layout": {
+            "x": 40,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-schema-map",
+          "type": "x-schema-map",
+          "parent_id": null,
+          "props": {
+            "label": "x-schema-map example",
+            "text": "x-schema-map — x-schema-map extension object",
+            "placeholder": "Example x-schema-map",
+            "tables": [
+              {
+                "id": "a",
+                "label": "Source",
+                "fields": [
+                  "ID",
+                  "Name"
+                ],
+                "x": 20,
+                "y": 30
+              },
+              {
+                "id": "b",
+                "label": "Target",
+                "fields": [
+                  "ID",
+                  "Name"
+                ],
+                "x": 250,
+                "y": 30
+              }
+            ],
+            "links": [
+              {
+                "source": "a",
+                "target": "b"
+              }
+            ]
+          },
+          "layout": {
+            "x": 600,
+            "y": 580,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-6",
+      "name": "Gallery 7",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "layout": {
+        "mode": "freeform",
+        "overflow_x": "auto",
+        "overflow_y": "auto"
+      },
+      "nodes": [
+        {
+          "id": "heading-demo-6",
+          "type": "text",
+          "parent_id": null,
+          "props": {
+            "text": "Object Gallery — x-timeline, x-file-preview, x-diagram"
+          },
+          "layout": {
+            "x": 35,
+            "y": 14,
+            "width": 1150,
+            "height": 45
+          }
+        },
+        {
+          "id": "example-x-timeline",
+          "type": "x-timeline",
+          "parent_id": null,
+          "props": {
+            "label": "x-timeline example",
+            "text": "x-timeline — x-timeline extension object",
+            "placeholder": "Example x-timeline",
+            "dataset_id": "demo-records",
+            "label_column": "Name",
+            "id_column": "ID",
+            "date_column": "Date",
+            "title_column": "Name",
+            "source_table_id": "example-table",
+            "chart_type": "bar",
+            "searchable": true,
+            "sortable": true
+          },
+          "layout": {
+            "x": 40,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-file-preview",
+          "type": "x-file-preview",
+          "parent_id": null,
+          "props": {
+            "label": "x-file-preview example",
+            "text": "x-file-preview — x-file-preview extension object",
+            "placeholder": "Example x-file-preview"
+          },
+          "layout": {
+            "x": 600,
+            "y": 80,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        },
+        {
+          "id": "example-x-diagram",
+          "type": "x-diagram",
+          "parent_id": null,
+          "props": {
+            "label": "x-diagram example",
+            "text": "x-diagram — x-diagram extension object",
+            "placeholder": "Example x-diagram",
+            "nodes": [
+              {
+                "id": "a",
+                "label": "Start",
+                "x": 20,
+                "y": 30
+              },
+              {
+                "id": "b",
+                "label": "Finish",
+                "x": 220,
+                "y": 30
+              }
+            ],
+            "links": [
+              {
+                "source": "a",
+                "target": "b"
+              }
+            ]
+          },
+          "layout": {
+            "x": 40,
+            "y": 330,
+            "width": 480,
+            "height": 190,
+            "overflow_x": "auto",
+            "overflow_y": "auto"
+          }
+        }
+      ]
+    }
+  ],
+  "components": [],
+  "themes": {
+    "light": {
+      "tokens": {
+        "surface.page": "#F5F7FA",
+        "surface.default": "#FFFFFF",
+        "surface.nav": "#E9F1FC",
+        "surface.input": "#FFFFFF",
+        "surface.selected": "#DBEAFE",
+        "text.primary": "#172033",
+        "text.secondary": "#52647B",
+        "border.default": "#CBD5E1",
+        "action.primary": "#2563EB",
+        "action.on_primary": "#FFFFFF"
+      }
+    },
+    "dark": {
+      "tokens": {
+        "surface.page": "#101827",
+        "surface.default": "#1E293B",
+        "surface.nav": "#0B1220",
+        "surface.input": "#1E293B",
+        "surface.selected": "#263F66",
+        "text.primary": "#F1F5F9",
+        "text.secondary": "#94A3B8",
+        "border.default": "#334155",
+        "action.primary": "#60A5FA",
+        "action.on_primary": "#0B1220"
+      }
+    }
+  },
+  "datasets": [
+    {
+      "id": "demo-records",
+      "columns": [
+        {
+          "id": "ID",
+          "type": "text"
+        },
+        {
+          "id": "Name",
+          "type": "text"
+        },
+        {
+          "id": "Status",
+          "type": "text"
+        },
+        {
+          "id": "Date",
+          "type": "date"
+        }
+      ],
+      "rows": [
+        {
+          "ID": "1",
+          "Name": "Alpha example",
+          "Status": "Open",
+          "Date": "2026-11-01"
+        },
+        {
+          "ID": "2",
+          "Name": "Beta example",
+          "Status": "In progress",
+          "Date": "2026-11-07"
+        },
+        {
+          "ID": "3",
+          "Name": "Gamma example",
+          "Status": "Closed",
+          "Date": "2026-11-12"
+        }
+      ],
+      "persistence": "seed-reset"
+    }
+  ],
+  "assets": []
+}
