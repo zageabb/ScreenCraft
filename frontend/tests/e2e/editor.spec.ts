@@ -565,3 +565,54 @@ test('Download .scraft never exports a stale revision when save fails',async({pa
  await expect(page.locator('.status')).toContainText('Revision conflict');
  expect(downloads).toBe(0);
 });
+
+
+test('editor left and right panels collapse independently and retain layout preference',async({page})=>{
+ const canvas=page.locator('.mainarea');
+ const initial=await canvas.evaluate(el=>el.getBoundingClientRect().width);
+ await page.getByRole('button',{name:'Collapse left menu'}).click();
+ await expect(page.locator('#sc-editor-left-panel')).toBeHidden();
+ await expect(page.locator('#sc-editor-right-panel')).toBeVisible();
+ const leftHidden=await canvas.evaluate(el=>el.getBoundingClientRect().width);
+ expect(leftHidden).toBeGreaterThan(initial);
+ await page.getByRole('button',{name:'Collapse right menu'}).click();
+ await expect(page.locator('#sc-editor-right-panel')).toBeHidden();
+ const bothHidden=await canvas.evaluate(el=>el.getBoundingClientRect().width);
+ expect(bothHidden).toBeGreaterThan(leftHidden);
+ await page.reload();
+ await page.getByRole('button',{name:'Open',exact:true}).click();
+ await expect(page.locator('#sc-editor-left-panel')).toBeHidden();
+ await expect(page.locator('#sc-editor-right-panel')).toBeHidden();
+ await page.getByRole('button',{name:'Expand left menu'}).click();
+ await expect(page.locator('#sc-editor-left-panel')).toBeVisible();
+ await page.getByRole('button',{name:'Expand right menu'}).click();
+ await expect(page.locator('#sc-editor-right-panel')).toBeVisible();
+});
+
+test('object palette colours follow dark theme and fixed overrides survive save',async({page})=>{
+ const node=page.locator('.canvas-node').first();
+ await node.click();
+ const picker=page.locator('.object-colour-editor');
+ await expect(picker).toBeVisible();
+ await picker.getByRole('button',{name:'Use Primary action for Background'}).click();
+ await expect(node).toHaveCSS('background-color','rgb(37, 99, 235)');
+ await page.locator('.toolbar select').selectOption('dark');
+ await expect(node).toHaveCSS('background-color','rgb(117, 170, 255)');
+ const firstSave=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const tokenStyle=(await firstSave).postDataJSON().document.screens[0].nodes.find((n:any)=>n.id==='welcome').style;
+ expect(tokenStyle.background_color_token).toBe('action.primary');
+ expect(tokenStyle.background_color).toBeUndefined();
+ await picker.getByRole('textbox',{name:'Fixed Background HEX'}).fill('#AA1122');
+ await picker.getByRole('textbox',{name:'Fixed Background HEX'}).press('Enter');
+ await expect(node).toHaveCSS('background-color','rgb(170, 17, 34)');
+ await page.locator('.toolbar select').selectOption('light');
+ await expect(node).toHaveCSS('background-color','rgb(170, 17, 34)');
+ const secondSave=page.waitForRequest(req=>req.url().endsWith('/api/projects/p1')&&req.method()==='PUT');
+ await page.getByRole('button',{name:'Save',exact:true}).click();
+ const fixedStyle=(await secondSave).postDataJSON().document.screens[0].nodes.find((n:any)=>n.id==='welcome').style;
+ expect(fixedStyle.background_color).toBe('#AA1122');
+ expect(fixedStyle.background_color_token).toBeUndefined();
+ await picker.getByRole('button',{name:'Use default'}).click();
+ await expect(node).not.toHaveAttribute('data-sc-bg');
+});
