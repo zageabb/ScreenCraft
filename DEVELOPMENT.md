@@ -380,3 +380,14 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - **Issue #31:** Independently collapsible Screens/Object Gallery/Layers (left) and Inspector/Properties (right) editor panels. Both can be hidden simultaneously to give the canvas more room; state persists per browser in localStorage, not in shared .scraft files. Responsive layout uses a stacked arrangement on narrow viewports.
 - Automated regression added for panel toggle/persistence, palette-linked light/dark appearance, fixed overrides, save payloads and the real standalone HTML export. **Validation remains pending** a green frontend build, browser suite and manual responsive/accessibility acceptance; do not call the feature production-ready solely because the code is committed.
 - The prototype's *application navigation* and collapsible document containers are distinct from these editor-only side panels; no change to their saved structure is intended.
+
+
+## Online help, demo gallery and AI copilot (2026-11-14)
+
+- **SC-041**: Detailed online help derived from pinned catalogue, 39 entries, workflows and Mermaid binding diagrams — IMPLEMENTED_UNVERIFIED. Source: docs/ONLINE_HELP.md; in-editor floating Help view.
+- **SC-042**: Globally visible immutable read-only gallery, seven screens and 39 object examples with synthetic sample data — IMPLEMENTED_UNVERIFIED. API exposes virtual screencraft-demo to all authenticated users; write APIs remain denied. Browser and real deployment acceptance pending.
+- **SC-043**: Draggable AI chat using backend-only Ollama gpt-oss:120b-cloud — IMPLEMENTED_UNVERIFIED. Backend sends current design and manual; response is an explainable limited operation proposal with explicit approval, validations, Undo and Save. LAN endpoint / model availability NOT verified here.
+- **SC-044**: Object-to-object wiring assistance (button → input bindings → dataset → grid, navigation, modal and parent container links) — IMPLEMENTED_UNVERIFIED. Acceptance: proposed connections must reject invalid targets and preserve existing IDs and permissions.
+- **SC-045**: Acceptance hardening — IN_PROGRESS. Test assisted edits, export parity, ACL in UDA/local mode, long response/timeouts, prompt injection, keyboard/touch dragging, help rendering on mobile, and frontend build. Never deploy without review.
+- The demonstration is intentionally virtual, not editable, and not inserted into existing user database records. It can be downloaded and imported into a new project for custom experimentation.
+- Important: Ollama's cloud model may send document content to upstream cloud infrastructure. Treat the feature as opt-in for sensitive/customer data; add explicit user-facing disclosure and data minimisation before production enablement.
