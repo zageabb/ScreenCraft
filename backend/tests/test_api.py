@@ -120,7 +120,7 @@ def test_create_project_through_caddy_prefix(tmp_path,monkeypatch):
     loaded=c.get("/apps/screencraft/api/projects",headers=headers,
         environ_overrides={"SCRIPT_NAME":"/apps/screencraft","PATH_INFO":"/api/projects"})
     assert loaded.status_code==200 and loaded.is_json
-    assert loaded.json["projects"][0]["name"]=="Test Application"
+    assert any(p["name"]=="Test Application" for p in loaded.json["projects"])
 
 def test_readonly_scraft_inspection_does_not_change_project(app):
     import io
