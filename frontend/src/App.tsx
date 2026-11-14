@@ -41,9 +41,9 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
  const nodeStyle=node.style||{};const resolve=(key:string,fallback?:string)=>nodeStyle[key+'_token']?tokens[nodeStyle[key+'_token']]||fallback:nodeStyle[key]||fallback;
  const objectForeground=resolve('color'),objectBackground=resolve('background_color'),objectBorder=resolve('border_color');
   style.color=objectForeground;style.backgroundColor=objectBackground;style.borderColor=objectBorder;
-  if(objectForeground)style['--sc-object-fg' as keyof React.CSSProperties]=objectForeground;
-  if(objectBackground)style['--sc-object-bg' as keyof React.CSSProperties]=objectBackground;
-  if(objectBorder)style['--sc-object-border' as keyof React.CSSProperties]=objectBorder;
+  if(objectForeground)Object.assign(style,{'--sc-object-fg':objectForeground});
+  if(objectBackground)Object.assign(style,{'--sc-object-bg':objectBackground});
+  if(objectBorder)Object.assign(style,{'--sc-object-border':objectBorder});
  const [activePane,setActivePane]=useState(0);
  const [expanded,setExpanded]=useState(p.expanded!==false);
  const paneLabels:Array<string>=Array.isArray(p.tab_labels)&&p.tab_labels.length?p.tab_labels:['Step 1','Step 2'];
