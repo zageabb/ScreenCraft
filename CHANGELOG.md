@@ -100,3 +100,11 @@ No runnable ScreenCraft application has been released.
 - Fixed Download .scraft exporting the previous saved ZIP when unsaved design edits existed: the editor now saves changed content first, blocks stale downloads on conflicts, and skips redundant saves.
 - Synchronized supported-object validation with the canonical catalogue so known objects are not falsely labelled inactive during import.
 - Added browser tests for save-before-download and failure handling, plus a full API archive/restore regression covering 39 objects, nested properties, screens/order, navigation, datasets, components and packaged image bytes.
+
+
+## Object palette and collapsible editor panels (2026-11-14)
+- Added an object Appearance palette selector for background, foreground and border, supporting semantic light/dark token links, fixed HEX overrides and reset to inherited defaults.
+- Connected object colour rendering to current ScreenCraft canvas and standalone interactive HTML output without changing existing .scraft style property names.
+- Added independent show/hide controls for left and right editor panels, persistent local browser preferences, accessible button names and responsive canvas expansion.
+- Added browser regressions for theme switching, save payloads, panel persistence and real offline HTML colour parity.
+- Code committed on feature branch; build/CI and manual browser acceptance are separate gates.
