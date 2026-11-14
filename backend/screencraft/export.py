@@ -46,6 +46,21 @@ def interactive_html(app: dict, assets: dict | None = None) -> str:
 .shared-preview-layout.sc-theme .shared-app-nav{background:var(--sc-nav);color:var(--sc-text);border-color:var(--sc-border)}
 .shared-preview-layout.sc-theme .shared-app-nav button{background:transparent;color:var(--sc-text);border-color:var(--sc-border)}
 .shared-preview-layout.sc-theme .shared-app-nav button.is-active{background:var(--sc-selected);color:var(--sc-text)}
+/* Ensure an authored object colour reaches native controls with their own backgrounds.
+   These are scoped to the current node's direct content to avoid recolouring descendants. */
+.canvas.sc-theme .canvas-node[data-sc-bg] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-bg] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-bg] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{background-color:var(--sc-object-bg)!important}
+.canvas.sc-theme .canvas-node[data-sc-fg] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-fg] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-fg] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{color:var(--sc-object-fg)!important}
+.canvas.sc-theme .canvas-node[data-sc-border] > :is(.prototype-button,input,select,textarea,.data-grid,.container-outline,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview),
+.canvas.sc-theme .canvas-node[data-sc-border] > label > :is(input,select,textarea),
+.sc-theme .sc-node[data-sc-border] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
+{border:1px solid var(--sc-object-border)!important}
+
 </style></head><body><header><strong id="title"></strong><nav class="sc-menu" id="menu"></nav><small>Interactive prototype — no production actions</small></header><main id="root"></main><script type="application/json" id="sc-document">"""+payload+"""</script><script type="application/json" id="sc-assets">"""+asset_payload+"""</script><script>
 'use strict';
 const app=JSON.parse(document.getElementById('sc-document').textContent);
@@ -77,7 +92,12 @@ function applyNodeStyle(node,element){
  const style=node.style||{},tokens=app.themes?.[theme]?.tokens||{};
  for(const [key,cssKey] of [['color','color'],['background_color','backgroundColor'],['border_color','borderColor']]){
  const value=style[key+'_token']?tokens[style[key+'_token']]:style[key];
- if(typeof value==='string'&&value)element.style[cssKey]=value;
+ if(typeof value==='string'&&value){
+  element.style[cssKey]=value;
+  const suffix={color:'fg',background_color:'bg',border_color:'border'}[key];
+  element.setAttribute('data-sc-'+suffix,'true');
+  element.style.setProperty('--sc-object-'+suffix,value);
+ }
  }
 }
 const containerStates=Object.create(null);
