@@ -391,3 +391,8 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - **SC-045**: Acceptance hardening — IN_PROGRESS. Test assisted edits, export parity, ACL in UDA/local mode, long response/timeouts, prompt injection, keyboard/touch dragging, help rendering on mobile, and frontend build. Never deploy without review.
 - The demonstration is intentionally virtual, not editable, and not inserted into existing user database records. It can be downloaded and imported into a new project for custom experimentation.
 - Important: Ollama's cloud model may send document content to upstream cloud infrastructure. Treat the feature as opt-in for sensitive/customer data; add explicit user-facing disclosure and data minimisation before production enablement.
+
+
+### SC-046 — General Search internet research integration (2026-11-14)
+
+Status: IMPLEMENTED_UNVERIFIED. ScreenCraft's floating AI assistant starts a General Search job through a backend proxy and polls its status, displaying research text with source links and optionally attaching that evidence to an Ollama design proposal. Reuses the existing `zageabb/general-search` API (`POST /api/search`, `GET /api/search/<job_id>`) at a backend-configurable endpoint. Does not duplicate crawler, DDGS, PDF parsing, browser rendering or retrieval ranking. Backend does not send application designs to General Search; the research query alone is transmitted. Source content is untrusted and can never directly modify design state. Operator must restrict network access to General Search since its API does not itself provide project ACL. Deployment, active LAN availability, UDA proxy acceptance and real web retrieval are NOT verified in this environment.
