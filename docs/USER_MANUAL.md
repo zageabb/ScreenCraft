@@ -190,3 +190,15 @@ Select an object on the design canvas, then open **Appearance** in the right-han
 Use **Collapse left menu** / **Expand left menu** in the canvas toolbar to hide or restore the Screens, Object Gallery and Layers panel. Use **Collapse right menu** / **Expand right menu** for the Inspector and Properties panel. Either or both can be hidden; the canvas fills the freed desktop width. Panel visibility is a local browser preference and is not exported in the shared .scraft design; no screen objects or unsaved form data should be lost when you hide a panel. On smaller displays panels stack above/below the canvas.
 
 The standalone Interactive HTML export retains the object's semantic colour tokens and fixed overrides, but does not include ScreenCraft's *editor* sidebar collapse controls. Check the real exported HTML in both themes when reviewing appearance changes.
+
+
+## Object gallery, online reference and AI assistant (2026-11-14)
+
+- Use the full [39-object help reference](ONLINE_HELP.md) for every palette type, data-binding examples, diagram flows and troubleshooting.
+- **ScreenCraft Object Gallery Demo** appears in Applications for all authenticated users with viewer rights. It contains seven screens with each canonical palette object and a synthetic dataset. Inspect or Preview but do not edit the shared original. Download its .scraft and import into your own editable project to experiment.
+- Click the floating **ScreenCraft AI** header at the right of the editor to open the chat. Drag the header to reposition it, or use the minimise button. Select **Help / full object manual** to view reference content without leaving the editor.
+- Ask for object explanations, suggested controls, positions, or link wiring (for example: "Connect the Name input, Status select and Add Record button to the contacts table"). The assistant sees the current app design and the help reference.
+- The AI returns an explanation plus a numbered structured operations plan. Read the full proposed JSON and click **Approve and apply** only when correct; otherwise Reject. Approved changes are local editor state until you Save and are undoable. Missing/invalid bindings, IDs and cycles are rejected.
+- AI editing is blocked on the shared demo and other viewer-only projects. It cannot create backend SQL tables, publish code, access arbitrary network endpoints, or bypass application permissions.
+- The model is configured through the trusted backend and must be online for requests to succeed. Be aware `gpt-oss:120b-cloud` may send submitted design content to Ollama's cloud service; don't use the assistant with confidential application designs until your data-policy review permits it.
+- AI-generated changes must be checked in Preview, then retested in standalone HTML export. Visual alignment and full parity are not automatically guaranteed by the AI.
