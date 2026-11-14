@@ -33,3 +33,12 @@ Read docs/INTERACTIVE_PROTOTYPE_PROPOSAL.md before implementing editor, data sto
 The **Download .scraft** button must represent the editor's current **saved design**, not an earlier server revision. If the working document has unsaved changes, save them first using optimistic revision checking; only request the stored ZIP after successful save. On save or revision conflict, stop the download and display the error—never silently export stale content. Avoid incrementing project revisions when there is no change.
 
 Regression tests must verify real API ZIP contents and round-trip import of **all current catalogue types**, all screen metadata/order, nested nodes and action bindings, datasets/seed rows, themes, shared navigation, reusable components, arbitrary safe optional fields and declared packaged images. The canonical catalogue snapshot defines the recognized IDs; old inactive-placeholder warning lists must not mislabel supported types. Preview-only runtime values and local file-preview selections are not embedded in the design export; describe these scope limits in the manual.
+
+
+
+## AI assistant and demo safety
+- docs/ONLINE_HELP.md is the object assistance reference. Keep it aligned with the pinned catalogue, behaviour and export when new objects arrive.
+- The built-in screencraft-demo project is a global immutable teaching resource. Every authenticated user may open it; no edit, upload, member mutation or AI write may affect the original.
+- LLM output is untrusted: generate plans only, validate type, target IDs, layout, parent cycles, action links, ACL and schema, require explicit user approval and keep Undo.
+- Ollama must be contacted server-side only. Never expose the private network endpoint to the browser, never accept a model-supplied URL, and never execute arbitrary AI source code or SQL.
+- Future binding changes must update standalone HTML exporter and browser parity tests in the same PR.
