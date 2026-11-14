@@ -181,3 +181,12 @@ Applying a named preset changes the semantic theme token values in the document;
 Expand **Visual quality · contrast audit** in the editor inspector. The finding count reflects the current light/dark theme. The audit checks ordinary text against the current page background and any explicit background on its parent containers. Each finding displays the screen, object ID, estimated contrast ratio and colour sample. A ratio below 4.5:1 is flagged for review.
 
 To correct a finding, inspect the object's colour or its parent container background and prefer compatible semantic light/dark theme tokens. Explicit colours intentionally remain unchanged until you edit them. Switch the theme to check both variants. This audit is conservative: it does not certify contrast for controls, images, translucent surfaces, gradients or complex compositing. Browser and accessibility acceptance remain required.
+
+
+## Object appearance palette and editor sidebars
+
+Select an object on the design canvas, then open **Appearance** in the right-hand Properties area. Choose the colour property (**Background**, **Text / foreground**, or **Border**), and click a named swatch from the **Application palette colours** grid. The selected token stays linked to the application palette: switching the editor's Theme selector between light and dark uses that theme's value. To use a colour that never changes with theme, select a **Custom HEX** colour or enter a valid six-digit `#RRGGBB` value in **Fixed HEX override**, then leave the field or press Enter. **Use default** clears only the selected colour property's override. Presets and theme token values are still edited under **Application palette**. Review readable text contrast in both variants.
+
+Use **Collapse left menu** / **Expand left menu** in the canvas toolbar to hide or restore the Screens, Object Gallery and Layers panel. Use **Collapse right menu** / **Expand right menu** for the Inspector and Properties panel. Either or both can be hidden; the canvas fills the freed desktop width. Panel visibility is a local browser preference and is not exported in the shared .scraft design; no screen objects or unsaved form data should be lost when you hide a panel. On smaller displays panels stack above/below the canvas.
+
+The standalone Interactive HTML export retains the object's semantic colour tokens and fixed overrides, but does not include ScreenCraft's *editor* sidebar collapse controls. Check the real exported HTML in both themes when reviewing appearance changes.
