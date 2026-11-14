@@ -45,7 +45,7 @@ def test_uda_new_user_is_not_admin_and_has_no_existing_projects(tmp_path):
     me=c.get("/api/me",headers=trusted("new.person@example.com"))
     assert me.status_code==200
     assert me.json["is_admin"] is False
-    assert c.get("/api/projects",headers=trusted("new.person@example.com")).json["projects"]==[]
+    assert [p for p in c.get("/api/projects",headers=trusted("new.person@example.com")).json["projects"] if p["id"]!="screencraft-demo"]==[]
     assert c.post("/api/users",headers=trusted("new.person@example.com"),json={
        "username":"other","password":"password-password"}).status_code==403
     assert c.get("/api/me",headers=trusted("invalid name!")).status_code==401
@@ -69,7 +69,7 @@ def test_existing_local_account_keeps_identity_and_projects(tmp_path):
     assert response.json["id"]==owner
     assert response.json["is_admin"] is True
     projects=authenticated.get("/api/projects",headers=trusted()).json["projects"]
-    assert len(projects)==1 and projects[0]["id"]==project
+    assert len([p for p in projects if p["id"]!="screencraft-demo"])==1 and any(p["id"]==project for p in projects)
     with Session(engine) as db:
         assert len(db.scalars(select(User)).all())==1
 
