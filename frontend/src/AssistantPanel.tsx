@@ -1,7 +1,8 @@
-import React,{useState,useRef} from 'react';
+import React,{useState,useRef,useEffect} from 'react';
 import type {Document,Node} from './model';
 import {catalogueEntries,cloneDoc,isContainer} from './model';
 type Proposal={explanation:string;operations:any[]};
+type SearchResult={status:string;phase:string;answer:string;sources:{title:string;url:string}[];error?:string|null};
 function endpoint(path:string){return (location.pathname.startsWith('/apps/screencraft/')?'/apps/screencraft':'')+path}
 export function applyProposal(doc:Document,operations:any[]):Document {
  if(!Array.isArray(operations)||operations.length>12)throw Error('Too many AI operations');
@@ -66,11 +67,40 @@ export function applyProposal(doc:Document,operations:any[]):Document {
  return result;
 }
 export default function AssistantPanel({doc,canEdit,projectId,onApply}:{doc:Document;canEdit:boolean;projectId:string;onApply:(v:Document)=>void}){
+ const [webEnabled,setWebEnabled]=useState(false),[webQuestion,setWebQuestion]=useState(''),[webJob,setWebJob]=useState(''),[webResult,setWebResult]=useState<SearchResult|null>(null),[webBusy,setWebBusy]=useState(false);
  const [open,setOpen]=useState(false),[help,setHelp]=useState(false),[manual,setManual]=useState(''),[prompt,setPrompt]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[proposal,setProposal]=useState<Proposal|null>(null);
  const [pos,setPos]=useState({x:Math.max(12,window.innerWidth-490),y:120});
  const dragging=useRef<{x:number;y:number;left:number;top:number}|null>(null);
+ useEffect(()=>{
+  if(!webJob)return;
+  let stopped=false;
+  const poll=async()=>{
+   try{
+    const response=await fetch(endpoint('/api/ai/research/'+webJob),{credentials:'same-origin'});
+    const status=await response.json();
+    if(!response.ok)throw Error(status.error||'Could not retrieve research');
+    if(stopped)return;
+    setWebResult(status);
+    if(status.status==='completed'||status.status==='failed'){setWebBusy(false);setWebJob('')}
+   }catch(e){if(!stopped){setWebBusy(false);setWebJob('');setError(String(e))}}
+  };
+  void poll();
+  const timer=window.setInterval(()=>void poll(),4000);
+  return ()=>{stopped=true;window.clearInterval(timer)};
+ },[webJob]);
+ const research=async()=>{
+  if(!webQuestion.trim())return;
+  setWebBusy(true);setWebResult(null);setWebJob('');setError('');
+  try{
+   const response=await fetch(endpoint('/api/ai/research'),{method:'POST',credentials:'same-origin',
+     headers:{'Content-Type':'application/json'},body:JSON.stringify({query:webQuestion.trim()})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Search unavailable');
+   setWebJob(data.job_id);
+  }catch(e){setWebBusy(false);setError(String(e))}
+ };
  const ask=async()=>{setBusy(true);setError('');setProposal(null);try{
-  const response=await fetch(endpoint('/api/ai/propose'),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({instruction:prompt,document:doc,project_id:projectId})});
+  const response=await fetch(endpoint('/api/ai/propose'),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({instruction:prompt,document:doc,project_id:projectId,
+    research:webEnabled&&webResult?.status==='completed'?{answer:webResult.answer.slice(0,14500),sources:webResult.sources}:null})});
   const data=await response.json();if(!response.ok)throw Error(data.error||'AI request failed');
   if(data.operations?.length)applyProposal(doc,data.operations);setProposal(data);
  }catch(err){setError(String(err))}finally{setBusy(false)}};
@@ -84,6 +114,17 @@ export default function AssistantPanel({doc,canEdit,projectId,onApply}:{doc:Docu
     <button onClick={()=>void openHelp()}>{help?'Back to assistant':'Help / full object manual'}</button>
     {help?<pre className="sc-ai-manual">{manual}</pre>:<>
       <p>Ask about objects or connections. AI can propose adding, positioning and wiring objects. Changes require approval.</p>
+      <details className="sc-ai-web-search">
+       <summary>Internet research · General Search</summary>
+       <p>Search public sources for examples, APIs and design patterns. Only your search question is sent to General Search; it does not receive the design document.</p>
+       <label>Search the web<input aria-label="Web research question" value={webQuestion} onChange={e=>setWebQuestion(e.target.value)} placeholder="Accessible editable table patterns"/></label>
+       <button disabled={webBusy||webQuestion.trim().length<3} onClick={()=>void research()}>{webBusy?'Searching…':'Search Internet'}</button>
+       {webResult&&<section aria-live="polite"><small>{webResult.phase||webResult.status}</small>
+         {webResult.answer&&<pre className="sc-ai-research-result">{webResult.answer}</pre>}
+         {webResult.sources.length>0&&<ul>{webResult.sources.map((source,index)=><li key={index}><a target="_blank" rel="noopener noreferrer" href={source.url}>{source.title||source.url}</a></li>)}</ul>}
+         {webResult.status==='completed'&&<label><input type="checkbox" checked={webEnabled} onChange={e=>setWebEnabled(e.target.checked)}/>Include this research in AI design suggestions</label>}
+       </section>}
+      </details>
       <textarea aria-label="AI instruction" rows={4} placeholder="Connect the Name input and Status dropdown to the Add button and table…" value={prompt} onChange={e=>setPrompt(e.target.value)}/>
       <button disabled={!canEdit||busy||!prompt.trim()} onClick={()=>void ask()}>{busy?'Analysing…':'Analyse and propose'}</button>
       {!canEdit&&<small>Read-only demo: AI changes are disabled.</small>}
