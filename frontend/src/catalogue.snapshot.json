@@ -1,8 +1,8 @@
 {
   "canonical_source": "zageabb/Application-Standard/standards/screencraft/object-catalogue.json",
-  "source_blob_sha": "e7c91d3325988cfa07e39171b713dc919344e813",
+  "source_blob_sha": "324b975fc838b04e60b10dc9408f46a8d18d6ef1",
   "catalogue_id": "screencraft-object-catalogue",
-  "catalogue_version": "1.0.0",
+  "catalogue_version": "1.1.0",
   "objects": [
     {
       "id": "text",
@@ -459,6 +459,31 @@
         "style",
         "bindings",
         "action"
+      ],
+      "unsupported_behavior": "preserve-and-warn"
+    },
+    {
+      "id": "x-spreadsheet",
+      "category": "Data",
+      "level": "extension",
+      "description": "Engine-neutral workbook spreadsheet host; first runtime candidate Univer via SheetBridge. Design/export are safe previews, not executable spreadsheets.",
+      "container": {
+        "supports_children": false,
+        "allowed_child_roles": []
+      },
+      "property_groups": [
+        "props.label",
+        "props.engine",
+        "props.workbook_ref",
+        "props.mode",
+        "props.show_formula_bar",
+        "props.show_sheet_tabs",
+        "props.show_ribbon",
+        "props.allow_xlsx_import",
+        "props.allow_xlsx_export",
+        "bindings.dataset_id",
+        "layout",
+        "style"
       ],
       "unsupported_behavior": "preserve-and-warn"
     },
