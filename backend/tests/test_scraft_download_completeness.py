@@ -156,7 +156,7 @@ def test_download_zip_contains_entire_saved_application_and_import_preserves_it(
     # Known canonical extensions must not be misreported as unsupported on import.
     warnings = validate_contract(manifest, restored, assets, verify_assets=True)
     assert not any("inactive placeholder" in warning for warning in warnings), warnings
-    assert len(restored["screens"][0]["nodes"]) == 41
+    assert len(restored["screens"][0]["nodes"]) == 42
     assert {node["type"] for node in restored["screens"][0]["nodes"] if node["id"].startswith("object-")} == set(types)
 
     # Import the exported bytes, not a reconstructed Python dictionary.
