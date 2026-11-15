@@ -8,6 +8,7 @@ import TableDataEditor from './TableDataEditor';
 import DataGrid from './DataGrid';
 import {DataExtension,DataPagination} from './DataExtensions';
 import RecordDetail from './RecordDetail';
+import {SpreadsheetObject} from './SpreadsheetObject';
 import SharedNavigation from './SharedNavigation';
 import {MenuObject,BreadcrumbsObject} from './NavigationObjects';
 import {DiagramView,TimelineView,FilePreviewView} from './AdvancedObjects';
@@ -61,6 +62,7 @@ function CanvasNode({node,mode,selected,onPick,onMove,onResize,onAction,onInputC
  case 'input':child=<input required={!!p.required} minLength={p.min_length===undefined?undefined:Number(p.min_length)} maxLength={p.max_length===undefined?undefined:Number(p.max_length)} placeholder={p.placeholder||'Input'} value={String(inputValues[node.id]??'')} onChange={e=>onInputChange(node.id,e.target.value)} disabled={mode==='design'}/>;break;
  case 'select':child=<select disabled={mode==='design'} value={String(inputValues[node.id]??(p.options||['Option 1','Option 2'])[0]??'')} onChange={e=>onInputChange(node.id,e.target.value)}>{(p.options||['Option 1','Option 2']).map((v:string,i:number)=><option key={i}>{v}</option>)}</select>;break;
  case 'checkbox':child=<label><input required={!!p.required} type="checkbox" checked={Boolean(inputValues[node.id]??false)} onChange={e=>onInputChange(node.id,e.target.checked)} disabled={mode==='design'}/>{p.label||'Checkbox'}</label>;break;
+ case 'x-spreadsheet':child=<SpreadsheetObject props={p} mode={mode}/>;break;
  case 'table':case 'x-editable-grid':{
  const dataset=doc.datasets.find(d=>d.id===p.dataset_id);
  child=dataset?<DataGrid key={node.id+'-'+dataset.id} dataset={dataset} rows={rows}
@@ -385,7 +387,17 @@ function Editor({doc,setDoc,onSave,onExport,canEdit,projectId,onImageUpload}: {d
  {node.type==='x-search'&&<label>Filter table/grid<select aria-label="Search target table" disabled={!canEdit} value={node.props.target_table_id||''} onChange={e=>property('target_table_id',e.target.value)}><option value="">No linked table</option>{screen.nodes.filter(n=>['table','x-editable-grid'].includes(n.type)).map(n=><option key={n.id} value={n.id}>{n.props.label||n.type} · {n.id.slice(0,8)}</option>)}</select></label>}
  <small className="muted">Rules are checked when an Add Row button uses this field as an input source.</small>
  </section>}
- {(node.type==='x-kpi'||node.type==='x-chart')&&<section className="metric-configuration" aria-label="Metric configuration">
+ {node.type==='x-spreadsheet'&&<section className="spreadsheet-configuration" aria-label="Spreadsheet configuration">
+  <h3>Spreadsheet object</h3>
+  <p className="muted">Design-time preview only. A trusted SheetBridge runtime will provide live Univer editing; this screen cannot run Python, fetch a workbook or access a database.</p>
+  <label>Workbook reference (opaque ID)<input aria-label="Spreadsheet workbook reference" maxLength={200} disabled={!canEdit} value={String(node.props.workbook_ref||'')} onChange={e=>property('workbook_ref',e.target.value)} placeholder="e.g. purchase-orders"/></label>
+  <label>Engine<select aria-label="Spreadsheet engine" disabled={!canEdit} value="univer"><option value="univer">Univer (planned)</option></select></label>
+  <label>Mode<select aria-label="Spreadsheet mode" disabled={!canEdit} value={node.props.mode||'read-only'} onChange={e=>property('mode',e.target.value)}><option value="read-only">Read-only</option><option value="editable">Editable (requires runtime permission)</option></select></label>
+  {([['show_formula_bar','Show formula bar'],['show_sheet_tabs','Show sheet tabs'],['show_ribbon','Show ribbon'],['allow_xlsx_import','Allow XLSX import (runtime only)'],['allow_xlsx_export','Allow XLSX export (runtime only)']] as [string,string][]).map(([key,label])=><label key={key}><input type="checkbox" aria-label={label} disabled={!canEdit} checked={key==='show_formula_bar'||key==='show_sheet_tabs'?node.props[key]!==false:node.props[key]===true} onChange={e=>property(key,e.target.checked)}/>{label}</label>)}
+  <label>Mock dataset<select aria-label="Spreadsheet dataset" disabled={!canEdit} value={node.bindings?.dataset_id||''} onChange={e=>edit(updateNode(doc,screen.id,node.id,n=>({...n,bindings:{...(n.bindings||{}),dataset_id:e.target.value}})))}><option value="">None</option>{doc.datasets.map(d=><option key={d.id} value={d.id}>{d.id}</option>)}</select></label>
+  <small className="muted">Workbook access and permissions must be checked by SheetBridge. These options do not grant access.</small>
+  </section>}
+  {(node.type==='x-kpi'||node.type==='x-chart')&&<section className="metric-configuration" aria-label="Metric configuration">
  <h3>Data source</h3>
  <label>Metric dataset<select aria-label="Metric dataset" disabled={!canEdit} value={node.props.dataset_id||''} onChange={e=>property('dataset_id',e.target.value)}><option value="">Static (KPI only)</option>{doc.datasets.map(d=><option key={d.id} value={d.id}>{d.id}</option>)}</select></label>
  <label>Aggregation<select aria-label="Metric aggregation" disabled={!canEdit} value={node.props.aggregation||'count'} onChange={e=>property('aggregation',e.target.value)}>{['count','sum','average','min','max'].map(v=><option key={v} value={v}>{v}</option>)}</select></label>
