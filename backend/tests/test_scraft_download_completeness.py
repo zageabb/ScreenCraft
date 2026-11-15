@@ -1,4 +1,4 @@
-"""End-to-end .scraft archive completeness regression after the 39-object expansion."""
+"""End-to-end .scraft archive completeness regression after the 40-object catalogue."""
 from hashlib import sha256
 from io import BytesIO
 import json
@@ -27,7 +27,7 @@ def complete_document(doc, image_path, digest):
         (Path(__file__).resolve().parents[2] / "frontend/src/catalogue.snapshot.json").read_text()
     )
     types = [item["id"] for item in catalogue["objects"]]
-    assert len(types) == 39 and len(set(types)) == 39
+    assert len(types) == 40 and len(set(types)) == 40
 
     doc["name"] = "Complete .scraft round trip"
     doc["screens"][0]["name"] = "Overview"
