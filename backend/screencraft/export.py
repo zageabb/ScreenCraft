@@ -569,6 +569,7 @@ function renderNode(n,parent){const p=n.props||{},l=n.layout||{};let x;
  case 'select':x=el('select');(p.options||[]).forEach(v=>{let o=el('option',typeof v==='string'?v:v.label);o.value=selectValue(v);x.append(o)});captureInput(n,x,'select');break;
  case 'checkbox':x=el('label');let c=el('input');c.type='checkbox';c.checked=!!p.checked;c.required=!!p.required;captureInput(n,c,'checkbox');x.append(c,el('span',p.label||''));break;
  case 'image':{x=el('img');x.alt=p.alt||'';if(assetUris[p.asset])x.src=assetUris[p.asset];break}
+ case 'x-spreadsheet':x=spreadsheetPreview(n);break;
  case 'table':case 'x-editable-grid':x=tableView(n);break;
  case 'x-record-detail':x=recordDetailView(n);break;
  case 'x-list':case 'x-tree':x=dataExtensionView(n);break;
