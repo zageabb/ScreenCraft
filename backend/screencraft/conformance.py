@@ -11,8 +11,8 @@ from pathlib import PurePosixPath
 import re
 
 CORE_TYPES = frozenset("text button input select checkbox table image container tabs modal".split())
-EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail x-time x-radio x-toggle x-file-upload x-search x-menu x-breadcrumbs x-tree x-list x-pagination x-schema-map x-timeline x-file-preview x-diagram".split())
-KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram""".split())
+EDITOR_EXTENSIONS = frozenset("x-card x-grid x-flex x-toolbar x-date x-number x-textarea x-kpi x-record-detail x-time x-radio x-toggle x-file-upload x-search x-menu x-breadcrumbs x-tree x-list x-pagination x-schema-map x-timeline x-file-preview x-diagram x-spreadsheet".split())
+KNOWN_CATALOGUE = frozenset("""x-card x-grid x-flex x-splitter x-sidebar x-accordion x-number x-date x-time x-radio x-toggle x-file-upload x-search x-textarea x-editable-grid x-tree x-list x-record-detail x-kpi x-chart x-pagination x-menu x-breadcrumbs x-toolbar x-wizard x-schema-map x-timeline x-file-preview x-diagram x-spreadsheet""".split())
 ACTION_TYPES = frozenset("navigate back show_modal close_modal toggle_visibility set_mock_field add_mock_row delete_mock_row message toggle_container collapse_container expand_container".split())
 PERSISTENCE = frozenset(("seed-reset", "session-persisted", "project-shared"))
 MAX_DEPTH = 64
@@ -219,6 +219,22 @@ def validate_contract(manifest: dict, app: dict, assets: dict | None = None, *, 
                 visited.add(parent)
                 parent = idmap[parent].get("parent_id")
             p = node.get("props") or {}
+            if kind == "x-spreadsheet":
+                # Declarative design metadata only. Never interpret workbook_ref as a URL or executable path.
+                _require(p.get("engine", "univer") == "univer", f"Unsupported spreadsheet engine on {nid}")
+                _require(p.get("mode", "read-only") in ("read-only", "editable"), f"Invalid spreadsheet mode on {nid}")
+                reference = p.get("workbook_ref", "")
+                _require(isinstance(reference, str) and len(reference) <= 200, f"Invalid workbook reference on {nid}")
+                _require(not any(c in reference for c in "/\\\\:?&#") and not any(ord(c) < 32 for c in reference),
+                         f"Workbook reference must be an opaque identifier on {nid}")
+                for flag in ("show_formula_bar", "show_sheet_tabs", "show_ribbon", "allow_xlsx_import", "allow_xlsx_export"):
+                    _require(flag not in p or isinstance(p[flag], bool), f"Invalid spreadsheet flag {flag} on {nid}")
+                ref_dataset = (node.get("bindings") or {}).get("dataset_id")
+                if ref_dataset:
+                    _require(isinstance(ref_dataset, str), f"Invalid spreadsheet dataset binding on {nid}")
+                    if ref_dataset not in dataset_ids:
+                        warnings.append(f"Screen {sid}: spreadsheet {nid} refers to a missing sample dataset.")
+                warnings.append(f"Screen {sid}: spreadsheet {nid} is a design-only preview; no live Univer provider is attached.")
             if kind == "table" and p.get("dataset_id") and p["dataset_id"] not in dataset_ids:
                 warnings.append(f"Screen {sid}: table {nid} refers to missing sample dataset {p['dataset_id']}.")
             if kind in ("x-diagram", "x-schema-map"):
