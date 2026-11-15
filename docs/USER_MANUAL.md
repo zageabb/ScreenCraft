@@ -190,3 +190,22 @@ Select an object on the design canvas, then open **Appearance** in the right-han
 Use **Collapse left menu** / **Expand left menu** in the canvas toolbar to hide or restore the Screens, Object Gallery and Layers panel. Use **Collapse right menu** / **Expand right menu** for the Inspector and Properties panel. Either or both can be hidden; the canvas fills the freed desktop width. Panel visibility is a local browser preference and is not exported in the shared .scraft design; no screen objects or unsaved form data should be lost when you hide a panel. On smaller displays panels stack above/below the canvas.
 
 The standalone Interactive HTML export retains the object's semantic colour tokens and fixed overrides, but does not include ScreenCraft's *editor* sidebar collapse controls. Check the real exported HTML in both themes when reviewing appearance changes.
+
+
+## Spreadsheet object (x-spreadsheet) — design preview
+
+Select **Object Gallery → Data → x-spreadsheet** to add a spreadsheet-shaped object. Drag, resize, reposition and place it inside any compatible container in Design mode.
+
+Select the object to open **Properties → Spreadsheet object**. Configure:
+- **Workbook reference**: an opaque identifier such as `purchase-orders` (not a URL, filename path, credential or query).
+- **Engine**: Univer is the initial planned runtime; this setting is not editable until further integrations exist.
+- **Mode**: read-only or editable (design intent only; SheetBridge must independently authorise live edits).
+- **Show formula bar**, **Show sheet tabs** and **Show ribbon** for the appearance of the prototype.
+- **Allow XLSX import/export**: future runtime capability declarations; the current prototype does **not** import/export Excel files.
+- **Mock dataset**: optional reference for future data binding. The design preview currently uses fixed example values and does not evaluate dataset formulas.
+
+In ScreenCraft **Design**, **Preview** and the exported **Interactive HTML**, the object shows a local static example with worksheet headings and optional controls. It does not execute formulas, load real workbooks, contact the server, run scripts or provide an Excel editor. Its declaration survives .scraft save/export/import; when reading a file with unknown future extensions, the application should preserve its data and show a warning.
+
+A live Univer renderer, Excel import/export, Python macros, AI and database access are planned for the separate SheetBridge integration. Nothing in the .scraft file confers user permissions or executes code.
+
+Troubleshooting: If a workbook reference is rejected on import, use only a short opaque ID with no slashes, URL punctuation or control characters. If the preview is static, that is expected until a trusted SheetBridge provider is implemented.
