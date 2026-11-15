@@ -201,3 +201,19 @@
 .object-colour-actions label{display:flex;flex-direction:row;gap:8px;align-items:center;margin:4px 0}
 .object-colour-actions input[type=color]{width:40px;height:32px;padding:2px}
 .object-colour-editor .muted{margin:6px 0}
+
+
+/* x-spreadsheet: static local design preview; never a live workbook. */
+.sc-spreadsheet-preview { display:flex;flex-direction:column;width:100%;height:100%;min-height:180px;overflow:auto;background:var(--sc-surface,#fff);color:var(--sc-text,#172033);border:1px solid var(--sc-border,#cbd5e1);font:12px system-ui,sans-serif;box-sizing:border-box }
+.sc-spreadsheet-top { display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--sc-border,#cbd5e1);min-width:300px }
+.sc-spreadsheet-top span { color:var(--sc-muted,#64748b);font-size:11px }
+.sc-spreadsheet-ribbon { padding:7px 10px;border-bottom:1px solid var(--sc-border,#cbd5e1);white-space:nowrap }
+.sc-spreadsheet-formula { display:grid;grid-template-columns:45px 24px 1fr;gap:8px;padding:5px 10px;border-bottom:1px solid var(--sc-border,#cbd5e1);min-width:300px }
+.sc-spreadsheet-formula span:first-child,.sc-spreadsheet-formula span:nth-child(2) { border-right:1px solid var(--sc-border,#cbd5e1) }
+.sc-spreadsheet-grid { border-collapse:collapse;table-layout:fixed;min-width:350px;width:100%;text-align:left;color:inherit }
+.sc-spreadsheet-grid th,.sc-spreadsheet-grid td { padding:5px 8px;border:1px solid var(--sc-border,#cbd5e1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:normal }
+.sc-spreadsheet-grid th { background:var(--sc-page,#f1f5f9);text-align:center;font-weight:500 }
+.sc-spreadsheet-grid td { background:transparent }
+.sc-spreadsheet-tabs { border-top:1px solid var(--sc-border,#cbd5e1);padding:5px 10px;margin-top:auto }
+.sc-spreadsheet-tabs span { margin-left:12px;color:var(--sc-muted,#64748b) }
+.sc-spreadsheet-preview small {display:block;padding:6px 10px;color:var(--sc-muted,#64748b)}
