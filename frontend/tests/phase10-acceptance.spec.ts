@@ -1,0 +1,55 @@
+import {test,expect} from '@playwright/test';
+
+test('phase 10 contrast audit includes shared navigation, active item and authored button colours',async({page})=>{
+ await page.goto('/');
+ const result=await page.evaluate(async()=>{
+  const {inspectTextContrast}=await import('/src/contrastAudit.ts');
+  const doc={
+   themes:{light:{tokens:{
+    'surface.page':'#FFFFFF','surface.nav':'#172A3D',
+    'surface.selected':'#18283A','text.primary':'#202D3E',
+    'action.primary':'#F0F0F0','action.on_primary':'#EFEFEF'
+   }}},
+   shared_navigation:{enabled:true,position:'left',collapsible:true,items:[
+    {id:'portfolio',label:'Portfolio',target_screen:'home'}
+   ]},
+   screens:[{id:'home',name:'Home',nodes:[
+    {id:'save',type:'button',parent_id:null,props:{label:'Save'},style:{}},
+    {id:'override',type:'button',parent_id:null,props:{label:'Confirm'},style:{background_color:'#111111',color:'#222222'}},
+    {id:'safe',type:'text',parent_id:null,props:{text:'Readable'}}
+   ]}]
+  };
+  return inspectTextContrast(doc as any,'light');
+ });
+ const ids=result.map(x=>x.nodeId);
+ expect(ids).toContain('portfolio');
+ expect(ids).toContain('portfolio:active');
+ expect(ids).toContain('save');
+ expect(ids).toContain('override');
+ expect(ids).not.toContain('safe');
+ expect(result.find(x=>x.nodeId==='portfolio')?.screen).toBe('Shared navigation');
+});
+
+test('phase 10 contrast audit handles missing navigation and remains non-mutating',async({page})=>{
+ await page.goto('/');
+ const data=await page.evaluate(async()=>{
+  const {inspectTextContrast}=await import('/src/contrastAudit.ts');
+  const doc={themes:{light:{tokens:{'text.primary':'#172033'}}},
+   screens:[{id:'home',name:'Home',nodes:[{id:'title',type:'text',parent_id:null,props:{text:'Title'}}]}]};
+  const before=JSON.stringify(doc);
+  return {findings:inspectTextContrast(doc as any,'light'),unchanged:before===JSON.stringify(doc)};
+ });
+ expect(data.unchanged).toBe(true);
+ expect(data.findings).toEqual([]);
+});
+
+test('phase 10 long prototype button labels are constrained in canvas and standalone stylesheet',async({page})=>{
+ await page.goto('/');
+ const css=await page.evaluate(async()=>{
+  const response=await fetch('/src/prototype-theme.css');
+  return response.text();
+ });
+ expect(css).toContain('Phase 10 acceptance: keep authored button labels');
+ expect(css).toContain('overflow-wrap:anywhere');
+ expect(css).toContain('.sc-theme .sc-node > button');
+});
