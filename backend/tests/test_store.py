@@ -3,7 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from screencraft.package import starter_app,make_document
-from screencraft.store import Base,connect,create_user,create_project,get_project,update_project,set_membership,mutate_rows
+from screencraft.store import Base,connect,create_user,create_project,get_project,update_project,delete_project,set_membership,mutate_rows
 
 @pytest.fixture
 def store():
@@ -63,3 +63,27 @@ def test_owner_membership_created_with_valid_parent(store):
             AND m.role='owner'
         """), {"project":project_id,"user":owner_id}).scalar_one()
     assert count == 1
+
+def test_delete_project_owner_only_and_atomic_cleanup(store):
+    from sqlalchemy import select,func
+    from screencraft.store import Project,Membership,PrototypeSession
+    engine,owner,designer,viewer,pid=store
+    set_membership(engine,pid,owner,designer,"admin")
+    set_membership(engine,pid,owner,viewer,"viewer")
+    mutate_rows(engine,pid,owner,"demo","project-shared",[{"name":"Seed"}],"list")
+    with pytest.raises(PermissionError):
+        delete_project(engine,pid,designer,1,"Project")
+    with pytest.raises(PermissionError):
+        delete_project(engine,pid,viewer,1,"Project")
+    with pytest.raises(ValueError):
+        delete_project(engine,pid,owner,1,"Incorrect")
+    with pytest.raises(ValueError):
+        delete_project(engine,pid,owner,0,"Project")
+    assert get_project(engine,pid,owner)["name"]=="Project"
+    delete_project(engine,pid,owner,1,"Project")
+    with Session(engine) as db:
+        assert db.get(Project,pid) is None
+        assert db.scalar(select(func.count()).select_from(Membership).where(Membership.project_id==pid))==0
+        assert db.scalar(select(func.count()).select_from(PrototypeSession).where(PrototypeSession.project_id==pid))==0
+    with pytest.raises(PermissionError):
+        delete_project(engine,pid,owner,1,"Project")
