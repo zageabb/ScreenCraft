@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 from .package import FormatError, read_document, make_document, starter_app, MAX_ARCHIVE
 from .conformance import validate_contract
 from .export import interactive_html
-from .store import connect, User, Project, Membership, create_user, create_project, get_project, update_project, set_membership, get_role, mutate_rows
+from .store import connect, User, Project, Membership, create_user, create_project, get_project, update_project, delete_project, set_membership, get_role, mutate_rows
 
 def create_app(config=None):
     app=Flask(__name__,static_folder=None)
@@ -186,6 +186,19 @@ def create_app(config=None):
         document=starter_app();document["name"]=name
         p=create_project(engine,session["user_id"],name,make_document(document))
         return jsonify(id=p,revision=1),201
+    @app.delete("/api/projects/<project_id>")
+    @auth
+    def project_delete(project_id):
+        payload=request.get_json(silent=True) or {}
+        # Require a JSON confirmation and the exact currently displayed revision.
+        revision=payload.get("revision")
+        if not isinstance(revision,int) or isinstance(revision,bool):
+            return jsonify(error="Current project revision required"),400
+        if not isinstance(payload.get("confirm_name"),str):
+            return jsonify(error="Exact project name confirmation required"),400
+        delete_project(engine,project_id,session["user_id"],revision,payload["confirm_name"])
+        return jsonify(deleted=True,id=project_id)
+
     @app.get("/api/projects/<project_id>")
     @auth
     def project_read(project_id):
