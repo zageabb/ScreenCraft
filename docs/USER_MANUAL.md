@@ -209,3 +209,12 @@ In ScreenCraft **Design**, **Preview** and the exported **Interactive HTML**, th
 A live Univer renderer, Excel import/export, Python macros, AI and database access are planned for the separate SheetBridge integration. Nothing in the .scraft file confers user permissions or executes code.
 
 Troubleshooting: If a workbook reference is rejected on import, use only a short opaque ID with no slashes, URL punctuation or control characters. If the preview is static, that is expected until a trusted SheetBridge provider is implemented.
+
+## Phase 10.2 — Contrast checking and button label layout
+The **Visual quality · contrast audit** checks text nodes, shared application-navigation labels (including selected items), and prototype button text using known theme or object colours. A finding shows the screen or Shared navigation, the object/item ID, contrast ratio and colour samples. Resolve findings by adjusting semantic colour tokens or object-level colours. The audit never changes saved design colours automatically.
+
+This is a conservative source/theme colour check, not a complete browser accessibility audit. Images, alpha compositing, gradients, third-party CSS, focus states, disabled controls and imported raster text still need manual verification. In particular, a **zero findings** result does not certify WCAG compliance.
+
+Long button labels now wrap within their authored prototype object instead of extending beyond its box; if content exceeds a very short button, it may scroll. Check object dimensions, font size and wording in desktop/tablet/mobile layouts. Preview and offline interactive HTML use the same shared prototype stylesheet.
+
+If a summary/KPI count differs from table records, inspect whether the KPI uses a fixed mock value, a different dataset, or a runtime query/filter. Do not replace a reported count until its actual binding and row definition are confirmed.
