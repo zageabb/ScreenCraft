@@ -45,11 +45,20 @@ test('phase 10 contrast audit handles missing navigation and remains non-mutatin
 
 test('phase 10 long prototype button labels are constrained in canvas and standalone stylesheet',async({page})=>{
  await page.goto('/');
- const css=await page.evaluate(async()=>{
-  const response=await fetch('/src/prototype-theme.css');
-  return response.text();
+ const computed=await page.evaluate(()=>{
+  const host=document.createElement('div');
+  host.className='canvas sc-theme';
+  const button=document.createElement('button');
+  button.className='prototype-button';
+  button.textContent='Very long sample button label which must wrap within the object';
+  host.append(button);
+  document.body.append(host);
+  const style=getComputedStyle(button);
+  const result={wrap:style.overflowWrap,whiteSpace:style.whiteSpace,boxSizing:style.boxSizing};
+  host.remove();
+  return result;
  });
- expect(css).toContain('Phase 10 acceptance: keep authored button labels');
- expect(css).toContain('overflow-wrap:anywhere');
- expect(css).toContain('.sc-theme .sc-node > button');
+ expect(computed.wrap).toBe('anywhere');
+ expect(computed.whiteSpace).toBe('normal');
+ expect(computed.boxSizing).toBe('border-box');
 });
