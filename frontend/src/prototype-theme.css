@@ -42,3 +42,28 @@
 .canvas.sc-theme .canvas-node[data-sc-border] > label > :is(input,select,textarea),
 .sc-theme .sc-node[data-sc-border] > :is(button,input,select,textarea,.sc-box,.sc-card,.sc-panel-container,.sc-accordion,.sc-record-detail,.sc-data-extension,.sc-local-menu,.sc-breadcrumbs,.sc-advanced-diagram,.sc-advanced-timeline,.sc-advanced-file-preview)
 {border:1px solid var(--sc-object-border)!important}
+
+/* Phase 10 acceptance: keep authored button labels inside their layout boxes.
+   Mirrors canvas and standalone .scraft HTML export rendering. */
+.canvas.sc-theme .prototype-button,
+.sc-theme .sc-node > button,
+.shared-preview-layout.sc-theme .shared-app-nav button,
+.sc-theme .sc-shared-nav button {
+ box-sizing:border-box;
+ max-width:100%;
+ min-width:0;
+ overflow-wrap:anywhere;
+ white-space:normal;
+}
+.canvas.sc-theme .prototype-button,
+.sc-theme .sc-node > button {
+ width:100%;
+ height:100%;
+ overflow:auto;
+}
+.shared-preview-layout.sc-theme .shared-app-nav button > span,
+.sc-theme .sc-shared-nav button > span {
+ min-width:0;
+ overflow-wrap:anywhere;
+ white-space:normal;
+}
