@@ -108,3 +108,13 @@ No runnable ScreenCraft application has been released.
 - Added independent show/hide controls for left and right editor panels, persistent local browser preferences, accessible button names and responsive canvas expansion.
 - Added browser regressions for theme switching, save payloads, panel persistence and real offline HTML colour parity.
 - Code committed on feature branch; build/CI and manual browser acceptance are separate gates.
+
+
+## Unreleased — x-spreadsheet proposal (2026-11-15)
+
+- Added specialist workbook design object `x-spreadsheet` from canonical Application-Standard catalogue v1.1.
+- Added safe React design-time preview and properties for workbook reference, presentation and permissions intent.
+- Added equivalent offline HTML export placeholder (no network access, formulas or runtime).
+- Added format validation and targeted tests.
+- Updated user manual; live Univer/SheetBridge engine explicitly deferred.
+- State: changes committed on feature branch; tests, CI, approval and merge require verification.

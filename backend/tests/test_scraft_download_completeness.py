@@ -1,4 +1,4 @@
-"""End-to-end .scraft archive completeness regression after the 39-object expansion."""
+"""End-to-end .scraft archive completeness regression after the 40-object catalogue."""
 from hashlib import sha256
 from io import BytesIO
 import json
@@ -27,7 +27,7 @@ def complete_document(doc, image_path, digest):
         (Path(__file__).resolve().parents[2] / "frontend/src/catalogue.snapshot.json").read_text()
     )
     types = [item["id"] for item in catalogue["objects"]]
-    assert len(types) == 39 and len(set(types)) == 39
+    assert len(types) == 40 and len(set(types)) == 40
 
     doc["name"] = "Complete .scraft round trip"
     doc["screens"][0]["name"] = "Overview"
@@ -156,7 +156,7 @@ def test_download_zip_contains_entire_saved_application_and_import_preserves_it(
     # Known canonical extensions must not be misreported as unsupported on import.
     warnings = validate_contract(manifest, restored, assets, verify_assets=True)
     assert not any("inactive placeholder" in warning for warning in warnings), warnings
-    assert len(restored["screens"][0]["nodes"]) == 41
+    assert len(restored["screens"][0]["nodes"]) == 42
     assert {node["type"] for node in restored["screens"][0]["nodes"] if node["id"].startswith("object-")} == set(types)
 
     # Import the exported bytes, not a reconstructed Python dictionary.

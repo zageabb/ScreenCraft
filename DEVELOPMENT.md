@@ -380,3 +380,16 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - **Issue #31:** Independently collapsible Screens/Object Gallery/Layers (left) and Inspector/Properties (right) editor panels. Both can be hidden simultaneously to give the canvas more room; state persists per browser in localStorage, not in shared .scraft files. Responsive layout uses a stacked arrangement on narrow viewports.
 - Automated regression added for panel toggle/persistence, palette-linked light/dark appearance, fixed overrides, save payloads and the real standalone HTML export. **Validation remains pending** a green frontend build, browser suite and manual responsive/accessibility acceptance; do not call the feature production-ready solely because the code is committed.
 - The prototype's *application navigation* and collapsible document containers are distinct from these editor-only side panels; no change to their saved structure is intended.
+
+
+## x-spreadsheet specialist component — 2026-11-15
+
+- Development branch: `feature/x-spreadsheet-object`.
+- Scope: import a centrally defined `x-spreadsheet` extension, add a safe editable design-time object (not cell editing), properties, mock preview, and offline HTML export parity. Live Univer and SheetBridge APIs remain separate future work.
+- Source of truth: `zageabb/Application-Standard/standards/screencraft/extended/x-spreadsheet.json`. Local catalogue snapshot is pinned to the canonical catalogue version 1.1.
+- Implemented on branch: palette/default model, React preview, inspector, mock worksheet appearance, exported static preview and conformance validation for safe workbook identifiers/modes/flags.
+- Test coverage added: Python conformance/round-trip tests, offline HTML test and Playwright exported HTML/no network test; prior fixed catalogue count updated to 40.
+- Test evidence: **NOT RUN** here; requires CI or local Node/Python environment. Do not mark implemented behaviour verified or merged until checks run.
+- Manual: `docs/USER_MANUAL.md` updated in the same change.
+- Known limitations: no actual Univer installed in ScreenCraft, no external workbook fetch, formula execution, persistence of live cells or XLSX conversion. No runtime provider credentials, scripts or network URL supplied by .scraft.
+- Acceptance checks pending: backend pytest, frontend TypeScript/build, Playwright desktop preview/export test, actual .scraft round-trip, latest GitHub Actions and merge.
