@@ -164,3 +164,34 @@ def test_invalid_scraft_preflight_cannot_replace_project(app):
     assert successful.json["revision"]==2
     assert any("x-custom" in x for x in successful.json["warnings"])
     assert c.get(f"/api/projects/{project}").json["document"]["screens"][0]["nodes"][0]["props"]["keep"]=="retained"
+
+def test_delete_project_requires_owner_confirmation_and_current_revision(app):
+    c=app.test_client()
+    assert c.delete("/api/projects/missing",json={"revision":1,"confirm_name":"Demo"}).status_code==401
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    pid=c.post("/api/projects",json={"name":"Demo"}).json["id"]
+    url="/api/projects/"+pid
+    assert c.delete(url,json={}).status_code==400
+    assert c.delete(url,json={"revision":1,"confirm_name":"Wrong"}).status_code==409
+    assert c.delete(url,json={"revision":0,"confirm_name":"Demo"}).status_code==409
+    assert c.get(url).status_code==200
+    assert c.delete(url,json={"revision":1,"confirm_name":"Demo"}).status_code==200
+    assert pid not in {p["id"] for p in c.get("/api/projects").json["projects"]}
+    assert c.delete(url,json={"revision":1,"confirm_name":"Demo"}).status_code==403
+
+
+def test_project_delete_denied_to_project_admin_and_designer(app):
+    from screencraft.store import User,Membership
+    from sqlalchemy.orm import Session
+    c=app.test_client()
+    c.post("/api/bootstrap",json={"setup_key":"test-setup-secret","username":"admin","password":"A-Very-Long-Password!"})
+    pid=c.post("/api/projects",json={"name":"Shared"}).json["id"]
+    c.post("/api/users",json={"username":"collaborator","password":"A-Very-Long-Password!"})
+    with Session(app.extensions["screencraft_engine"]) as db:
+        collaborator=db.query(User).filter(User.username=="collaborator").one()
+        db.add(Membership(project_id=pid,user_id=collaborator.id,role="admin"))
+        db.commit()
+    c.post("/api/logout")
+    assert c.post("/api/login",json={"username":"collaborator","password":"A-Very-Long-Password!"}).status_code==200
+    assert c.delete("/api/projects/"+pid,json={"revision":1,"confirm_name":"Shared"}).status_code==403
+    assert c.get("/api/projects/"+pid).status_code==200
