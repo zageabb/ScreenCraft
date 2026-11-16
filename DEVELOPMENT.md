@@ -393,3 +393,10 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Manual: `docs/USER_MANUAL.md` updated in the same change.
 - Known limitations: no actual Univer installed in ScreenCraft, no external workbook fetch, formula execution, persistence of live cells or XLSX conversion. No runtime provider credentials, scripts or network URL supplied by .scraft.
 - Acceptance checks pending: backend pytest, frontend TypeScript/build, Playwright desktop preview/export test, actual .scraft round-trip, latest GitHub Actions and merge.
+
+## Phase 10 — Project list deletion (2026-11-16, implementation pending verification)
+- Added **Delete** beside **Open** in the Applications list, displayed only to the project's original owner. Exact application name must be typed before confirmation; UI refreshes after success and reports errors.
+- Added authenticated `DELETE /api/projects/<project_id>` with current-revision and exact-name confirmation. Backend independently checks immutable `sc_projects.owner_id`, not membership role.
+- Store deletes the project, shared membership rows and preview sessions atomically, preserving PostgreSQL foreign key integrity. No schema changes required; deletion is permanent, with no restoration facility. User should export `.scraft` first.
+- Added backend API and store regression coverage for permission enforcement, wrong name, stale revision and dependent-row cleanup. CI and manual deployment acceptance are separate gates.
+- This is only ScreenCraft project deletion: no external GitHub/database operations. Ensure existing active Phase 10 work is not displaced.
