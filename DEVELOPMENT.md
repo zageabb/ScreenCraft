@@ -393,3 +393,10 @@ Branch `fix/dark-theme-token-parity-20261113`:
 - Manual: `docs/USER_MANUAL.md` updated in the same change.
 - Known limitations: no actual Univer installed in ScreenCraft, no external workbook fetch, formula execution, persistence of live cells or XLSX conversion. No runtime provider credentials, scripts or network URL supplied by .scraft.
 - Acceptance checks pending: backend pytest, frontend TypeScript/build, Playwright desktop preview/export test, actual .scraft round-trip, latest GitHub Actions and merge.
+
+## Phase 10.2 — Initial user-acceptance defect remediation (2026-11-16; proposed PR)
+- Initial operator testing of seven-screen TAIJU design, contrast audit and themes has **started**; this is not complete manual acceptance. Reported: unreadable light-mode sidebar text with zero audit findings, button labels overflowing backgrounds, and an 8-row KPI versus 7 sample table rows. Track evidence and remaining manual checks in Issue #35.
+- Root-cause gap confirmed in source: existing audit only visited nodes of type `text`, not `shared_navigation.items` or button controls. Extended non-destructive audit to include shared-nav normal/selected labels and button label colours, with browser regression.
+- Added scoped prototype button wrapping and size containment shared by editor canvas and offline HTML runtime. Long labels should wrap; visual/browser acceptance remains pending.
+- **Count discrepancy NOT DIAGNOSED:** summary might represent a different source/filter/fixture or a hard-coded KPI. No arbitrary data or count changes are made; identify source binding and expected row definition on a user-supplied, sanitised fixture before code correction.
+- Separate branch `fix/phase10-manual-acceptance-20261116`. Run TypeScript build, browser suite, Python tests and CI. Do not claim deployed or user accepted until the checks and live Ubuntu retest complete.
