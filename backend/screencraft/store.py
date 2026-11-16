@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from uuid import uuid4
-from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select, update, event
+from sqlalchemy import create_engine, String, Integer, ForeignKey, LargeBinary, Text, Boolean, select, update, delete, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 class Base(DeclarativeBase): pass
@@ -80,6 +80,27 @@ def update_project(engine, project_id, user_id, archive, expected_revision):
             raise ValueError("Revision conflict")
         db.commit()
         return expected_revision+1
+
+def delete_project(engine, project_id, actor_id, expected_revision, confirm_name):
+    """Irreversibly remove an owned project and its dependent rows, atomically.
+
+    Ownership is checked against sc_projects.owner_id, not an editable membership role.
+    A revision and exact project-name confirmation protect against accidental deletion
+    and against silently deleting a project that changed after listing.
+    """
+    with Session(engine) as db:
+        project=db.scalar(select(Project).where(Project.id==project_id).with_for_update())
+        if project is None or project.owner_id!=actor_id:
+            raise PermissionError("Project deletion denied")
+        if not isinstance(expected_revision,int) or isinstance(expected_revision,bool) or expected_revision!=project.revision:
+            raise ValueError("Revision conflict; refresh the project list")
+        if not isinstance(confirm_name,str) or confirm_name!=project.name:
+            raise ValueError("Project name confirmation does not match")
+        db.execute(delete(PrototypeSession).where(PrototypeSession.project_id==project_id))
+        db.execute(delete(Membership).where(Membership.project_id==project_id))
+        db.delete(project)
+        db.commit()
+
 
 def set_membership(engine, project_id, actor_id, user_id, role):
     if role not in ("owner","admin","designer","viewer"): raise ValueError("Invalid role")
