@@ -62,3 +62,15 @@ test('phase 10 long prototype button labels are constrained in canvas and standa
  expect(computed.whiteSpace).toBe('normal');
  expect(computed.boxSizing).toBe('border-box');
 });
+
+test('a dataset-bound DPPP row-count KPI reflects the seven fixture rows and subsequent additions',async({page})=>{
+ await page.goto('/');
+ const data=await page.evaluate(async()=>{
+  const {aggregate}=await import('/src/Metrics.tsx');
+  const rows=Array.from({length:7},(_,i)=>({'Work item / link ID':'demo-'+i}));
+  const count=aggregate(rows,'count','');
+  rows.push({'Work item / link ID':'demo-7'});
+  return {initial:count,afterAdd:aggregate(rows,'count','')};
+ });
+ expect(data).toEqual({initial:7,afterAdd:8});
+});
